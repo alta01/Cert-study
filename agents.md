@@ -1,12 +1,57 @@
 # Agents
 
-This document describes the AI agents used in the Cert-Study application. Each agent has a specific role in generating, validating, and enhancing study content for certification exams.
+AI agents in Cert Study span two paths: the **built-in local assistant** (implemented in `ai.js`, powered by Ollama) and the **Claude API agents** (implemented in `src/services/llm/` and `scripts/`, requiring an Anthropic API key).
+
+---
+
+## Built-in Local AI (Ollama)
+
+**File:** `ai.js`
+**Requires:** [Ollama](https://ollama.com) running locally at `http://localhost:11434`
+**API key:** none — fully offline
+
+The vanilla app ships with a sidebar AI panel containing two modes:
+
+### Chat Assistant
+
+A streaming conversational assistant. Maintains message history for the session and sends it with every request so the model has full context. Useful for asking questions about exam material, getting concept explanations, or working through why an answer is correct.
+
+**Endpoint:** `POST /api/chat` (Ollama)
+**Model:** any model installed in Ollama (user-selectable at runtime)
+
+### Exam Generator
+
+Accepts pasted study material and produces a complete exam JSON file in the app's flat schema format. Output can be loaded directly into the quiz engine or downloaded.
+
+**Prompt contract:** instructs the model to return valid JSON only (no markdown fences, no commentary) matching the schema below. Strips fences and extracts the JSON object if the model doesn't comply.
+
+**Output schema:**
+```json
+{
+  "exam": {
+    "code": "CODE", "name": "...", "passingScore": 700, "maxScore": 1000,
+    "domains": [{ "number": 1, "name": "...", "weight": "100%", "topics": ["..."] }]
+  },
+  "questions": [
+    {
+      "id": 1, "domain": 1, "domainName": "...", "topic": "...",
+      "question": "...",
+      "options": { "A": "...", "B": "...", "C": "...", "D": "..." },
+      "answer": "A",
+      "rationale": "...",
+      "optionRationales": { "A": "...", "B": "...", "C": "...", "D": "..." }
+    }
+  ]
+}
+```
+
+**Connection check:** pings `/api/tags` every 30 seconds to detect Ollama status; disables inputs and shows an offline indicator when not reachable.
 
 ---
 
 ## 1. Question Generator Agent
 
-**Purpose:** Generates multiple-choice exam questions for a given certification domain using an LLM (Claude or compatible model).
+**Purpose:** Generates multiple-choice exam questions for a given certification domain using the Claude API.
 
 **Inputs:**
 - Certification name (e.g., `AWS Solutions Architect – Associate`)
@@ -24,9 +69,12 @@ This document describes the AI agents used in the Cert-Study application. Each a
 - For `scenario-chain` style, generates a shared scenario paragraph followed by 2–5 related questions that build on each other (mimicking Microsoft exam format)
 - Validates output against the question schema before returning
 
-**Trigger:** Manual via `scripts/generate-questions.js`, via the Admin UI upload panel, or via API call from the app
+**Trigger:** `scripts/generate-questions.js`, the Admin UI upload panel, or API call from the React app
 
-**Model:** Claude (`claude-3-5-sonnet` by default; configurable via `VITE_LLM_MODEL` env var)
+**Model:** `claude-sonnet-4-6` (default); override via `VITE_LLM_MODEL` env var. Current model options:
+- `claude-opus-4-7` — highest quality, slower
+- `claude-sonnet-4-6` — balanced (recommended default)
+- `claude-haiku-4-5-20251001` — fastest, lowest cost
 
 ---
 
@@ -58,18 +106,18 @@ This document describes the AI agents used in the Cert-Study application. Each a
 **Purpose:** Enriches answer explanations with authoritative reference links so learners can verify claims and dig deeper.
 
 **Inputs:**
-- A question object (or batch of objects) that already has an explanation text
+- A question object (or batch) that already has an explanation
 - The certification vendor (e.g., AWS, Microsoft, CompTIA, Google Cloud)
 
 **Outputs:**
-- The same question objects with a populated `references` array containing `{ title, url }` objects pointing to official documentation or whitepapers
+- The same question objects with a populated `references` array: `[{ title, url }]`
 
 **Behavior:**
-- Queries a curated list of documentation base URLs per vendor (see `src/services/llm/referenceMap.js`)
-- Falls back to a general web search prompt when a specific link cannot be resolved
+- Queries curated documentation base URLs per vendor (`src/services/llm/referenceMap.js`)
+- Falls back to a general search prompt when a specific link can't be resolved
 - Never fabricates URLs; marks unresolved references as `{ title: "...", url: null, note: "manual verification required" }`
 
-**Trigger:** Runs automatically after the Question Generator Agent produces output, or can be run independently via `scripts/generate-questions.js --enrich-refs`
+**Trigger:** Runs automatically after Question Generator, or standalone via `scripts/generate-questions.js --enrich-refs`
 
 ---
 
@@ -81,43 +129,43 @@ This document describes the AI agents used in the Cert-Study application. Each a
 - Path to an `exam.json` or `questions.json` file
 
 **Outputs:**
-- A validation report (stdout or saved as `validation-report.json`)
-- A pass/fail status
+- A validation report (stdout or `validation-report.json`)
+- Pass/fail exit code
 
 **Checks performed:**
 - Schema validation against `data/schemas/question-schema.json`
-- Each question has at least 2 answer choices; multiple-answer questions have at least 2 correct answers marked
+- Each question has at least 2 answer choices; multi-answer questions have ≥ 2 correct answers
 - No duplicate question stems
-- All `references` entries that have a `url` field return HTTP 2xx (lightweight link check)
+- All `references` entries with a `url` return HTTP 2xx
 - Scenario-chain questions have consistent `scenarioId` grouping
 
-**Trigger:** `scripts/validate-exam.js <path-to-exam-or-questions-file>` or CI pipeline
+**Trigger:** `scripts/validate-exam.js <path>` or CI pipeline
 
 ---
 
 ## 5. Adaptive Difficulty Agent *(future)*
 
-**Purpose:** Tracks learner performance across practice sessions and adjusts the difficulty mix of subsequent question sets.
+**Purpose:** Tracks learner performance across sessions and adjusts the difficulty mix of subsequent question sets.
 
 **Inputs:**
-- Learner session history (stored in `localStorage` or a backend)
+- Learner session history (localStorage or backend)
 - Target exam and domain
 
 **Outputs:**
-- A weighted question pool configuration indicating how many questions to draw from each difficulty tier
+- Weighted question pool configuration (how many questions per difficulty tier)
 
 **Behavior:**
-- Increases proportion of harder questions when a learner consistently scores above 80% on a domain
+- Increases harder questions when a learner consistently scores above 80% on a domain
 - Surfaces weak-domain questions more frequently
-- Can recommend specific content sections to review based on wrong answers
+- Recommends specific content sections to review based on wrong answers
 
-**Trigger:** Automatically at the start of each practice session (when adaptive mode is enabled in settings)
+**Trigger:** Automatically at session start when adaptive mode is enabled
 
 ---
 
 ## Agent Communication Protocol
 
-All agents communicate via structured JSON messages. The shared message envelope is:
+All Claude API agents communicate via structured JSON messages:
 
 ```json
 {
@@ -125,16 +173,16 @@ All agents communicate via structured JSON messages. The shared message envelope
   "version": "1.0",
   "exam": "aws-saa-c03",
   "domain": "security",
-  "payload": { },
+  "payload": {},
   "metadata": {
-    "model": "claude-3-5-sonnet-20241022",
-    "timestamp": "2026-05-01T00:00:00Z",
+    "model": "claude-sonnet-4-6",
+    "timestamp": "2026-05-03T00:00:00Z",
     "requestedBy": "admin-ui"
   }
 }
 ```
 
-Agents read from and write to the `data/exams/` directory tree by convention. Inter-agent orchestration is handled by `src/services/llm/agentOrchestrator.js`.
+Agents read from and write to `data/exams/`. Orchestration is handled by `src/services/llm/agentOrchestrator.js`.
 
 ---
 
@@ -142,8 +190,11 @@ Agents read from and write to the `data/exams/` directory tree by convention. In
 
 | Variable | Description | Default |
 |---|---|---|
-| `VITE_ANTHROPIC_API_KEY` | API key for Claude (Anthropic) | *(required)* |
-| `VITE_LLM_MODEL` | LLM model identifier | `claude-3-5-sonnet-20241022` |
-| `VITE_LLM_BASE_URL` | Override base URL (for proxies or alternative providers) | Anthropic default |
+| `ANTHROPIC_API_KEY` | Claude API key (scripts) | *(required for CLI scripts)* |
+| `VITE_ANTHROPIC_API_KEY` | Claude API key (React app) | *(required for React app)* |
+| `VITE_LLM_MODEL` | Model ID for question generation | `claude-sonnet-4-6` |
+| `VITE_LLM_BASE_URL` | Override base URL (proxies / alternative providers) | Anthropic default |
 | `VITE_ENABLE_ADAPTIVE` | Enable Adaptive Difficulty Agent | `false` |
-| `VITE_DEFAULT_EXAM_MODE` | Default exam feedback mode (`immediate`, `end`) | `end` |
+| `VITE_DEFAULT_EXAM_MODE` | Default feedback mode (`immediate`, `end`) | `end` |
+
+The Ollama-based local AI in the vanilla app requires no environment variables — it auto-detects Ollama at `http://localhost:11434`.
