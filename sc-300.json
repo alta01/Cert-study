@@ -1,0 +1,679 @@
+{
+  "exam": {
+    "code": "SC-300",
+    "name": "Microsoft Identity and Access Administrator",
+    "passingScore": 700,
+    "maxScore": 1000,
+    "lastUpdated": "2025-05-03",
+    "notes": [
+      "Azure AD is now Microsoft Entra ID.",
+      "Azure AD Connect is now Microsoft Entra Connect.",
+      "Azure AD B2C is closed to new purchases as of May 1, 2025; the strategic CIAM product is Microsoft Entra External ID.",
+      "The September 30, 2025 deadline to migrate legacy MFA/SSPR settings into the unified Authentication methods policy has passed — all exam scenarios assume the unified policy.",
+      "Microsoft Entra ID Governance is a separate add-on (requires P1 or P2 base) and gates: entitlement management advanced features, multi-stage access reviews on inactive users, sponsor approvers, and Lifecycle Workflows."
+    ],
+    "domains": [
+      {
+        "number": 1,
+        "name": "Implement identities in Microsoft Entra ID",
+        "weight": "20-25%",
+        "topics": [
+          "Configure and manage a Microsoft Entra tenant",
+          "Create and manage identities (users, groups, devices, RBAC, administrative units)",
+          "Implement external identities (B2B collaboration, B2B direct connect, cross-tenant sync, External ID)",
+          "Implement hybrid identity (Connect, Cloud Sync, PHS, PTA, federation, Seamless SSO, password writeback)"
+        ]
+      },
+      {
+        "number": 2,
+        "name": "Implement authentication and access management",
+        "weight": "25-30%",
+        "topics": [
+          "Plan and manage user authentication (MFA, passwordless, SSPR, password protection, authentication strengths)",
+          "Conditional Access (assignments, controls, CAE, report-only, What If)",
+          "Microsoft Entra Identity Protection (risk types, policies, investigation)",
+          "Global Secure Access (Internet Access, Private Access)",
+          "Azure RBAC, managed identities, Key Vault"
+        ]
+      },
+      {
+        "number": 3,
+        "name": "Implement access management for applications",
+        "weight": "15-20%",
+        "topics": [
+          "App registrations vs enterprise applications (service principals)",
+          "Permissions, consent, and credentials (delegated, application, WIF)",
+          "SSO modes (SAML, OIDC, password-based, linked, header-based, IWA/KCD)",
+          "Application Proxy and Global Secure Access Private Access",
+          "Application security and monitoring (audit logs, workbooks, CA for workload identities)"
+        ]
+      },
+      {
+        "number": 4,
+        "name": "Plan and automate identity governance",
+        "weight": "20-25%",
+        "topics": [
+          "Entitlement management (access packages, catalogs, connected organizations, policies)",
+          "Access reviews (single-stage, multi-stage, auto-apply, recommendations)",
+          "Privileged Identity Management (eligible vs active, PIM for Groups, security alerts)",
+          "Lifecycle Workflows (joiner, mover, leaver templates)",
+          "Monitoring, logs, and workbooks (diagnostic settings, Log Analytics, Event Hub)"
+        ]
+      }
+    ],
+    "licenseQuickReference": {
+      "P1": "Conditional Access, dynamic groups, custom directory roles, AU-scoped admins, SSPR",
+      "P2": "Identity Protection (risk-based CA), PIM, basic access reviews",
+      "GovernanceStepUp": "Entitlement management (advanced), sponsor approvers, inactive-users reviews with recommendations, Lifecycle Workflows, multi-stage access reviews"
+    },
+    "keyDecisionHeuristics": [
+      "Match feature to license: P1 = CA/dynamic groups; P2 = Identity Protection/PIM/basic reviews; Governance = entitlement management, advanced reviews, Lifecycle Workflows.",
+      "Honor least privilege: prefer scoped roles, AUs, and PIM eligibility over standing tenant-wide assignments.",
+      "Pick the architecturally correct tool: Connect for device writeback and PTA; Cloud Sync for disconnected forests/active-active HA; App Proxy for HTTP; GSA Private Access for VPN replacement.",
+      "Always exclude break-glass accounts from CA policies and protect them with FIDO2 hardware keys.",
+      "Global Administrator does NOT by default have Azure resource access — 'Elevate access' (Properties) grants root-scope User Access Administrator."
+    ]
+  },
+  "questions": [
+    {
+      "id": 1,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Hybrid identity — authentication methods",
+      "question": "Contoso has 25,000 users in on-premises AD. Security forbids any password material — even hashes — being stored in the cloud, requires real-time enforcement of on-prem sign-in hours and disabled accounts, has no AD FS investment, and wants minimal on-premises infrastructure. Which authentication method should you recommend?",
+      "options": {
+        "A": "PHS with Seamless SSO",
+        "B": "Pass-Through Authentication with Seamless SSO",
+        "C": "Federation with AD FS",
+        "D": "Cloud Sync with PHS"
+      },
+      "answer": "B",
+      "rationale": "PTA validates credentials directly against on-prem AD via lightweight agents, stores no password material in Entra, and enforces real-time AD policy (sign-in hours, disabled accounts). Combined with Seamless SSO it provides desktop SSO. Three agents are recommended for HA; only outbound port 443 is needed. A stores hashes in the cloud and provides no real-time AD policy enforcement. C would meet the security requirement but contradicts 'minimize on-prem infrastructure' (ADFS farm + WAP + HA). D Cloud Sync supports only PHS, which violates both the no-hash and real-time-policy requirements."
+    },
+    {
+      "id": 2,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Hybrid identity — Connect vs Cloud Sync",
+      "question": "Litware has acquired two companies, each with a separate, disconnected AD forest with no trust. They want a single Entra tenant containing all identities, multiple active sync agents for HA, and minimal on-prem footprint. PHS is acceptable. What do you implement?",
+      "options": {
+        "A": "Entra Connect in staging mode in each forest",
+        "B": "Entra Cloud Sync with provisioning agents in each forest",
+        "C": "Entra Connect with multi-forest topology",
+        "D": "AD FS with multi-forest claims provider trusts"
+      },
+      "answer": "B",
+      "rationale": "Cloud Sync explicitly supports multiple disconnected forests and multiple active provisioning agents (true active/active HA) — Microsoft cites M&A as the primary use case. A: staging mode is active/passive HA, not active/active. C: Connect's multi-forest topology requires connectivity between all forests and a heavier on-prem footprint. D: AD FS is a federation/authentication system, not a sync product."
+    },
+    {
+      "id": 3,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Dynamic groups",
+      "question": "You need a dynamic security group containing only Member-type users in Germany or France whose department is 'Finance.' Which rule is correct?",
+      "options": {
+        "A": "(user.userType -eq \"Member\") -and (user.country -in [\"Germany\",\"France\"]) -and (user.department -eq \"Finance\")",
+        "B": "(user.userType = \"Member\") AND (user.country IN (\"Germany\",\"France\")) AND (user.department = \"Finance\")",
+        "C": "(user.userType -eq \"Member\") -and ((user.country -eq \"Germany\") -or (user.country -eq \"France\")) -and (user.department -eq \"Finance\")",
+        "D": "user.userType -eq \"Member\" -and user.country -contains \"Germany,France\" -and user.department -eq \"Finance\""
+      },
+      "answer": "C",
+      "rationale": "Dynamic rules use PowerShell-style dash operators with parentheses; the explicit -or form is universally accepted by the rule builder and is the canonical exam-safe answer. B uses SQL-style syntax (=, AND, IN) which is invalid. D misuses -contains (a collection operator) against a scalar string. A is technically valid in newer rule builder versions but C is safer on the exam."
+    },
+    {
+      "id": 4,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Administrative Units",
+      "question": "Fabrikam University's Engineering IT team needs to reset passwords only for the ~4,000 Engineering students and faculty, with no tenant-wide admin visibility. What is the best approach?",
+      "options": {
+        "A": "Helpdesk Administrator at tenant scope",
+        "B": "Create an Administrative Unit for Engineering and assign Helpdesk Administrator scoped to that AU",
+        "C": "Password Administrator at tenant scope",
+        "D": "Make them M365 group owners"
+      },
+      "answer": "B",
+      "rationale": "Administrative Units scope admin rights to a subset of users; an AU-scoped Helpdesk Administrator can reset passwords only for AU members (non-admins). A and C are over-privileged — they grant tenant-wide access. D: group ownership does not grant directory password-reset rights."
+    },
+    {
+      "id": 5,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "External identities — CIAM",
+      "question": "Northwind is launching a retail mobile app where customers self-sign-up via email or social IDPs (Google, Apple), with branded sign-in, MFA, and 5 million-user scale, separate from the employee directory. Which service should you use?",
+      "options": {
+        "A": "Workforce-tenant B2B collaboration",
+        "B": "Cross-tenant synchronization",
+        "C": "Microsoft Entra External ID (external tenant)",
+        "D": "New Azure AD B2C tenant"
+      },
+      "answer": "C",
+      "rationale": "Microsoft Entra External ID (external tenant) is Microsoft's GA CIAM solution with social login, native Conditional Access/MFA, and scale up to 50,000 free MAU. A: B2B is for known business partners, not consumer self-signup. B: cross-tenant sync is a multitenant-org feature. D: Azure AD B2C is closed to new purchases since May 1, 2025."
+    },
+    {
+      "id": 6,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Hybrid join troubleshooting",
+      "question": "A Windows 11 hybrid-joined laptop keeps prompting for SharePoint credentials. dsregcmd /status shows AzureAdJoined: NO, DomainJoined: YES, WorkplaceJoined: NO, and DRS Discovery Test fails. What is the most likely cause?",
+      "options": {
+        "A": "Entra ID license not assigned to the device",
+        "B": "Missing or misconfigured Service Connection Point (SCP) in on-prem AD",
+        "C": "User has not enrolled in MFA",
+        "D": "Conditional Access is blocking the device"
+      },
+      "answer": "B",
+      "rationale": "A failed DRS Discovery Test on a domain-joined device that is not AzureAdJoined points directly at the Service Connection Point (SCP) being missing or misconfigured in on-prem AD. Without the SCP the device cannot discover the Entra tenant to complete hybrid join. A: licensing does not gate device registration. C: MFA is unrelated to device registration. D: a CA block surfaces post-registration at sign-in, not as a DRS discovery failure."
+    },
+    {
+      "id": 7,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Custom directory roles",
+      "question": "Developers must update credentials on all app registrations they own but cannot create new apps or change tenant settings. Built-in roles are either too broad or too narrow. What is the best approach?",
+      "options": {
+        "A": "Application Administrator at tenant scope",
+        "B": "Cloud Application Administrator at tenant scope",
+        "C": "Custom role with microsoft.directory/applications/credentials/update at tenant scope",
+        "D": "Make them owners of every application"
+      },
+      "answer": "C",
+      "rationale": "Custom directory roles deliver least-privilege via granular permission strings and require P1. A and B both include create/delete/admin-consent permissions — far too broad. D does not scale to all registrations and grants owners many other rights beyond credential management."
+    },
+    {
+      "id": 8,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Cross-tenant synchronization",
+      "question": "Contoso (parent) wants to push employees as users to Fabrikam (subsidiary) automatically and silently, where they appear as internal members for unified people search. What do you configure?",
+      "options": {
+        "A": "Cross-tenant sync provisioning job at Contoso targeting Fabrikam, Fabrikam enables inbound sync and automatic redemption, mapping sets userType=Member",
+        "B": "Manual B2B invitations at Fabrikam with email verification disabled",
+        "C": "Entra Connect with connectivity to both tenants",
+        "D": "Microsoft Identity Manager (MIM)"
+      },
+      "answer": "A",
+      "rationale": "The source tenant (Contoso) runs the provisioning job; the target (Fabrikam) enables inbound sync; both tenants enable automatic redemption to suppress consent prompts; userType=Member supports the multitenant-org M365 experience (people cards, directory search). C: Connect cannot sync between two Entra tenants. D: MIM is on-prem and unsupported for this scenario. B: does not scale and creates Guest objects, not Members."
+    },
+    {
+      "id": 9,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Seamless SSO",
+      "question": "You enabled Seamless SSO via Connect and pushed a GPO adding https://autologon.microsoftazuread-sso.com to Trusted Sites. Domain-joined Windows 11 devices are still prompted on the corporate network. Why?",
+      "options": {
+        "A": "The Kerberos key on AZUREADSSOACC has not been rolled",
+        "B": "The URL must be in the Local Intranet zone, not Trusted Sites",
+        "C": "Devices must be Entra-joined (not just domain-joined) for Seamless SSO",
+        "D": "The AZUREADSSOACC computer account does not exist"
+      },
+      "answer": "B",
+      "rationale": "Microsoft documentation explicitly states that placing the autologon URL in Trusted Sites breaks silent Kerberos negotiation; it must be in the Local Intranet zone. A: the key does not need to be rolled for initial functionality. C: Seamless SSO is designed specifically for domain-joined (not Entra-joined) devices — Entra-joined devices use PRT-based SSO instead. D: Entra Connect creates the AZUREADSSOACC account automatically when Seamless SSO is enabled."
+    },
+    {
+      "id": 10,
+      "domain": 1,
+      "domainName": "Implement identities in Microsoft Entra ID",
+      "topic": "Connect vs Cloud Sync feature gap",
+      "question": "You run Entra Connect with device writeback (for AD FS claims) and want to migrate to Cloud Sync to gain HA and absorb a newly acquired disconnected forest. Can Cloud Sync fully replace Connect?",
+      "options": {
+        "A": "Yes — Cloud Sync supports all features including device writeback and PTA",
+        "B": "No — Cloud Sync supports neither device writeback nor PTA; keep Connect for the original forest and add Cloud Sync for the new forest side-by-side",
+        "C": "Yes, but you must federate first and then migrate",
+        "D": "Cloud Sync is only for Azure AD B2C scenarios"
+      },
+      "answer": "B",
+      "rationale": "Cloud Sync does not support device writeback, PTA, federation, Exchange hybrid writeback, or custom sync rules. Microsoft explicitly supports running Connect and Cloud Sync side-by-side in different domains/forests, making this the correct migration strategy. A is false — Cloud Sync's limitations are a core exam topic. C and D are incorrect."
+    },
+    {
+      "id": 11,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Authentication strengths — Conditional Access",
+      "question": "Contoso's CISO mandates that all Global Administrators use only phishing-resistant MFA, while other users may continue to use Authenticator push or SMS. What is the best approach?",
+      "options": {
+        "A": "Enable security defaults requiring FIDO2 for all users",
+        "B": "CA policy targeting Directory roles → Global Administrator, requiring the built-in Phishing-resistant MFA authentication strength",
+        "C": "Per-user MFA Enforced for admins plus tenant-wide SMS disable",
+        "D": "Enable the legacy 'Require MFA for admins' baseline policy"
+      },
+      "answer": "B",
+      "rationale": "The Phishing-resistant MFA authentication strength accepts only FIDO2, Windows Hello for Business, or CBA. Scoping the CA policy to the Global Administrator directory role cleanly limits the requirement without affecting other users. A: security defaults are tenant-wide and cannot be scoped by method. C: per-user MFA cannot enforce specific methods and SMS disable affects everyone. D: the legacy baseline was retired."
+    },
+    {
+      "id": 12,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Identity Protection — risk-based CA",
+      "question": "A user receives a High sign-in risk after a successful MFA prompt. The team wants ID Protection to handle these automatically — block at High, require MFA at Medium. What is the best configuration?",
+      "options": {
+        "A": "One CA policy combining sign-in risk High = Block AND user risk Medium = Require password change",
+        "B": "One CA policy: sign-in risk High+Medium = Require MFA and Require password change together",
+        "C": "CA policy on sign-in risk Medium+High requiring MFA via authentication strength, with break-glass excluded",
+        "D": "Enable both legacy Identity Protection risk policies (sign-in and user)"
+      },
+      "answer": "C",
+      "rationale": "Microsoft explicitly recommends migrating to CA-based risk policies and never combining sign-in risk and user risk in the same policy. Password change is the remediation for user risk (compromised credential), not for a single-session sign-in risk event. Excluding break-glass prevents lockout. D: legacy ID Protection policies are deprecated. A and B mix risk types and controls incorrectly."
+    },
+    {
+      "id": 13,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Conditional Access tools",
+      "question": "The help desk wants to prospectively simulate a sign-in for a Mac user against a CA policy without actually authenticating. Which tool is correct?",
+      "options": {
+        "A": "Sign-in logs filtered by the user",
+        "B": "Conditional Access What If tool",
+        "C": "CA Insights and Reporting workbook",
+        "D": "Policy impact view"
+      },
+      "answer": "B",
+      "rationale": "The What If tool is the only forward-simulation tool — it accepts hypothetical inputs (user, resource, platform, client app, location) and returns which policies would apply. A, C, and D are all retrospective views of past sign-ins."
+    },
+    {
+      "id": 14,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Identity Protection — leaked credentials and PHS dependency",
+      "question": "Contoso uses Entra Connect with PHS disabled (federated to AD FS). ID Protection flags a hybrid user with leaked credentials. The admin triggers a cloud password reset. What happens to the risk?",
+      "options": {
+        "A": "Fully remediated for both cloud and on-prem",
+        "B": "Remediated only for the cloud session; the on-prem credential remains at risk because PHS is disabled",
+        "C": "Leaked-credential detection does not apply to federated tenants",
+        "D": "The admin must enable password writeback first before any remediation is possible"
+      },
+      "answer": "B",
+      "rationale": "Without PHS, Entra ID cannot validate the new on-prem password hash against breach data or confirm the on-prem credential has changed. The cloud session risk is cleared but the on-prem credential may still be exposed. Leaked-credential detection works regardless of authentication method (it checks breach databases). PHS is required to confirm on-prem remediation, not just to detect it."
+    },
+    {
+      "id": 15,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Continuous Access Evaluation",
+      "question": "Users are prompted for MFA on every Outlook on the web visit. The admin wants prompts only on fresh sign-in but with near-real-time revocation when a password changes or an account is disabled. Which feature provides this?",
+      "options": {
+        "A": "Configurable Token Lifetime set to 90 days",
+        "B": "Continuous Access Evaluation (CAE)",
+        "C": "Persistent browser session set to Always",
+        "D": "Sign-in frequency set to Every time"
+      },
+      "answer": "B",
+      "rationale": "CAE issues long-lived tokens (up to 28 hours) to reduce prompt frequency, but resource providers (Exchange Online, SharePoint, Teams) can revoke them in near real-time (5–15 minutes) on critical events such as password change or account disable. A: Configurable Token Lifetime is not honored by CAE-aware sessions and the policy is retired for refresh tokens. C: persistent browser session controls cookie behavior, not server-side revocation. D: Every time is the opposite of what is needed."
+    },
+    {
+      "id": 16,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Conditional Access — filter for devices (PAW pattern)",
+      "question": "Privileged Access Workstations (PAWs) have extensionAttribute1 = 'SAW'. You want to allow access to Microsoft Azure Management only from these devices. Which CA design is correct?",
+      "options": {
+        "A": "Require compliant device on Microsoft Azure Management for all users",
+        "B": "Filter for devices in include mode (device.extensionAttribute1 -eq 'SAW'), grant Allow",
+        "C": "Filter for devices in exclude mode (device.extensionAttribute1 -ne 'SAW'), grant Block, plus a baseline Allow policy",
+        "D": "Add PAW IP addresses to a named trusted location"
+      },
+      "answer": "C",
+      "rationale": "Microsoft's documented PAW Conditional Access pattern uses exclude mode with the not-equals operator plus Block. This also catches unregistered devices whose extensionAttribute1 evaluates as null — they fail the exclusion and are blocked. B (include + equals) does not block unregistered devices because they have no attribute value to match. A does not specifically enforce PAW identity. D: IP-based trust can be spoofed and does not verify device identity."
+    },
+    {
+      "id": 17,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Managed identities",
+      "question": "A developer's Azure Function in two regions needs to read Key Vault secrets and write to Storage with no credentials in code, while minimizing role-assignment overhead. What is the best approach?",
+      "options": {
+        "A": "System-assigned managed identities on each Function with separate role assignments",
+        "B": "One user-assigned managed identity attached to both Functions, with role assignments done once",
+        "C": "Service principal with a client secret stored in Key Vault, referenced in app settings",
+        "D": "User credentials with MFA configured"
+      },
+      "answer": "B",
+      "rationale": "User-assigned managed identities are decoupled from resource lifecycle and can be attached to many resources, so role assignments need only be made once. Microsoft recommends user-assigned as the default for shared or pre-provisioned scenarios. A duplicates role assignments per resource. C has a chicken-and-egg bootstrap problem (credential needed to get credential). D: using user credentials for a background workload is an anti-pattern."
+    },
+    {
+      "id": 18,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Conditional Access — combined session and grant controls",
+      "question": "A new finance app must enforce: compliant or hybrid joined device; non-persistent browser session; reauthentication every 4 hours; break-glass account excluded. Which CA combination is correct?",
+      "options": {
+        "A": "Grant: Require approved client app; Session: Sign-in frequency 4 hours",
+        "B": "Grant: Require compliant device OR Require hybrid joined device; Session: Sign-in frequency 4 hours, Persistent browser session Never; exclude emergency account",
+        "C": "Grant: Block; Session: App enforced restrictions",
+        "D": "Grant: Require MFA only; Session: Defender for Cloud Apps Monitor only"
+      },
+      "answer": "B",
+      "rationale": "OR semantics between compliant and hybrid joined are supported. Sign-in frequency = 4 hours enforces reauthentication. Persistent browser = Never enforces non-persistent sessions. Always exclude break-glass accounts to prevent lockout. A: approved client app targets Intune-protected mobile apps, not the device join state. C: Block denies all access. D: does not satisfy device or session persistence requirements."
+    },
+    {
+      "id": 19,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Per-user MFA to CA MFA migration",
+      "question": "Migrating from per-user MFA to CA-based MFA. Which statement is true?",
+      "options": {
+        "A": "Disabling per-user MFA clears all registered MFA methods",
+        "B": "Per-user MFA and CA MFA can run in parallel without conflicts",
+        "C": "Disabling per-user MFA does NOT clear registered methods; Microsoft recommends disabling per-user MFA before enabling the CA policy",
+        "D": "CA-based MFA requires P2 for every licensed user"
+      },
+      "answer": "C",
+      "rationale": "Microsoft's documented switchFromPerUserMFA guidance states that registered methods remain on the user object when per-user MFA is disabled — they are attached to the user, not to the per-user setting. Running both simultaneously causes double-prompts and Intune onboarding failures. Therefore, disable per-user MFA first, then enable the CA policy. D: CA requires P1; P2 is only needed for risk-based signals in ID Protection."
+    },
+    {
+      "id": 20,
+      "domain": 2,
+      "domainName": "Implement authentication and access management",
+      "topic": "Azure RBAC — least privilege at resource scope",
+      "question": "Maya (Help Desk Operator) already has Entra directory rights to reset passwords. The Azure team wants her to start and stop VMs in resource group RG-Helpdesk-VMs but never delete them. What is the best approach?",
+      "options": {
+        "A": "Add her to Global Administrator",
+        "B": "Owner on the Azure subscription",
+        "C": "Virtual Machine Contributor at subscription scope",
+        "D": "Custom Azure role with Microsoft.Compute/virtualMachines/start/action and deallocate/action (plus read), scoped to RG-Helpdesk-VMs"
+      },
+      "answer": "D",
+      "rationale": "Least-privilege Azure RBAC at the smallest possible scope. Entra directory roles do not grant Azure resource access — Azure RBAC is required separately. A: Global Administrator is wildly over-privileged and still does not grant Azure access by default. B: Owner at subscription allows deletion and other destructive actions. C: Virtual Machine Contributor includes create and delete actions and is broader than needed."
+    },
+    {
+      "id": 21,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "Application permissions — daemon apps",
+      "question": "An internal HR analytics web app reads Microsoft Graph nightly with no signed-in user. How do you configure permissions?",
+      "options": {
+        "A": "Delegated User.Read.All and Mail.Read; user consents on first run",
+        "B": "Application User.Read.All and Mail.Read; Global Administrator grants tenant-wide admin consent",
+        "C": "Linked SSO on the Enterprise Application",
+        "D": "Password-based SSO with a shared service account"
+      },
+      "answer": "B",
+      "rationale": "Daemons use the client credentials flow, which requires application permissions (emitted in the roles claim). Application permissions always require admin consent and cannot be delegated to a user. A: delegated permissions require a signed-in user context. C: Linked SSO issues no token and cannot call APIs. D: Password SSO replays HTML form credentials, not Graph API tokens."
+    },
+    {
+      "id": 22,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "Admin Consent Workflow",
+      "question": "A vendor's multi-tenant SaaS requests Files.ReadWrite.All and Mail.Send. Users cannot consent. Policy is to allow user consent only for low-impact permissions from verified publishers, but you want to provide a self-service path for users. What do you implement?",
+      "options": {
+        "A": "Disable user consent entirely with no alternative",
+        "B": "Enable the Admin Consent Workflow with designated reviewers",
+        "C": "Add Files.ReadWrite.All and Mail.Send to the low-impact permission classifications",
+        "D": "Convert the vendor app to single-tenant inside your tenant"
+      },
+      "answer": "B",
+      "rationale": "The Admin Consent Workflow (only Global Admin can enable) lets users submit justification requests to designated reviewers, providing a controlled approval path without over-permissioning. A provides no self-service path. C would allow any user to consent to highly sensitive permissions tenant-wide — a major security risk. D: you cannot change another vendor's app registration."
+    },
+    {
+      "id": 23,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "Application Proxy — IWA/KCD",
+      "question": "An internal IIS intranet site uses Integrated Windows Authentication against on-prem AD. Remote Mac and iOS users need access without a VPN; CA must enforce MFA and compliant device. What is the best approach?",
+      "options": {
+        "A": "Application Proxy with Pre-authentication = Microsoft Entra ID and KCD SSO",
+        "B": "Application Proxy with Pre-authentication = Passthrough",
+        "C": "Password-based SSO",
+        "D": "Linked SSO requiring users to be on the corporate network"
+      },
+      "answer": "A",
+      "rationale": "Pre-authentication set to Microsoft Entra ID ensures Entra enforces CA (MFA + compliant device) before the connector forwards the request. KCD (S4U2Self/S4U2Proxy with 'Use any authentication protocol') provides Kerberos SSO to the IIS site without requiring Kerberos on the client device. B: Passthrough skips Entra pre-auth entirely, bypassing CA. C: Password SSO is for HTML-forms apps. D: Linked SSO does not proxy traffic."
+    },
+    {
+      "id": 24,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "App management policies — credential restrictions",
+      "question": "You want to block new client secrets on app registrations created after January 1, 2026, while preserving existing secrets and allowing one legacy app as an exception. How do you configure this?",
+      "options": {
+        "A": "Disable user app registration via User settings",
+        "B": "Default tenant app management policy restricting passwordAddition with restrictForAppsCreatedAfterDateTime = 2026-01-01, plus a custom per-app policy on the legacy app explicitly allowing it",
+        "C": "CA policy blocking password-based authentication for apps",
+        "D": "Set 'Users can register applications = No' in User settings"
+      },
+      "answer": "B",
+      "rationale": "App management policies are purpose-built for credential-type restrictions with prospective scoping (restrictForAppsCreatedAfterDateTime) and per-app exceptions. A and D restrict who can register apps, not what credential types are allowed on existing registrations. C: CA policies control sign-in, not app registration credential management."
+    },
+    {
+      "id": 25,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "Workload identity federation",
+      "question": "GitHub Actions must deploy to Azure without any stored secrets. What is the best approach?",
+      "options": {
+        "A": "Long-lived client secret stored in GitHub Secrets, manually rotated quarterly",
+        "B": "Federated identity credential on the app registration trusting GitHub OIDC, subject = repo/branch, audience = api://AzureADTokenExchange",
+        "C": "System-assigned managed identity on a GitHub-hosted runner",
+        "D": "Self-signed certificate stored in GitHub Secrets"
+      },
+      "answer": "B",
+      "rationale": "Workload Identity Federation (WIF) eliminates stored secrets by using OIDC token exchange. The GitHub OIDC token is presented to Entra, which validates it against the federated credential trust configuration (repo + branch in the subject claim, api://AzureADTokenExchange audience) and returns a short-lived access token. A is the anti-pattern WIF replaces. C: managed identities work only for Azure-hosted compute resources, not GitHub-hosted runners. D still requires the certificate to be stored and rotated."
+    },
+    {
+      "id": 26,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "CA for workload identities",
+      "question": "A finance batch service principal has had its client secret leaked. ID Protection flags it at High risk. You need an automated control to block future sign-ins for that SP only. What do you configure?",
+      "options": {
+        "A": "Disable the entire app registration",
+        "B": "Conditional Access for Workload Identities targeting that SP with Service principal risk = High and Block (requires Workload ID Premium license)",
+        "C": "User-targeted CA policy requiring MFA from the SP owner",
+        "D": "Add the SP to a managed identity exclusion group"
+      },
+      "answer": "B",
+      "rationale": "Conditional Access for Workload Identities supports single-tenant service principals with risk-based blocking and near-real-time enforcement via CAE. Workload ID Premium ($3/identity/month) is required. A: disabling the app registration is broader than necessary and blocks all tenants. C: SPs cannot perform MFA — this control is only for human sign-ins. D: managed identities are separate from service principals and exclusion groups do not block sign-ins."
+    },
+    {
+      "id": 27,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "SAML SSO configuration",
+      "question": "You need to configure SSO with Salesforce from the gallery so users sign in with corporate credentials (CA and MFA enforced) and receive custom attributes (department, employee ID) in the SAML assertion. What do you configure?",
+      "options": {
+        "A": "Password-based SSO",
+        "B": "SAML SSO with Identifier/Reply URL configured, custom Attributes & Claims mapped, certificate metadata exported to Salesforce, and users/groups assigned",
+        "C": "Linked SSO pointing to the Salesforce login page",
+        "D": "Application Proxy with pre-authentication for Salesforce"
+      },
+      "answer": "B",
+      "rationale": "SAML 2.0 SSO is the correct mode for Salesforce; the Attributes & Claims blade maps directory attributes (department, employeeId) into the assertion; CA targets the Salesforce service principal for MFA enforcement. A: password SSO replays form credentials and cannot carry custom claims. C: Linked SSO issues no SAML assertion and no CA/MFA enforcement. D: App Proxy is for on-prem HTTP apps, not cloud SaaS."
+    },
+    {
+      "id": 28,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "Claims mapping policy",
+      "question": "A developer added an optional 'groups' claim and a claims mapping policy, but the customized claims do not appear in the token. What is the most likely cause?",
+      "options": {
+        "A": "The user has not consented to the application",
+        "B": "acceptMappedClaims=true is not set on the application manifest and no custom signing key is configured on the service principal",
+        "C": "Claims mapping policies only work with SAML tokens, not JWTs",
+        "D": "The app is registered as single-tenant, which blocks claims mapping"
+      },
+      "answer": "B",
+      "rationale": "Claims mapping requires explicit acknowledgement via acceptMappedClaims=true on the app manifest (requires a verified domain as App ID URI) OR a custom signing key on the service principal — these are anti-spoofing safeguards to prevent unauthorized tenants from including arbitrary claims. A: consent is unrelated to claims mapping. C: claims mapping works for both SAML and JWT tokens. D: single vs multi-tenant does not break claims mapping (though acceptMappedClaims should not be used on multi-tenant apps)."
+    },
+    {
+      "id": 29,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "GSA Private Access — VPN replacement",
+      "question": "You need to replace a legacy VPN. Users from anywhere need to reach on-prem SQL Server (TCP 1433), SMB shares (TCP 445), and RDP (TCP 3389). CA must require a compliant device. What is the best approach?",
+      "options": {
+        "A": "Extend Application Proxy to publish SQL, SMB, and RDP endpoints",
+        "B": "Microsoft Entra Private Access (GSA) with app segments for the relevant IPs/ports, GSA client deployed, CA requiring compliant device",
+        "C": "Linked SSO tiles for each service",
+        "D": "Header-based SSO with a third-party reverse proxy"
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra Private Access is Microsoft's ZTNA solution supporting any TCP/UDP port over the same private network connector infrastructure. It supports Conditional Access (compliant device) via app segment policies and the GSA client. A: Application Proxy only supports HTTP/HTTPS — not SQL, SMB, or RDP. C and D: neither can tunnel non-HTTP protocols."
+    },
+    {
+      "id": 30,
+      "domain": 3,
+      "domainName": "Implement access management for applications",
+      "topic": "Audit logs — consent investigation",
+      "question": "You need to investigate which apps users consented to over the last 30 days, including potential phishing-style illicit consent grants. Where do you look?",
+      "options": {
+        "A": "Service principal sign-in logs filtered by IP address",
+        "B": "Audit logs → Category: ApplicationManagement → Activity: Consent to application / Add delegated permission grant",
+        "C": "Risky users report in Identity Protection",
+        "D": "Provisioning logs"
+      },
+      "answer": "B",
+      "rationale": "OAuth consent grants are recorded as audit events under the ApplicationManagement category, capturing who consented, to which app, and which permissions were granted — essential for investigating illicit consent grant attacks. A: sign-in logs show authentication events, not consent grants. C: ID Protection risky users relates to compromised identity risk, not OAuth consent. D: provisioning logs cover SCIM-based attribute synchronization."
+    },
+    {
+      "id": 31,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "PIM — eligible assignments with activation requirements",
+      "question": "Contoso wants 30 employees who occasionally need User Administrator privileges to have no standing rights, require MFA on every elevation, require manager approval, and have a maximum 4-hour activation window. What is the best PIM setup?",
+      "options": {
+        "A": "Permanent active User Administrator assignment with CA-required MFA at sign-in",
+        "B": "Eligible User Administrator assignment with role settings: Require MFA on activation, Require approval, Max activation duration 4 hours",
+        "C": "Active time-bound assignment renewed every 4 hours daily",
+        "D": "Eligible Global Administrator assignment with approval required"
+      },
+      "answer": "B",
+      "rationale": "Eligible + JIT activation with configured requirements is the correct PIM pattern for zero standing privilege. User Administrator is the least-privileged role that satisfies the use case. A and C retain standing privileges. D violates least privilege by using Global Administrator instead of User Administrator."
+    },
+    {
+      "id": 32,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "Entitlement management — external users, connected organizations",
+      "question": "200 partners from 5 vendor firms cycle in and out of a 12-month marketing project; email addresses are not known in advance; access should auto-expire every 90 days. What is the best approach?",
+      "options": {
+        "A": "Bulk B2B-invite all known partners and add them to an M365 group manually",
+        "B": "Cross-tenant synchronization from each vendor tenant",
+        "C": "Entitlement management access package in a catalog with 5 connected organizations, self-service request policy, 90-day assignment expiration, and recurring access reviews",
+        "D": "Self-service group join with no expiration"
+      },
+      "answer": "C",
+      "rationale": "Connected organizations let external users self-request access without you knowing their email addresses in advance. The 90-day expiration and recurring access reviews provide automated lifecycle governance with an audit trail. A does not scale and lacks lifecycle management. B: cross-tenant sync provisions known users from managed tenants, not open self-service. D: lacks expiration and formal review governance."
+    },
+    {
+      "id": 33,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "Access reviews — guest cleanup",
+      "question": "You have 4,000 guests; many have not signed in for 6 months. You need a recurring control to recertify access across all M365 groups quarterly with automatic cleanup when reviewers do not respond. What do you configure?",
+      "options": {
+        "A": "PowerShell script to delete guests inactive for 180 days on a schedule",
+        "B": "CA policy blocking guest sign-ins after 180 days of inactivity",
+        "C": "Access review on M365 groups containing guests, group-owner as reviewer, quarterly recurrence, Remove access on no response, auto-apply enabled, take recommendations",
+        "D": "Lifecycle Workflow Delete user task scoped to userType = Guest, scheduled quarterly"
+      },
+      "answer": "C",
+      "rationale": "Built-in access reviews provide an attestation audit trail, quarterly recurrence, system recommendations (based on 30-day inactivity), and automatic removal when reviewers do not respond. A: bypasses governance and produces no audit trail. B: blocks sign-in but does not recertify or remove access, and does not delete accounts. D: Lifecycle Workflows are designed for joiner/mover/leaver automation, not recurring reviewer-attested governance of existing access."
+    },
+    {
+      "id": 34,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "Entitlement management — multi-stage approval",
+      "question": "A SOX-compliant access package requires: requestor justification, manager approves first, then the application owner approves second, with auto-deny on timeout. How do you configure this?",
+      "options": {
+        "A": "Single-stage approval with manager OR app owner as alternatives",
+        "B": "Two-stage approval: Stage 1 = Manager (with fallback approver), Stage 2 = specific application owners; require justification; decision deadline configured to auto-deny on timeout",
+        "C": "Lifecycle Workflow with two sequential approval tasks",
+        "D": "Multi-stage access review with manager and app owner as reviewers"
+      },
+      "answer": "B",
+      "rationale": "Entitlement management supports up to 3 sequential approval stages per policy. Stage 1 uses the requestor's manager (with a fallback approver in case no manager is set); Stage 2 uses designated app owners. Justification is a policy toggle; decision deadlines can be configured to auto-deny. A does not sequence approvals. C: Lifecycle Workflows automate JML tasks, not access-request approvals. D: access reviews recertify existing access, not initial grant requests."
+    },
+    {
+      "id": 35,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "PIM — Azure resource roles at resource scope",
+      "question": "A vendor needs Storage Blob Data Contributor on one specific storage account, JIT only, with manager approval and MFA required on activation. No standing privileges. What do you configure?",
+      "options": {
+        "A": "Permanent group assignment of Storage Blob Data Contributor on the storage account",
+        "B": "PIM Azure resource — Eligible Storage Blob Data Contributor scoped to the storage account; role settings: require MFA, require justification, require approval; max activation 8 hours",
+        "C": "Eligible Owner at subscription scope",
+        "D": "Active permanent assignment at resource group scope"
+      },
+      "answer": "B",
+      "rationale": "PIM Azure resource roles can be scoped down to a single resource (not just subscription or RG), providing JIT access with the least-privileged role and requiring MFA, justification, and approval on activation. A and D create standing privileges. C: Owner at subscription scope violates least privilege significantly."
+    },
+    {
+      "id": 36,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "Lifecycle Workflows — leaver automation",
+      "question": "When HR sets employeeLeaveDateTime, you need to: immediately disable the account, remove all group/Teams memberships, revoke sessions, remove licenses — and delete the account 30 days later. What do you build?",
+      "options": {
+        "A": "Two access reviews targeting the user",
+        "B": "An Onboard new-hire Lifecycle Workflow",
+        "C": "Two Lifecycle Workflows: a real-time leaver template (immediate tasks) plus a scheduled post-offboard workflow with the Delete user task triggered 30 days after employeeLeaveDateTime",
+        "D": "A custom Logic App that calls the Graph API to delete the account immediately on an HR webhook"
+      },
+      "answer": "C",
+      "rationale": "Lifecycle Workflows have dedicated real-time leaver and post-offboard templates that natively model the two-phase JML requirement. The 30-day delay is expressed as an attribute-relative schedule. A: access reviews are for recertification, not deprovisioning. B: wrong category — this is a leaver scenario. D: a custom Logic App loses the built-in audit history, native task library, and the required 30-day retention period."
+    },
+    {
+      "id": 37,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "Diagnostic settings — archive and SIEM streaming",
+      "question": "Compliance requires Entra sign-in and audit logs retained for 7 years. The SOC needs near-real-time streaming to Splunk. What is the most cost-effective combination?",
+      "options": {
+        "A": "Log Analytics workspace with a 7-year retention policy",
+        "B": "Two diagnostic settings: one to a Storage Account (immutable, 7-year lifecycle policy) and one to an Event Hub (consumed by Splunk via the Splunk add-on)",
+        "C": "Event Hub only; configure Splunk to archive to its own storage",
+        "D": "Storage Account only; configure Splunk to poll blob storage"
+      },
+      "answer": "B",
+      "rationale": "Entra supports up to 5 diagnostic settings per resource, allowing fan-out. Azure Storage is the lowest-cost archive option and supports immutable blob policies for regulatory retention. Event Hub is the canonical real-time SIEM ingestion path (Splunk, QRadar, ArcSight, Sumo Logic all support it natively). A: Log Analytics at 7-year retention is significantly more expensive than blob storage. C: Splunk archive is not typically a regulator-accepted immutable archive. D: blob polling introduces latency and is not near-real-time."
+    },
+    {
+      "id": 38,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "License requirements",
+      "question": "Your deployment requires: Conditional Access, PIM with approval and MFA on activation, entitlement management with connected organizations, and Lifecycle Workflows. What is the minimum per-user license?",
+      "options": {
+        "A": "Microsoft Entra ID P1 for everyone",
+        "B": "Microsoft Entra ID P2 for everyone",
+        "C": "Microsoft Entra ID P2 plus Microsoft Entra ID Governance Step-Up for users using these features",
+        "D": "Microsoft 365 E3 for everyone"
+      },
+      "answer": "C",
+      "rationale": "CA requires P1. PIM and basic access reviews require P2. Entitlement management (connected organizations), Lifecycle Workflows, and advanced access reviews require the Microsoft Entra ID Governance add-on (Step-Up layers Governance on a P2 base). A: lacks PIM, reviews, entitlement management, and Lifecycle Workflows. B: lacks Lifecycle Workflows and advanced entitlement management features. D: Microsoft 365 E3 only bundles Entra ID P1."
+    },
+    {
+      "id": 39,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "PIM security alerts",
+      "question": "Your tenant has 18 Global Administrators. Security wants automatic alerts when: there are too many GAs, admin roles are assigned outside PIM, and role activations do not require MFA. Which built-in feature provides this?",
+      "options": {
+        "A": "Microsoft Defender for Identity alerts",
+        "B": "Conditional Access named-location alerts",
+        "C": "PIM → Microsoft Entra roles → Alerts (configure thresholds; enable 'Roles being assigned outside PIM' and 'Roles don't require MFA for activation')",
+        "D": "Microsoft Sentinel KQL analytics rule on Entra audit logs"
+      },
+      "answer": "C",
+      "rationale": "PIM ships built-in security alerts for exactly these scenarios: too many Global Admins (configurable threshold), roles assigned outside PIM, and roles that don't require MFA on activation. Alerts appear on the PIM Alerts page and can be emailed to Privileged Role Administrators, Security Administrators, and Global Administrators. A: Defender for Identity focuses on on-prem AD and lateral movement threats. B: CA named locations do not produce PIM hygiene alerts. D: Sentinel via KQL is also valid but requires custom rule authoring — PIM built-in alerts are the correct built-in answer."
+    },
+    {
+      "id": 40,
+      "domain": 4,
+      "domainName": "Plan and automate identity governance",
+      "topic": "Multi-stage access reviews",
+      "question": "You need a multi-stage guest recertification: Stage 1 self-review, Stage 2 manager reviews only users who self-attested they still need access, Stage 3 resource owner final decision. What is the correct solution and required license?",
+      "options": {
+        "A": "Three separate single-stage access reviews chained manually; requires P2",
+        "B": "One multi-stage access review (self → manager → resource owner stages with conditional progression); requires Microsoft Entra ID Governance",
+        "C": "Entitlement management 3-stage approval policy on an access package; requires P2",
+        "D": "Three Lifecycle Workflow stages with approval tasks; requires P2"
+      },
+      "answer": "B",
+      "rationale": "Multi-stage access reviews support up to 3 sequential reviewer stages where later decisions can be conditioned on prior decisions (e.g., only escalate users who said they still need access). This advanced feature requires Microsoft Entra ID Governance. A: three separate reviews lose conditional progression between stages. C: entitlement management policies gate new access requests, not recertification of existing access. D: Lifecycle Workflows do not have reviewer/decision semantics for access certifications."
+    }
+  ]
+}
