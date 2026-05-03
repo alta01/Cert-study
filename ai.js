@@ -2,6 +2,16 @@
 
 const OLLAMA_BASE = 'http://localhost:11434';
 
+const SYSTEM_PROMPT =
+  'You are a study assistant for the Cert Study app. ' +
+  'Help users understand exam topics, explain concepts, and discuss practice questions. ' +
+  'Do not execute code, perform system actions, access files, browse the web, or assist ' +
+  'with anything outside educational study content. ' +
+  'If asked to do something outside this scope, politely decline and redirect to study topics.';
+
+// Preferred model order shown first in the selector (most safety-focused first)
+const PREFERRED_MODELS = ['gemma4', 'phi4-mini', 'phi4', 'gemma3', 'llama3.2', 'llama3', 'mistral'];
+
 const AI = (() => {
   let _models = [];
   let _ready = false;
@@ -40,9 +50,15 @@ const AI = (() => {
   function populateModelSelect() {
     const sel = document.getElementById('ai-model-select');
     if (!sel) return;
-    sel.innerHTML = _models.length
-      ? _models.map(m => `<option value="${m}">${m}</option>`).join('')
-      : '<option value="">No models found</option>';
+    if (!_models.length) { sel.innerHTML = '<option value="">No models found</option>'; return; }
+    const sorted = [..._models].sort((a, b) => {
+      const scoreA = PREFERRED_MODELS.findIndex(p => a.startsWith(p));
+      const scoreB = PREFERRED_MODELS.findIndex(p => b.startsWith(p));
+      const sa = scoreA === -1 ? PREFERRED_MODELS.length : scoreA;
+      const sb = scoreB === -1 ? PREFERRED_MODELS.length : scoreB;
+      return sa !== sb ? sa - sb : a.localeCompare(b);
+    });
+    sel.innerHTML = sorted.map(m => `<option value="${m}">${m}</option>`).join('');
   }
 
   function enableInputs() {
@@ -77,6 +93,7 @@ const AI = (() => {
         signal: _abortController.signal,
         body: JSON.stringify({
           model: selectedModel(),
+          system: SYSTEM_PROMPT,
           messages,
           stream: true,
         }),
@@ -168,17 +185,41 @@ ${sourceText.slice(0, 12000)}
   }
 
   function parseGeneratedJSON(raw) {
-    // Strip markdown code fences if present
     let text = raw.trim();
     text = text.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '').trim();
-    // Find the first { and last }
     const start = text.indexOf('{');
     const end   = text.lastIndexOf('}');
     if (start === -1 || end === -1) throw new Error('No JSON object found in response');
     return JSON.parse(text.slice(start, end + 1));
   }
 
-  return { checkConnection, streamChat, generateExamQuestions, parseGeneratedJSON, isReady: () => _ready };
+  // Strip anything that doesn't belong in a safe exam object
+  function sanitizeGeneratedExam(exam) {
+    const VALID_KEYS = new Set(['A', 'B', 'C', 'D']);
+    (exam.questions || []).forEach((q, i) => {
+      // Enforce integer id
+      q.id = typeof q.id === 'number' ? Math.floor(q.id) : i + 1;
+      // Enforce numeric domain
+      q.domain = typeof q.domain === 'number' ? Math.floor(q.domain) : 1;
+      // Strip unexpected option keys
+      if (q.options && typeof q.options === 'object') {
+        for (const k of Object.keys(q.options)) {
+          if (!VALID_KEYS.has(k)) delete q.options[k];
+        }
+      }
+      // Ensure answer references a valid key
+      if (!VALID_KEYS.has(q.answer)) q.answer = Object.keys(q.options || {})[0] || 'A';
+      // Strip unexpected optionRationale keys
+      if (q.optionRationales && typeof q.optionRationales === 'object') {
+        for (const k of Object.keys(q.optionRationales)) {
+          if (!VALID_KEYS.has(k)) delete q.optionRationales[k];
+        }
+      }
+    });
+    return exam;
+  }
+
+  return { checkConnection, streamChat, generateExamQuestions, parseGeneratedJSON, sanitizeGeneratedExam, isReady: () => _ready };
 })();
 
 // ── UI wiring ──────────────────────────────────────────────────
@@ -265,7 +306,7 @@ function initAIPanel() {
         { examName: name, examCode: code || name.replace(/\s+/g, '-').toUpperCase().slice(0, 10), sourceText: source, count },
         (partial) => { genPreview.textContent = partial.slice(0, 800) + (partial.length > 800 ? '…' : ''); }
       );
-      _generatedExam = AI.parseGeneratedJSON(raw);
+      _generatedExam = AI.sanitizeGeneratedExam(AI.parseGeneratedJSON(raw));
       genPreview.textContent = JSON.stringify(_generatedExam, null, 2);
       genOutput.classList.remove('hidden');
       genStatus.textContent = `Generated ${_generatedExam.questions?.length || 0} questions.`;

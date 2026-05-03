@@ -90,10 +90,15 @@ function renderHome() {
         <div class="exam-card-title">${esc(exam.exam.name)}</div>
         <div class="exam-card-meta">${qCount} questions · ${domains} domain${domains !== 1 ? 's' : ''} · Pass ${exam.exam.passingScore}/${exam.exam.maxScore}</div>
         <div class="exam-card-actions">
-          <button class="btn-primary" onclick="openSetup(${i})">Study →</button>
+          <button class="btn-primary" data-exam-idx="${i}">Study →</button>
         </div>
       </div>`;
   }).join('');
+
+  grid.addEventListener('click', e => {
+    const btn = e.target.closest('[data-exam-idx]');
+    if (btn) openSetup(parseInt(btn.dataset.examIdx, 10));
+  }, { once: true });
 }
 
 window.openSetup = function(examIdx) {
@@ -179,9 +184,9 @@ function renderQuestion() {
 
   const optWrap = document.getElementById('q-options');
   optWrap.innerHTML = Object.entries(q.options).map(([k, v]) => `
-    <label class="opt-label" data-key="${k}">
-      <input type="radio" name="q-ans" value="${k}" />
-      <span class="opt-key">${k}</span>
+    <label class="opt-label" data-key="${esc(k)}">
+      <input type="radio" name="q-ans" value="${esc(k)}" />
+      <span class="opt-key">${esc(k)}</span>
       <span class="opt-text">${esc(v)}</span>
     </label>`).join('');
 
@@ -235,7 +240,7 @@ function showExplanation(q, selected, isCorrect) {
   banner.className = isCorrect ? 'correct' : 'incorrect';
   banner.textContent = isCorrect
     ? '✓ Correct'
-    : `✗ Incorrect — correct answer: ${q.answer}`;
+    : `✗ Incorrect — correct answer: ${esc(q.answer)}`;
 
   if (q.optionRationales) {
     body.innerHTML = Object.entries(q.options).map(([k, text]) => {
@@ -243,7 +248,7 @@ function showExplanation(q, selected, isCorrect) {
       const rat   = q.optionRationales[k] || '';
       return `
         <div class="exp-option ${isAns ? 'exp-correct' : 'exp-wrong'}">
-          <strong>${k}. ${esc(text)}</strong>
+          <strong>${esc(k)}. ${esc(text)}</strong>
           ${rat ? `<p>${esc(rat)}</p>` : ''}
         </div>`;
     }).join('');
@@ -305,8 +310,8 @@ function showResults() {
       return `
         <div class="wrong-item">
           <p><strong>Q${q.id}.</strong> ${esc(q.question)}</p>
-          <p class="wrong-answer">You chose: ${userAns} — ${esc(q.options[userAns])}</p>
-          <p class="correct-answer">Correct: ${q.answer} — ${esc(q.options[q.answer])}</p>
+          <p class="wrong-answer">You chose: ${esc(userAns)} — ${esc(q.options[userAns])}</p>
+          <p class="correct-answer">Correct: ${esc(q.answer)} — ${esc(q.options[q.answer])}</p>
         </div>`;
     }).join('');
     wrongPanel.classList.remove('hidden');
