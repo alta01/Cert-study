@@ -1,79 +1,63 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://certstudy.app/schemas/question",
-  "title": "Question",
-  "description": "A single multiple-choice exam question",
+  "title": "Cert Study Question",
+  "description": "Schema for a single question in the app's flat exam JSON format.",
   "type": "object",
-  "required": ["id", "stem", "choices", "correctAnswers"],
+  "required": ["id", "domain", "domainName", "question", "options", "answer"],
   "properties": {
     "id": {
-      "type": "string",
-      "description": "Unique identifier for this question"
-    },
-    "stem": {
-      "type": "string",
-      "description": "The question text displayed to the learner"
-    },
-    "scenario": {
-      "type": ["string", "null"],
-      "description": "Shared scenario paragraph shown above the question stem (used in scenario-chain style)"
-    },
-    "scenarioId": {
-      "type": ["string", "null"],
-      "description": "Groups questions that share the same scenario"
-    },
-    "imageUrl": {
-      "type": ["string", "null"],
-      "description": "Optional URL to a diagram or image shown with the question"
-    },
-    "multiAnswer": {
-      "type": "boolean",
-      "default": false,
-      "description": "If true, the learner must select all correct answers (checkboxes)"
-    },
-    "choices": {
-      "type": "array",
-      "minItems": 2,
-      "items": {
-        "type": "object",
-        "required": ["id", "text"],
-        "properties": {
-          "id": { "type": "string", "description": "Choice identifier, e.g. A, B, C, D" },
-          "text": { "type": "string", "description": "Choice display text" }
-        }
-      }
-    },
-    "correctAnswers": {
-      "type": "array",
-      "minItems": 1,
-      "items": { "type": "string" },
-      "description": "Array of choice IDs that are correct. Single-answer questions have exactly one entry."
-    },
-    "explanation": {
-      "type": "string",
-      "description": "Explanation of why the correct answer(s) are right, shown after submission"
-    },
-    "references": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "required": ["title"],
-        "properties": {
-          "title": { "type": "string" },
-          "url": { "type": ["string", "null"], "format": "uri" },
-          "note": { "type": "string" }
-        }
-      },
-      "description": "Authoritative reference links backing the explanation"
+      "description": "Unique integer identifier within the exam file.",
+      "type": "integer"
     },
     "domain": {
-      "type": "string",
-      "description": "Exam domain this question belongs to"
+      "description": "Domain number (matches exam.domains[].number).",
+      "type": "integer",
+      "minimum": 1
     },
-    "difficulty": {
+    "domainName": {
+      "description": "Human-readable domain name.",
+      "type": "string"
+    },
+    "topic": {
+      "description": "Optional sub-topic label shown in the quiz UI.",
+      "type": "string"
+    },
+    "question": {
+      "description": "Full question text. Use \\n to separate a scenario preamble from the question stem.",
       "type": "string",
-      "enum": ["foundational", "associate", "professional"],
-      "default": "associate"
+      "minLength": 10
+    },
+    "options": {
+      "description": "Answer choices keyed A–D.",
+      "type": "object",
+      "required": ["A", "B", "C", "D"],
+      "properties": {
+        "A": { "type": "string" },
+        "B": { "type": "string" },
+        "C": { "type": "string" },
+        "D": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "answer": {
+      "description": "Key of the correct option.",
+      "type": "string",
+      "enum": ["A", "B", "C", "D"]
+    },
+    "rationale": {
+      "description": "Overall explanation shown when optionRationales is absent.",
+      "type": "string"
+    },
+    "optionRationales": {
+      "description": "Per-option explanation (shown in the full explanation panel).",
+      "type": "object",
+      "properties": {
+        "A": { "type": "string" },
+        "B": { "type": "string" },
+        "C": { "type": "string" },
+        "D": { "type": "string" }
+      },
+      "additionalProperties": false
     }
   },
   "additionalProperties": false

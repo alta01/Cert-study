@@ -2,20 +2,20 @@
 /**
  * generate-questions.js
  *
- * CLI script that calls the Anthropic API to generate exam questions and
- * writes them to the appropriate domain folder.
+ * CLI script that calls the Anthropic API to generate exam questions in the
+ * app's flat JSON format and merges them into data/exams/<slug>.json.
  *
  * Usage:
  *   node scripts/generate-questions.js \
- *     --exam aws-saa-c03 \
- *     --domain "domain-1-design-secure-architectures" \
- *     --domain-title "Domain 1: Design Secure Architectures" \
- *     --count 10 \
- *     --style single-answer \
- *     [--enrich-refs]
+ *     --exam "AWS SAA-C03" \
+ *     --code SAA-C03 \
+ *     --slug aws-saa-c03 \
+ *     --domain 1 \
+ *     --domain-name "Design Secure Architectures" \
+ *     --domain-weight "30%" \
+ *     --count 10
  *
- * Requires:
- *   ANTHROPIC_API_KEY environment variable (or VITE_ANTHROPIC_API_KEY)
+ * Requires: ANTHROPIC_API_KEY environment variable
  */
 
 import fs from 'fs';
@@ -26,76 +26,74 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-// ── Parse CLI arguments ─────────────────────────────────────────────────────
+// ── CLI args ─────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
-
 function getArg(name) {
   const idx = args.indexOf(`--${name}`);
   return idx !== -1 ? args[idx + 1] : null;
 }
 
-const examSlug     = getArg('exam')         ?? 'aws-saa-c03';
-const domainSlug   = getArg('domain')       ?? 'domain-1-design-secure-architectures';
-const domainTitle  = getArg('domain-title') ?? 'Domain 1: Design Secure Architectures';
-const examName     = getArg('exam-name')    ?? 'AWS Certified Solutions Architect – Associate (SAA-C03)';
-const count        = parseInt(getArg('count') ?? '5', 10);
-const style        = getArg('style')        ?? 'single-answer';
-const enrichRefs   = args.includes('--enrich-refs');
+const examName    = getArg('exam')          ?? 'AWS Certified Solutions Architect – Associate';
+const examCode    = getArg('code')          ?? 'SAA-C03';
+const examSlug    = getArg('slug')          ?? 'aws-saa-c03';
+const domainNum   = parseInt(getArg('domain') ?? '1', 10);
+const domainName  = getArg('domain-name')  ?? 'Design Secure Architectures';
+const domainWeight = getArg('domain-weight') ?? '';
+const count       = parseInt(getArg('count') ?? '5', 10);
 
-const API_KEY = process.env.ANTHROPIC_API_KEY ?? process.env.VITE_ANTHROPIC_API_KEY;
-const MODEL   = process.env.LLM_MODEL ?? 'claude-3-5-sonnet-20241022';
+const API_KEY = process.env.ANTHROPIC_API_KEY;
+const MODEL   = process.env.LLM_MODEL ?? 'claude-sonnet-4-6';
 
 if (!API_KEY) {
   console.error('Error: ANTHROPIC_API_KEY is not set.');
   process.exit(1);
 }
 
-// ── Prompts ──────────────────────────────────────────────────────────────────
+// ── Prompt ───────────────────────────────────────────────────────────────────
 
-const SYSTEM = `You are an expert certification exam question writer. You produce
-high-quality, scenario-based multiple-choice questions that closely mirror the
-style of real vendor certification exams. Every question must be accurate,
-unambiguous, and include a concise explanation and at least one authoritative
-reference link.`;
-
-function buildUserPrompt(params) {
-  const { examName, domainTitle, count, style } = params;
-  const styleDesc =
-    style === 'multi-answer'
-      ? 'multiple-answer (select all that apply, 2+ correct)'
-      : style === 'scenario-chain'
-      ? 'scenario-chain (one shared scenario followed by 3 related questions)'
-      : 'single-answer multiple choice';
-
-  return `Generate ${count} ${styleDesc} questions for the "${examName}" exam,
-covering "${domainTitle}". Return ONLY a valid JSON array (no markdown fences).
-Each object must match:
-{
-  "id": "<unique string>",
-  "stem": "<question text>",
-  "scenario": null,
-  "scenarioId": null,
-  "imageUrl": null,
-  "multiAnswer": false,
-  "choices": [{ "id": "A", "text": "..." }, ...],
-  "correctAnswers": ["<id>"],
-  "explanation": "<why correct>",
-  "references": [{ "title": "<doc>", "url": "<https://...>" }],
-  "domain": "${domainTitle}",
-  "difficulty": "associate"
+const SCHEMA_EXAMPLE = `{
+  "id": 1,
+  "domain": 1,
+  "domainName": "Domain Name",
+  "topic": "specific sub-topic",
+  "question": "Question text?",
+  "options": { "A": "First option", "B": "Second option", "C": "Third option", "D": "Fourth option" },
+  "answer": "B",
+  "rationale": "B is correct because…",
+  "optionRationales": {
+    "A": "Why A is wrong.",
+    "B": "Why B is correct.",
+    "C": "Why C is wrong.",
+    "D": "Why D is wrong."
+  }
 }`;
+
+function buildPrompt() {
+  return `You are an expert certification exam question writer. Generate exactly ${count} high-quality multiple-choice questions for the "${examName}" exam, covering domain ${domainNum}: "${domainName}"${domainWeight ? ` (${domainWeight} of exam)` : ''}.
+
+Rules:
+- Each question must have exactly 4 options (A, B, C, D)
+- Only one option is correct
+- Questions should test understanding, not just memorization
+- Distractors should be plausible but clearly wrong when you know the material
+- Cover different sub-topics within the domain
+- For optionRationales: one concise sentence per option explaining why it is correct or incorrect
+
+Return ONLY a valid JSON array (no markdown fences, no commentary). Each object must match this schema:
+${SCHEMA_EXAMPLE}
+
+Use sequential integers for "id" starting from __START_ID__.`;
 }
 
-// ── Anthropic API helper ─────────────────────────────────────────────────────
+// ── Anthropic API ─────────────────────────────────────────────────────────────
 
-function callAnthropic(system, userPrompt) {
+function callAnthropic(prompt, startId) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
       model: MODEL,
       max_tokens: 8192,
-      system,
-      messages: [{ role: 'user', content: userPrompt }],
+      messages: [{ role: 'user', content: prompt.replace('__START_ID__', startId) }],
     });
 
     const options = {
@@ -131,48 +129,57 @@ function callAnthropic(system, userPrompt) {
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(`\n📝 Generating ${count} "${style}" questions for:`);
-  console.log(`   Exam:   ${examName}`);
-  console.log(`   Domain: ${domainTitle}\n`);
+  const outputPath = path.join(ROOT, 'data', 'exams', `${examSlug}.json`);
 
-  // Step 1 – Generate
-  const response = await callAnthropic(SYSTEM, buildUserPrompt({ examName, domainTitle, count, style }));
+  // Load existing file or scaffold a new one
+  let existing = {
+    exam: {
+      code: examCode,
+      name: examName,
+      passingScore: 700,
+      maxScore: 1000,
+      domains: [{ number: domainNum, name: domainName, weight: domainWeight || '100%', topics: [] }],
+    },
+    questions: [],
+  };
+
+  if (fs.existsSync(outputPath)) {
+    try { existing = JSON.parse(fs.readFileSync(outputPath, 'utf8')); } catch { /* start fresh */ }
+  }
+
+  const startId = (existing.questions.at(-1)?.id ?? 0) + 1;
+
+  console.log(`\nGenerating ${count} questions for ${examName} — Domain ${domainNum}: ${domainName}`);
+  console.log(`Model: ${MODEL}  |  Starting ID: ${startId}\n`);
+
+  const response = await callAnthropic(buildPrompt(), startId);
   const raw = response.content?.[0]?.text ?? '[]';
-  let questions;
+
+  let newQuestions;
   try {
-    questions = JSON.parse(raw);
+    const text = raw.trim().replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/```\s*$/i, '');
+    newQuestions = JSON.parse(text);
   } catch {
-    console.error('LLM returned invalid JSON:\n', raw.slice(0, 400));
+    console.error('LLM returned invalid JSON:\n', raw.slice(0, 600));
     process.exit(1);
   }
 
-  console.log(`✅ Generated ${questions.length} questions.`);
+  // Re-number IDs sequentially to avoid collisions
+  newQuestions.forEach((q, i) => { q.id = startId + i; q.domain = domainNum; q.domainName = domainName; });
 
-  // Step 2 – Write to file
-  const outputDir = path.join(ROOT, 'data', 'exams', examSlug, 'domains', domainSlug);
-  fs.mkdirSync(outputDir, { recursive: true });
+  const existingIds = new Set(existing.questions.map((q) => q.id));
+  const merged = [...existing.questions, ...newQuestions.filter((q) => !existingIds.has(q.id))];
+  existing.questions = merged;
 
-  const outputPath = path.join(outputDir, 'questions.json');
-  let existing = { questions: [] };
-
-  if (fs.existsSync(outputPath)) {
-    try {
-      existing = JSON.parse(fs.readFileSync(outputPath, 'utf8'));
-    } catch {
-      // corrupt file – start fresh
-    }
+  // Ensure the domain is registered in exam metadata
+  if (!existing.exam.domains.find((d) => d.number === domainNum)) {
+    existing.exam.domains.push({ number: domainNum, name: domainName, weight: domainWeight || '', topics: [] });
+    existing.exam.domains.sort((a, b) => a.number - b.number);
   }
 
-  // Merge, avoiding duplicate IDs
-  const existingIds = new Set((existing.questions ?? []).map((q) => q.id));
-  const newQuestions = questions.filter((q) => !existingIds.has(q.id));
-  const merged = { questions: [...(existing.questions ?? []), ...newQuestions] };
-
-  fs.writeFileSync(outputPath, JSON.stringify(merged, null, 2));
-  console.log(`💾 Saved to ${path.relative(ROOT, outputPath)} (${merged.questions.length} total questions)\n`);
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, JSON.stringify(existing, null, 2));
+  console.log(`Saved ${newQuestions.length} new questions to ${path.relative(ROOT, outputPath)} (${merged.length} total)\n`);
 }
 
-main().catch((err) => {
-  console.error('Fatal:', err.message);
-  process.exit(1);
-});
+main().catch((err) => { console.error('Fatal:', err.message); process.exit(1); });

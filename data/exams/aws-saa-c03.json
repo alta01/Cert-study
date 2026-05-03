@@ -1,0 +1,100 @@
+{
+  "exam": {
+    "code": "SAA-C03",
+    "name": "AWS Certified Solutions Architect – Associate",
+    "passingScore": 720,
+    "maxScore": 1000,
+    "domains": [
+      { "number": 1, "name": "Design Secure Architectures", "weight": "30%", "topics": ["IAM", "S3 encryption", "VPC security", "data protection", "incident response"] },
+      { "number": 2, "name": "Design Resilient Architectures", "weight": "26%", "topics": ["multi-AZ", "auto scaling", "disaster recovery", "decoupling", "backup"] },
+      { "number": 3, "name": "Design High-Performing Architectures", "weight": "24%", "topics": ["caching", "database selection", "compute scaling", "networking", "storage"] },
+      { "number": 4, "name": "Design Cost-Optimized Architectures", "weight": "20%", "topics": ["right-sizing", "reserved instances", "spot instances", "storage tiering", "data transfer"] }
+    ]
+  },
+  "questions": [
+    {
+      "id": 1,
+      "domain": 1,
+      "domainName": "Design Secure Architectures",
+      "topic": "S3 encryption",
+      "question": "A company stores sensitive customer data in Amazon S3. The security team requires that all data be encrypted at rest and that only specific IAM roles can decrypt the data. Which solution meets these requirements?",
+      "options": {
+        "A": "Enable S3 default encryption using SSE-S3.",
+        "B": "Enable S3 default encryption using SSE-KMS with a customer-managed CMK and restrict the CMK policy to the required IAM roles.",
+        "C": "Enable S3 Block Public Access and apply a bucket policy that denies all actions except to the specific IAM roles.",
+        "D": "Use Amazon Macie to classify and protect the sensitive data."
+      },
+      "answer": "B",
+      "rationale": "SSE-KMS with a customer-managed CMK lets you define key policies that explicitly allow only designated IAM roles to call kms:Decrypt. SSE-S3 uses an AWS-managed key with no fine-grained IAM control. Block Public Access and Macie do not provide per-role decryption control.",
+      "optionRationales": {
+        "A": "SSE-S3 uses an AWS-managed key — you cannot restrict which IAM roles can decrypt the data.",
+        "B": "Correct. A customer-managed CMK key policy can explicitly limit kms:Decrypt to specific IAM roles, satisfying both encryption-at-rest and access-control requirements.",
+        "C": "Block Public Access and bucket policies control object access, but they do not provide encryption or per-role decryption control.",
+        "D": "Amazon Macie classifies and discovers sensitive data but does not encrypt it or control decryption by IAM role."
+      }
+    },
+    {
+      "id": 2,
+      "domain": 1,
+      "domainName": "Design Secure Architectures",
+      "topic": "Temporary credentials",
+      "question": "A company needs to provide temporary AWS credentials to a mobile application. The credentials should be scoped to the minimum permissions required. Which AWS service should the solutions architect use?",
+      "options": {
+        "A": "AWS IAM long-term access keys embedded in the app.",
+        "B": "Amazon Cognito Identity Pools with IAM roles.",
+        "C": "An EC2 instance profile shared with the mobile app.",
+        "D": "AWS Organizations Service Control Policies."
+      },
+      "answer": "B",
+      "rationale": "Amazon Cognito Identity Pools vend temporary, limited-privilege AWS credentials to mobile and web clients by assuming an IAM role. Long-term access keys embedded in apps are a security anti-pattern. Instance profiles are for EC2, not mobile apps. SCPs restrict accounts within an organization, not individual app credentials.",
+      "optionRationales": {
+        "A": "Embedding long-term access keys in a mobile app is a critical security anti-pattern — keys can be extracted and misused.",
+        "B": "Correct. Cognito Identity Pools use STS to vend short-lived credentials scoped to an IAM role, following least-privilege principles.",
+        "C": "Instance profiles attach IAM roles to EC2 instances, not mobile applications.",
+        "D": "SCPs set permission guardrails across AWS accounts in an organization; they do not issue credentials to applications."
+      }
+    },
+    {
+      "id": 3,
+      "domain": 1,
+      "domainName": "Design Secure Architectures",
+      "topic": "Audit logging and PCI-DSS compliance",
+      "question": "Scenario: A financial services company is migrating a three-tier web application to AWS. The application processes credit card transactions and must comply with PCI-DSS. The architect must ensure all API calls to AWS services are logged, stored immutably for 7 years, and alerting is configured for any root account usage.\n\nWhich AWS service should the architect configure first to satisfy the audit logging requirement?",
+      "options": {
+        "A": "Enable Amazon GuardDuty across all regions.",
+        "B": "Enable AWS CloudTrail with a multi-region trail and log file validation, delivering logs to an S3 bucket with Object Lock in COMPLIANCE mode.",
+        "C": "Enable AWS Config with a conformance pack for PCI-DSS.",
+        "D": "Enable VPC Flow Logs for all VPCs."
+      },
+      "answer": "B",
+      "rationale": "CloudTrail records all AWS API calls. A multi-region trail with log file validation ensures no logs are tampered with. Storing logs in S3 with Object Lock in COMPLIANCE mode prevents deletion for the retention period, satisfying PCI-DSS immutability requirements. GuardDuty provides threat detection, not audit logging. AWS Config records configuration changes, not API calls. VPC Flow Logs capture network traffic, not API calls.",
+      "optionRationales": {
+        "A": "GuardDuty provides intelligent threat detection but does not log all API calls or provide immutable audit trails.",
+        "B": "Correct. CloudTrail with multi-region trail + log file validation + S3 Object Lock COMPLIANCE mode satisfies all three PCI-DSS requirements: full API logging, tamper-evident logs, and immutable 7-year retention.",
+        "C": "AWS Config records resource configuration states and changes, not individual API calls.",
+        "D": "VPC Flow Logs capture IP-level network traffic, not AWS service API calls."
+      }
+    },
+    {
+      "id": 4,
+      "domain": 1,
+      "domainName": "Design Secure Architectures",
+      "topic": "Real-time alerting and compliance",
+      "question": "Scenario: A financial services company is migrating a three-tier web application to AWS. The application processes credit card transactions and must comply with PCI-DSS. The architect must ensure all API calls to AWS services are logged, stored immutably for 7 years, and alerting is configured for any root account usage.\n\nThe security team wants to be alerted any time the root account is used. Which is the MOST operationally efficient solution?",
+      "options": {
+        "A": "Write a Lambda function that polls CloudTrail logs every 5 minutes and sends an SNS notification if a root login is detected.",
+        "B": "Create a CloudWatch Metric Filter on the CloudTrail log group for root account activity, create a CloudWatch Alarm, and configure an SNS topic as the alarm action.",
+        "C": "Use AWS Trusted Advisor to detect root account usage and email the team.",
+        "D": "Enable AWS Security Hub and review the findings dashboard daily."
+      },
+      "answer": "B",
+      "rationale": "A CloudWatch Metric Filter on the CloudTrail log group matches root-account API events in near real-time. A CloudWatch Alarm triggers immediately when the threshold is breached and can publish to SNS for instant notification. Lambda polling introduces up to 5-minute delays and is operationally heavier. Trusted Advisor does not provide real-time alerting. Security Hub requires manual review.",
+      "optionRationales": {
+        "A": "Lambda polling introduces up to a 5-minute delay and requires custom code — less efficient than a native CloudWatch alarm.",
+        "B": "Correct. A Metric Filter + CloudWatch Alarm + SNS is the AWS-native, near-real-time alerting pattern for CloudTrail events with minimal operational overhead.",
+        "C": "Trusted Advisor provides periodic checks and advisory recommendations; it does not fire real-time alerts on root account usage.",
+        "D": "Security Hub aggregates findings but requires a human to check the dashboard — it is not a real-time automated alerting solution."
+      }
+    }
+  ]
+}
