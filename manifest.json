@@ -1,0 +1,11 @@
+{
+  "version": "1",
+  "exams": [
+    {
+      "id": "sc-300",
+      "file": "sc-300.json",
+      "title": "SC-300: Microsoft Identity and Access Administrator",
+      "category": "Microsoft Certifications"
+    }
+  ]
+}
