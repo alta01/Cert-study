@@ -1,0 +1,11 @@
+{
+  "appId": "com.certstudy.app",
+  "appName": "Cert Study",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  }
+}

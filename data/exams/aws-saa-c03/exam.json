@@ -1,0 +1,32 @@
+{
+  "slug": "aws-saa-c03",
+  "title": "AWS Certified Solutions Architect – Associate (SAA-C03)",
+  "vendor": "aws",
+  "version": "SAA-C03",
+  "passingScore": 72,
+  "questionCount": 65,
+  "duration": 130,
+  "description": "Validates the ability to design cost-efficient, highly available, and scalable distributed systems on AWS.",
+  "domains": [
+    {
+      "slug": "domain-1-design-secure-architectures",
+      "title": "Domain 1: Design Secure Architectures",
+      "weight": 30
+    },
+    {
+      "slug": "domain-2-design-resilient-architectures",
+      "title": "Domain 2: Design Resilient Architectures",
+      "weight": 26
+    },
+    {
+      "slug": "domain-3-design-high-performing-architectures",
+      "title": "Domain 3: Design High-Performing Architectures",
+      "weight": 24
+    },
+    {
+      "slug": "domain-4-design-cost-optimized-architectures",
+      "title": "Domain 4: Design Cost-Optimized Architectures",
+      "weight": 20
+    }
+  ]
+}
