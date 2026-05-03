@@ -1,19 +1,27 @@
 # Cert Study
 
-> Open-source certification study app with LLM-generated questions, scenario-based exams, and adaptive learning. Designed as a web app (React + Vite) that can be shipped as an iOS or Android app via Capacitor.
+> Open-source study hub — any subject, any exam. Open `index.html` in a browser and start studying. No build step, no account, no cloud required.
+
+---
+
+## Quick Start
+
+Open `index.html` directly in any browser. That's it.
+
+Exams in `manifest.json` load automatically. The SC-300 and AWS SAA-C03 exams are included out of the box. You can also click **+ Load exam file** on the home screen to load any conforming `.json` file from disk.
 
 ---
 
 ## Features
 
-- **Multiple exam support** – add any certification under `data/exams/<exam-slug>/`
-- **Multiple-choice questions** – single-answer, multi-answer ("select all that apply"), and Microsoft-style scenario-chain questions
-- **Exam settings** – choose feedback mode before starting: show answers immediately after each question, or hold all feedback until the end
-- **Reference links** – every answer explanation links to official documentation
-- **Study Mode** – browse domain-organized Markdown study notes with diagrams
-- **LLM integration** – generate questions with Claude via the Admin panel or CLI scripts
-- **JSON import** – upload `questions.json` files conforming to the schema
-- **Validation** – built-in Exam Validator Agent checks schema compliance and quality
+- **Any subject** — Microsoft certs, AWS, CompTIA, ASVAB, history, premed: if you can write a JSON file, it works
+- **Domain filtering** — pick which topic areas to include per session
+- **Randomized order** — optional shuffle of the question pool
+- **Per-option explanations** — after each answer, see why each choice is right or wrong
+- **Retry wrong answers** — end-of-session button replays only the questions you missed
+- **Score ring + domain breakdown** — animated results screen with per-domain pass/fail bars
+- **Local AI assistant** — conversational chat and exam generation via [Ollama](https://ollama.com) (fully offline, no API key)
+- **AI exam generator** — paste any study material; the AI outputs a ready-to-load exam JSON
 
 ---
 
@@ -21,113 +29,136 @@
 
 ```
 Cert-study/
-├── agents.md                        # AI agent specifications
-├── capacitor.config.json            # iOS / Android (Capacitor) config
-├── index.html                       # Vite entry point
-├── package.json
-├── vite.config.js
-├── .env.example                     # Copy to .env and add your API key
+├── index.html              # App entry point — open directly in a browser
+├── app.js                  # Quiz engine (state, rendering, navigation)
+├── ai.js                   # Ollama AI panel (chat + exam generation)
+├── style.css               # App styles
+├── manifest.json           # Auto-loaded exam registry
 │
 ├── data/
 │   ├── exams/
-│   │   ├── index.json               # List of available exams shown on Home page
-│   │   └── <exam-slug>/
-│   │       ├── exam.json            # Exam manifest (domains, passing score, etc.)
-│   │       └── domains/
-│   │           └── <domain-slug>/
-│   │               ├── content.md   # Study notes (Markdown)
-│   │               └── questions.json
+│   │   ├── sc-300.json             # SC-300: Microsoft Identity & Access Admin (120 questions)
+│   │   ├── aws-saa-c03.json        # AWS SAA-C03: Solutions Architect – Associate
+│   │   └── aws-saa-c03/            # Study notes and source material (Markdown)
 │   └── schemas/
-│       ├── exam-schema.json         # JSON Schema for exam.json
-│       └── question-schema.json     # JSON Schema for questions
+│       ├── exam-schema.json        # JSON Schema for exam metadata
+│       └── question-schema.json    # JSON Schema for questions
 │
 ├── scripts/
-│   ├── generate-questions.js        # CLI: generate questions with Claude
-│   ├── import-content.js            # CLI: import Markdown from file or URL
-│   └── validate-exam.js             # CLI: validate a questions.json file
+│   ├── generate-questions.js   # CLI: generate questions via Claude API
+│   ├── import-content.js       # CLI: import Markdown study notes
+│   └── validate-exam.js        # CLI: validate an exam JSON file
 │
 ├── public/
 │   └── assets/
-│       ├── images/                  # Exam logos and static images
-│       └── diagrams/                # Architecture diagrams
+│       ├── images/             # Exam logos and static images
+│       └── diagrams/           # Architecture diagrams
 │
-└── src/
-    ├── main.jsx
-    ├── App.jsx
-    ├── context/
-    │   └── ExamContext.jsx          # Global exam session state (useReducer)
-    ├── components/
-    │   ├── Layout/                  # App shell + nav bar
-    │   ├── ExamSelector/            # Home page exam cards
-    │   ├── ExamSettings/            # Pre-exam feedback mode modal
-    │   ├── Question/                # Question + MultipleChoice renderer
-    │   ├── Results/                 # End-of-exam review with scores + refs
-    │   └── ContentUpload/           # Admin: JSON upload / paste / AI generate
-    ├── pages/
-    │   ├── Home.jsx
-    │   ├── ExamPage.jsx             # Active exam session
-    │   ├── StudyMode.jsx            # Domain content browser
-    │   └── Admin.jsx
-    ├── services/
-    │   ├── llm/
-    │   │   ├── llmService.js        # Anthropic API wrapper
-    │   │   ├── referenceMap.js      # Vendor → docs URL map
-    │   │   ├── referenceLinkAgent.js
-    │   │   ├── validatorAgent.js
-    │   │   └── agentOrchestrator.js
-    │   ├── questions/
-    │   │   └── questionService.js   # Load exam / domain data
-    │   └── storage/
-    │       └── storageService.js    # localStorage session persistence
-    ├── hooks/
-    │   ├── useExam.js
-    │   └── useQuestions.js
-    ├── utils/
-    │   ├── questionParser.js        # Normalize raw question objects
-    │   └── scoreCalculator.js
-    └── styles/
-        └── index.css
+├── agents.md               # AI agent specifications
+└── .env.example            # Environment variables for CLI scripts
 ```
 
 ---
 
-## Quick Start
+## Exam JSON Format
+
+Create a single `.json` file anywhere in the project. Add its path to `manifest.json` to auto-load it, or load it manually via the file picker.
+
+```json
+{
+  "exam": {
+    "code": "MY-001",
+    "name": "My Subject",
+    "passingScore": 700,
+    "maxScore": 1000,
+    "domains": [
+      { "number": 1, "name": "Topic Area One", "weight": "50%", "topics": ["sub-topic"] }
+    ]
+  },
+  "questions": [
+    {
+      "id": 1,
+      "domain": 1,
+      "domainName": "Topic Area One",
+      "topic": "specific sub-topic",
+      "question": "Question text here?",
+      "options": { "A": "First option", "B": "Second option", "C": "Third option", "D": "Fourth option" },
+      "answer": "B",
+      "rationale": "B is correct because…",
+      "optionRationales": {
+        "A": "Why A is wrong.",
+        "B": "Why B is correct.",
+        "C": "Why C is wrong.",
+        "D": "Why D is wrong."
+      }
+    }
+  ]
+}
+```
+
+`optionRationales` is optional — the app falls back to `rationale` if absent. Use `\n` in the `question` field to separate a scenario preamble from the question stem.
+
+### Register an exam for auto-loading
+
+Add an entry to `manifest.json`:
+
+```json
+{
+  "version": "1",
+  "exams": [
+    { "id": "my-001", "file": "data/exams/my-exam.json", "title": "My Subject", "category": "Custom" }
+  ]
+}
+```
+
+---
+
+## AI Assistant (Ollama — local, no API key)
+
+The built-in AI panel uses [Ollama](https://ollama.com) on your machine. No data leaves your device.
 
 ```bash
-# 1. Install dependencies
-npm install
+# Install Ollama
+curl -fsSL https://ollama.com/install.sh | sh
 
-# 2. Configure environment
+# Pull a model
+ollama pull llama3.2    # fast, good quality
+ollama pull mistral     # good alternative
+
+# Start Ollama (if not running as a service)
+ollama serve
+```
+
+Open `index.html`, click **AI Assistant** in the header. The status dot turns green when Ollama is detected.
+
+- **Chat tab** — ask anything about your exam material
+- **Generate Exam tab** — paste study notes → AI outputs a complete exam JSON → load it directly into the app or download it
+
+---
+
+## CLI Scripts (require Node.js + Anthropic API key)
+
+```bash
 cp .env.example .env
-# Edit .env and add your VITE_ANTHROPIC_API_KEY
-
-# 3. Start development server
-npm run dev
+# Edit .env: set ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
-
----
-
-## Adding a New Exam
-
-1. Create a folder: `data/exams/<exam-slug>/`
-2. Add `exam.json` (see `data/schemas/exam-schema.json` for the schema)
-3. Add domain sub-folders with `content.md` and `questions.json`
-4. Add the exam to `data/exams/index.json`
-
-### Generate questions with Claude
+### Generate questions
 
 ```bash
-ANTHROPIC_API_KEY=sk-... node scripts/generate-questions.js \
-  --exam aws-saa-c03 \
-  --domain domain-1-design-secure-architectures \
-  --domain-title "Domain 1: Design Secure Architectures" \
-  --count 20 \
-  --style scenario-chain
+node scripts/generate-questions.js \
+  --exam "AWS SAA-C03" \
+  --code SAA-C03 \
+  --slug aws-saa-c03 \
+  --domain 2 \
+  --domain-name "Design Resilient Architectures" \
+  --domain-weight "26%" \
+  --count 15
 ```
 
-### Import study content from a file or URL
+Output is merged into `data/exams/<slug>.json`, preserving existing questions.
+
+### Import study content (Markdown)
 
 ```bash
 node scripts/import-content.js \
@@ -136,60 +167,33 @@ node scripts/import-content.js \
   --file ~/my-notes.md
 ```
 
-### Validate a question file
+Study notes are stored in `data/exams/<slug>/domains/<domain>/content.md`.
+
+### Validate an exam file
 
 ```bash
-node scripts/validate-exam.js \
-  data/exams/aws-saa-c03/domains/domain-1-design-secure-architectures/questions.json
+node scripts/validate-exam.js data/exams/aws-saa-c03.json
+node scripts/validate-exam.js data/exams/sc-300.json
 ```
 
 ---
 
-## Mobile (iOS / Android)
+## Adding a New Exam
 
-This app uses [Capacitor](https://capacitorjs.com/) for native builds.
+1. Create `data/exams/<slug>.json` following the schema above
+2. Register it in `manifest.json`
+3. Optionally run `node scripts/validate-exam.js data/exams/<slug>.json` to check for issues
 
-```bash
-npm install @capacitor/core @capacitor/cli @capacitor/ios @capacitor/android
-npm run build
-npx cap add ios
-npx cap add android
-npx cap open ios      # opens Xcode
-npx cap open android  # opens Android Studio
-```
+Or use the AI assistant's Generate Exam tab to create one from pasted study material.
 
 ---
 
 ## AI Agents
 
-See [agents.md](./agents.md) for a full description of the AI agents used to generate and enrich content.
+See [agents.md](./agents.md) for specifications of the AI agents used to generate, enrich, and validate exam content.
 
 ---
 
-## Question JSON Schema
+## Contributing
 
-Questions must conform to `data/schemas/question-schema.json`. Example:
-
-```json
-{
-  "id": "saa-d1-001",
-  "stem": "Which S3 encryption option lets you restrict decryption to specific IAM roles?",
-  "multiAnswer": false,
-  "choices": [
-    { "id": "A", "text": "SSE-S3" },
-    { "id": "B", "text": "SSE-KMS with a customer-managed CMK" },
-    { "id": "C", "text": "SSE-C" },
-    { "id": "D", "text": "Client-side encryption" }
-  ],
-  "correctAnswers": ["B"],
-  "explanation": "SSE-KMS with a CMK lets you define key policies restricting kms:Decrypt to specific IAM roles.",
-  "references": [
-    {
-      "title": "SSE-KMS – AWS S3 User Guide",
-      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
-    }
-  ],
-  "domain": "Domain 1: Design Secure Architectures",
-  "difficulty": "associate"
-}
-```
+Drop a JSON exam file in a PR. Any subject welcome — certs, academic, professional licensing, military prep, anything.

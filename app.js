@@ -175,7 +175,7 @@ function renderQuestion() {
 
   document.getElementById('q-badge').textContent = `Domain ${q.domain}`;
   document.getElementById('q-topic').textContent = q.topic || '';
-  document.getElementById('q-text').textContent  = q.question;
+  document.getElementById('q-text').innerHTML    = esc(q.question).replace(/\n/g, '<br>');
 
   const optWrap = document.getElementById('q-options');
   optWrap.innerHTML = Object.entries(q.options).map(([k, v]) => `
