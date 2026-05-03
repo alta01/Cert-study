@@ -1,0 +1,112 @@
+{
+  "questions": [
+    {
+      "id": "saa-d1-001",
+      "stem": "A company stores sensitive customer data in Amazon S3. The security team requires that all data be encrypted at rest and that only specific IAM roles can decrypt the data. Which solution meets these requirements?",
+      "scenario": null,
+      "scenarioId": null,
+      "imageUrl": null,
+      "multiAnswer": false,
+      "choices": [
+        { "id": "A", "text": "Enable S3 default encryption using SSE-S3." },
+        { "id": "B", "text": "Enable S3 default encryption using SSE-KMS with a customer-managed CMK and restrict the CMK policy to the required IAM roles." },
+        { "id": "C", "text": "Enable S3 Block Public Access and apply a bucket policy that denies all actions except to the specific IAM roles." },
+        { "id": "D", "text": "Use Amazon Macie to classify and protect the sensitive data." }
+      ],
+      "correctAnswers": ["B"],
+      "explanation": "SSE-KMS with a customer-managed CMK (CMK) lets you define key policies that explicitly allow only designated IAM roles to call kms:Decrypt. SSE-S3 uses an AWS-managed key with no fine-grained IAM control. Block Public Access and Macie do not provide per-role decryption control.",
+      "references": [
+        {
+          "title": "Protecting data using server-side encryption with AWS KMS keys (SSE-KMS)",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingKMSEncryption.html"
+        },
+        {
+          "title": "AWS KMS key policies",
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html"
+        }
+      ],
+      "domain": "Domain 1: Design Secure Architectures",
+      "difficulty": "associate"
+    },
+    {
+      "id": "saa-d1-002",
+      "stem": "A company needs to provide temporary AWS credentials to a mobile application. The credentials should be scoped to the minimum permissions required. Which AWS service should the solutions architect use?",
+      "scenario": null,
+      "scenarioId": null,
+      "imageUrl": null,
+      "multiAnswer": false,
+      "choices": [
+        { "id": "A", "text": "AWS IAM long-term access keys embedded in the app." },
+        { "id": "B", "text": "Amazon Cognito Identity Pools with IAM roles." },
+        { "id": "C", "text": "An EC2 instance profile shared with the mobile app." },
+        { "id": "D", "text": "AWS Organizations Service Control Policies." }
+      ],
+      "correctAnswers": ["B"],
+      "explanation": "Amazon Cognito Identity Pools (Federated Identities) vend temporary, limited-privilege AWS credentials to mobile and web clients by assuming an IAM role. Long-term access keys embedded in apps are a security anti-pattern. Instance profiles are for EC2, not mobile apps. SCPs restrict accounts within an organization, not individual app credentials.",
+      "references": [
+        {
+          "title": "Amazon Cognito Identity Pools",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
+        }
+      ],
+      "domain": "Domain 1: Design Secure Architectures",
+      "difficulty": "associate"
+    },
+    {
+      "id": "saa-d1-scenario-001",
+      "stem": "Which AWS service should the architect configure first to satisfy the audit logging requirement?",
+      "scenario": "A financial services company is migrating a three-tier web application to AWS. The application processes credit card transactions and must comply with PCI-DSS. The architect must ensure all API calls to AWS services are logged, stored immutably for 7 years, and alerting is configured for any root account usage.",
+      "scenarioId": "saa-d1-s1",
+      "imageUrl": null,
+      "multiAnswer": false,
+      "choices": [
+        { "id": "A", "text": "Enable Amazon GuardDuty across all regions." },
+        { "id": "B", "text": "Enable AWS CloudTrail with a multi-region trail and log file validation, delivering logs to an S3 bucket with Object Lock in COMPLIANCE mode." },
+        { "id": "C", "text": "Enable AWS Config with a conformance pack for PCI-DSS." },
+        { "id": "D", "text": "Enable VPC Flow Logs for all VPCs." }
+      ],
+      "correctAnswers": ["B"],
+      "explanation": "CloudTrail records all AWS API calls. Enabling a multi-region trail with log file validation ensures no logs are tampered with. Storing logs in S3 with Object Lock in COMPLIANCE mode prevents deletion for the retention period, satisfying PCI-DSS immutability requirements. GuardDuty provides threat detection (not audit logging). AWS Config records resource configuration changes, not API calls. VPC Flow Logs capture network traffic, not API calls.",
+      "references": [
+        {
+          "title": "AWS CloudTrail – What is CloudTrail?",
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
+        },
+        {
+          "title": "Amazon S3 Object Lock",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html"
+        }
+      ],
+      "domain": "Domain 1: Design Secure Architectures",
+      "difficulty": "associate"
+    },
+    {
+      "id": "saa-d1-scenario-002",
+      "stem": "For the same PCI-DSS environment, the security team wants to be alerted any time the root account is used. Which is the MOST operationally efficient solution?",
+      "scenario": "A financial services company is migrating a three-tier web application to AWS. The application processes credit card transactions and must comply with PCI-DSS. The architect must ensure all API calls to AWS services are logged, stored immutably for 7 years, and alerting is configured for any root account usage.",
+      "scenarioId": "saa-d1-s1",
+      "imageUrl": null,
+      "multiAnswer": false,
+      "choices": [
+        { "id": "A", "text": "Write a Lambda function that polls CloudTrail logs every 5 minutes and sends an SNS notification if a root login is detected." },
+        { "id": "B", "text": "Create a CloudWatch Metric Filter on the CloudTrail log group for root account activity, create a CloudWatch Alarm, and configure an SNS topic as the alarm action." },
+        { "id": "C", "text": "Use AWS Trusted Advisor to detect root account usage and email the team." },
+        { "id": "D", "text": "Enable AWS Security Hub and review the findings dashboard daily." }
+      ],
+      "correctAnswers": ["B"],
+      "explanation": "A CloudWatch Metric Filter on the CloudTrail log group can match root-account API events in near real-time. A CloudWatch Alarm triggers immediately when the threshold is breached and can publish to SNS for instant notification. Polling with Lambda is less efficient and has a delay. Trusted Advisor does not provide real-time alerting for root account usage. Security Hub requires manual review.",
+      "references": [
+        {
+          "title": "Creating a CloudWatch alarm based on a metric filter",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CreateAlarmMetricFilter.html"
+        },
+        {
+          "title": "CIS AWS Foundations Benchmark – Root account monitoring",
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html"
+        }
+      ],
+      "domain": "Domain 1: Design Secure Architectures",
+      "difficulty": "associate"
+    }
+  ]
+}

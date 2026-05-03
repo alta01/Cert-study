@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://certstudy.app/schemas/exam",
+  "title": "Exam",
+  "description": "Certification exam manifest",
+  "type": "object",
+  "required": ["slug", "title", "domains"],
+  "properties": {
+    "slug": {
+      "type": "string",
+      "description": "URL-safe unique identifier, e.g. aws-saa-c03"
+    },
+    "title": {
+      "type": "string",
+      "description": "Full display name of the certification"
+    },
+    "vendor": {
+      "type": "string",
+      "description": "Vendor key used by the Reference Linker Agent, e.g. aws, azure, gcp, comptia"
+    },
+    "version": {
+      "type": "string",
+      "description": "Exam version code, e.g. SAA-C03"
+    },
+    "passingScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "default": 72,
+      "description": "Minimum percentage required to pass"
+    },
+    "questionCount": {
+      "type": "integer",
+      "description": "Number of questions in the real exam"
+    },
+    "duration": {
+      "type": "integer",
+      "description": "Exam duration in minutes"
+    },
+    "description": {
+      "type": "string"
+    },
+    "logoUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "domains": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["slug", "title", "weight"],
+        "properties": {
+          "slug": { "type": "string" },
+          "title": { "type": "string" },
+          "weight": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Percentage of exam questions from this domain"
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

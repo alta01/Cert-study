@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://certstudy.app/schemas/question",
+  "title": "Question",
+  "description": "A single multiple-choice exam question",
+  "type": "object",
+  "required": ["id", "stem", "choices", "correctAnswers"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this question"
+    },
+    "stem": {
+      "type": "string",
+      "description": "The question text displayed to the learner"
+    },
+    "scenario": {
+      "type": ["string", "null"],
+      "description": "Shared scenario paragraph shown above the question stem (used in scenario-chain style)"
+    },
+    "scenarioId": {
+      "type": ["string", "null"],
+      "description": "Groups questions that share the same scenario"
+    },
+    "imageUrl": {
+      "type": ["string", "null"],
+      "description": "Optional URL to a diagram or image shown with the question"
+    },
+    "multiAnswer": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, the learner must select all correct answers (checkboxes)"
+    },
+    "choices": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string", "description": "Choice identifier, e.g. A, B, C, D" },
+          "text": { "type": "string", "description": "Choice display text" }
+        }
+      }
+    },
+    "correctAnswers": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string" },
+      "description": "Array of choice IDs that are correct. Single-answer questions have exactly one entry."
+    },
+    "explanation": {
+      "type": "string",
+      "description": "Explanation of why the correct answer(s) are right, shown after submission"
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string" },
+          "url": { "type": ["string", "null"], "format": "uri" },
+          "note": { "type": "string" }
+        }
+      },
+      "description": "Authoritative reference links backing the explanation"
+    },
+    "domain": {
+      "type": "string",
+      "description": "Exam domain this question belongs to"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["foundational", "associate", "professional"],
+      "default": "associate"
+    }
+  },
+  "additionalProperties": false
+}

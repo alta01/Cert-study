@@ -1,0 +1,9 @@
+[
+  {
+    "slug": "aws-saa-c03",
+    "title": "AWS Certified Solutions Architect – Associate (SAA-C03)",
+    "description": "Validates the ability to design and implement distributed systems on AWS.",
+    "logoUrl": "/assets/images/aws-logo.png",
+    "passingScore": 72
+  }
+]
