@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cert-study
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # Uncomment for TLS via cert-manager:
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  # ingressClassName: nginx
+  rules:
+    - host: cert-study.example.com   # replace with your domain
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cert-study
+                port:
+                  number: 80
+  # Uncomment for TLS:
+  # tls:
+  #   - hosts:
+  #       - cert-study.example.com
+  #     secretName: cert-study-tls

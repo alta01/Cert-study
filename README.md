@@ -12,6 +12,62 @@ Exams in `manifest.json` load automatically. The SC-300 and AWS SAA-C03 exams ar
 
 ---
 
+## Docker
+
+```bash
+# Build and start the app + Ollama together
+docker compose up --build
+
+# App runs at http://localhost:8080
+# Ollama API at http://localhost:11434
+```
+
+Pull a model into the running Ollama container:
+
+```bash
+docker compose exec ollama ollama pull gemma4:4b
+```
+
+To point at an Ollama instance running elsewhere, set `OLLAMA_BASE`:
+
+```bash
+OLLAMA_BASE=http://192.168.1.50:11434 docker compose up --build
+```
+
+---
+
+## Kubernetes
+
+All manifests are in `k8s/`. Apply in order:
+
+```bash
+# 1. Persistent storage for Ollama models
+kubectl apply -f k8s/ollama-pvc.yaml
+
+# 2. Ollama service
+kubectl apply -f k8s/ollama-deployment.yaml
+kubectl apply -f k8s/ollama-service.yaml
+
+# 3. Cert Study app (points to the ollama service by default)
+kubectl apply -f k8s/cert-study-deployment.yaml
+kubectl apply -f k8s/cert-study-service.yaml
+
+# 4. Optional: Ingress (edit host in k8s/ingress.yaml first)
+kubectl apply -f k8s/ingress.yaml
+```
+
+Pull a model after Ollama is running:
+
+```bash
+kubectl exec -it deploy/ollama -- ollama pull gemma4:4b
+```
+
+To use a different Ollama URL, edit the `OLLAMA_BASE` env var in `k8s/cert-study-deployment.yaml`. The entrypoint patches both `ai.js` and the CSP header at startup — no image rebuild needed.
+
+For GPU support, uncomment the `nvidia.com/gpu` resource limit in `k8s/ollama-deployment.yaml`.
+
+---
+
 ## Features
 
 - **Any subject** — Microsoft certs, AWS, CompTIA, ASVAB, history, premed: if you can write a JSON file, it works

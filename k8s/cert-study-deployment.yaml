@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cert-study
+  labels:
+    app: cert-study
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cert-study
+  template:
+    metadata:
+      labels:
+        app: cert-study
+    spec:
+      containers:
+        - name: cert-study
+          image: cert-study:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: OLLAMA_BASE
+              value: "http://ollama:11434"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 30
