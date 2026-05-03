@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cert Study</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Home ───────────────────────────────────────────────── -->
+  <div id="screen-home" class="screen active">
+    <header class="app-header">
+      <div>
+        <h1 class="app-title">Cert Study</h1>
+        <p class="app-tagline">Open source study hub — any subject, any exam</p>
+      </div>
+      <button id="btn-ai-toggle" class="btn-ai-toggle" title="AI Study Assistant">
+        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        AI Assistant
+      </button>
+    </header>
+
+    <div id="exam-grid" class="exam-grid"></div>
+
+    <div class="home-actions">
+      <label class="btn-secondary btn-load" title="Load a JSON exam file">
+        + Load exam file
+        <input type="file" id="file-input" accept=".json" hidden />
+      </label>
+    </div>
+  </div>
+
+  <!-- ── Setup ──────────────────────────────────────────────── -->
+  <div id="screen-setup" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="btn-back-setup">← Back</button>
+      <span id="setup-exam-title" class="screen-title"></span>
+    </div>
+
+    <div class="card">
+      <section class="setup-section">
+        <h2>
+          Domains
+          <span class="section-actions">
+            <button id="btn-all" class="btn-link">All</button>
+            <button id="btn-none" class="btn-link">None</button>
+          </span>
+        </h2>
+        <div id="domain-filters"></div>
+      </section>
+
+      <section class="setup-section">
+        <h2>Questions</h2>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="q-count" value="all" checked />
+            All available
+          </label>
+          <label>
+            <input type="radio" name="q-count" value="custom" />
+            Custom count:
+            <input id="custom-count" type="number" min="1" value="20" class="inline-num" />
+          </label>
+        </div>
+      </section>
+
+      <section class="setup-section last">
+        <h2>Options</h2>
+        <label class="toggle-label">
+          <input type="checkbox" id="opt-randomize" />
+          Randomize question order
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="opt-explain" checked />
+          Show full explanations after answering
+        </label>
+      </section>
+
+      <button id="btn-start" class="btn-primary btn-full">Start Quiz →</button>
+    </div>
+  </div>
+
+  <!-- ── Quiz ───────────────────────────────────────────────── -->
+  <div id="screen-quiz" class="screen">
+    <div class="quiz-header">
+      <button class="btn-back" id="btn-back-quiz">← Exit</button>
+      <div class="quiz-progress">
+        <span id="q-label"></span>
+        <div class="progress-track"><div id="progress-bar" class="progress-fill"></div></div>
+      </div>
+      <span id="score-live" class="score-live"></span>
+    </div>
+
+    <div class="card quiz-card">
+      <div class="q-meta">
+        <span id="q-badge" class="badge"></span>
+        <span id="q-topic" class="q-topic"></span>
+      </div>
+      <p id="q-text" class="q-text"></p>
+      <div id="q-options" class="q-options"></div>
+
+      <div class="quiz-actions">
+        <button id="btn-submit" class="btn-primary" disabled>Submit</button>
+        <button id="btn-next" class="btn-primary hidden"></button>
+      </div>
+    </div>
+
+    <div id="explanation" class="card explanation hidden">
+      <div id="exp-banner"></div>
+      <div id="exp-body"></div>
+    </div>
+  </div>
+
+  <!-- ── Results ────────────────────────────────────────────── -->
+  <div id="screen-results" class="screen">
+    <div class="screen-header">
+      <button class="btn-back" id="btn-back-results">← Home</button>
+      <span class="screen-title">Results</span>
+    </div>
+
+    <div class="card">
+      <div class="score-ring-wrap">
+        <svg class="score-svg" viewBox="0 0 120 120">
+          <circle class="ring-bg" cx="60" cy="60" r="50"/>
+          <circle id="ring-arc" class="ring-arc" cx="60" cy="60" r="50"/>
+        </svg>
+        <div class="ring-inner">
+          <span id="res-pct" class="res-pct"></span>
+          <span class="res-label">correct</span>
+        </div>
+      </div>
+      <p id="res-fraction" class="res-fraction"></p>
+
+      <h2>By domain</h2>
+      <div id="domain-breakdown"></div>
+
+      <div class="result-actions">
+        <button id="btn-retry-wrong" class="btn-secondary" disabled>↩ Retry wrong answers</button>
+        <button id="btn-new-quiz" class="btn-primary">New quiz</button>
+      </div>
+    </div>
+
+    <div id="wrong-panel" class="card hidden">
+      <h2>Incorrect answers</h2>
+      <div id="wrong-list"></div>
+    </div>
+  </div>
+
+  <!-- ── AI Panel ───────────────────────────────────────────── -->
+  <div id="ai-panel" class="ai-panel" aria-label="AI Study Assistant">
+    <div class="ai-header">
+      <div>
+        <strong>AI Study Assistant</strong>
+        <span id="ai-status-dot" class="status-dot offline" title="Ollama status"></span>
+      </div>
+      <div class="ai-header-right">
+        <select id="ai-model-select" class="model-select" title="Select model"></select>
+        <button id="btn-ai-close" class="btn-icon" title="Close">✕</button>
+      </div>
+    </div>
+
+    <div class="ai-tabs">
+      <button class="ai-tab active" data-tab="chat">Chat</button>
+      <button class="ai-tab" data-tab="generate">Generate Exam</button>
+    </div>
+
+    <!-- Chat tab -->
+    <div id="ai-tab-chat" class="ai-tab-content">
+      <div id="ai-messages" class="ai-messages">
+        <div class="ai-msg assistant">
+          <p>Hi! I'm your local AI study assistant powered by Ollama. Ask me anything about your exam material, or use the <strong>Generate Exam</strong> tab to create new question sets from any study material.</p>
+          <p class="msg-hint">Requires <a href="https://ollama.com" target="_blank">Ollama</a> running locally.</p>
+        </div>
+      </div>
+      <div class="ai-input-row">
+        <textarea id="ai-input" class="ai-input" rows="2" placeholder="Ask a question…"></textarea>
+        <button id="btn-ai-send" class="btn-primary btn-send" disabled>→</button>
+      </div>
+    </div>
+
+    <!-- Generate tab -->
+    <div id="ai-tab-generate" class="ai-tab-content hidden">
+      <p class="gen-hint">Paste any study material — textbook excerpts, notes, documentation. The AI will generate exam questions in this app's format so you can start studying immediately.</p>
+      <input id="gen-exam-name" class="text-input" placeholder="Exam / subject name (e.g. 'Biology 101')" />
+      <input id="gen-exam-code" class="text-input" placeholder="Short code (e.g. 'BIO101')" />
+      <textarea id="gen-source" class="ai-input gen-source" rows="8" placeholder="Paste study material here…"></textarea>
+      <div class="gen-options">
+        <label>Questions: <input id="gen-count" type="number" class="inline-num" value="15" min="1" max="60" /></label>
+      </div>
+      <button id="btn-generate" class="btn-primary btn-full" disabled>Generate questions</button>
+      <div id="gen-output" class="gen-output hidden">
+        <div class="gen-preview" id="gen-preview"></div>
+        <div class="gen-actions">
+          <button id="btn-gen-load" class="btn-primary">Load into app</button>
+          <button id="btn-gen-download" class="btn-secondary">Download JSON</button>
+        </div>
+      </div>
+      <div id="gen-status" class="gen-status hidden"></div>
+    </div>
+  </div>
+
+  <div id="ai-overlay" class="ai-overlay hidden"></div>
+
+  <script src="ai.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
