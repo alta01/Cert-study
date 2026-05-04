@@ -5,6 +5,8 @@
   "description": "Open-source study hub — any subject, any exam",
   "type": "module",
   "scripts": {
+    "serve": "python3 -m http.server 3000",
+    "sync": "node scripts/sync-manifest.js",
     "generate": "node scripts/generate-questions.js",
     "import": "node scripts/import-content.js",
     "validate": "node scripts/validate-exam.js"

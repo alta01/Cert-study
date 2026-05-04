@@ -2,16 +2,16 @@
   "version": "1",
   "exams": [
     {
+      "id": "saa-c03",
+      "file": "data/exams/aws-saa-c03.json",
+      "title": "SAA-C03: AWS Certified Solutions Architect – Associate",
+      "category": "AWS Certifications"
+    },
+    {
       "id": "sc-300",
       "file": "data/exams/sc-300.json",
       "title": "SC-300: Microsoft Identity and Access Administrator",
       "category": "Microsoft Certifications"
-    },
-    {
-      "id": "aws-saa-c03",
-      "file": "data/exams/aws-saa-c03.json",
-      "title": "AWS Certified Solutions Architect – Associate (SAA-C03)",
-      "category": "AWS Certifications"
     }
   ]
 }

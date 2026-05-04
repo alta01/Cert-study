@@ -6,7 +6,13 @@
 
 ## Quick Start
 
-Open `index.html` directly in any browser. That's it.
+```bash
+npm run serve   # starts python3 -m http.server 3000
+```
+
+Then open `http://localhost:3000` in your browser.
+
+> **Why a server?** The app fetches `manifest.json` and exam files via `fetch()`, which browsers block on `file://` URLs. The dev server takes care of this. Node.js 18+ is required only for the CLI scripts — the server itself just uses Python 3.
 
 Exams in `manifest.json` load automatically. The SC-300 and AWS SAA-C03 exams are included out of the box. You can also click **+ Load exam file** on the home screen to load any conforming `.json` file from disk.
 
@@ -116,6 +122,7 @@ Cert-study/
 │       └── question-schema.json    # JSON Schema for questions
 │
 ├── scripts/
+│   ├── sync-manifest.js        # CLI: auto-update manifest.json from data/exams/
 │   ├── generate-questions.js   # CLI: generate questions via Claude API
 │   ├── import-content.js       # CLI: import Markdown study notes
 │   └── validate-exam.js        # CLI: validate an exam JSON file
@@ -204,6 +211,30 @@ Open `index.html`, click **AI Assistant** in the header. The status dot turns gr
 
 - **Chat tab** — ask anything about your exam material
 - **Generate Exam tab** — paste study notes → AI outputs a complete exam JSON → load it directly into the app or download it
+
+---
+
+## npm Scripts
+
+| Command | What it does |
+|---|---|
+| `npm run serve` | Start a local HTTP server at `http://localhost:3000` (Python 3 required) |
+| `npm run sync` | Scan `data/exams/` and auto-update `manifest.json` |
+| `npm run generate` | Generate questions via Claude API (see below) |
+| `npm run import` | Import Markdown study notes |
+| `npm run validate` | Validate an exam JSON file |
+
+---
+
+## Syncing the Manifest
+
+When you add or remove exam files in `data/exams/`, run:
+
+```bash
+npm run sync
+```
+
+This scans `data/exams/` for valid exam JSON files and rewrites `manifest.json`, preserving any `category` fields you've set manually. The app auto-loads everything in `manifest.json` on startup.
 
 ---
 

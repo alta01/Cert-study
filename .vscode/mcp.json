@@ -1,0 +1,29 @@
+{
+	"servers": {
+		"memory": {
+			"command": "docker",
+			"args": [
+				"run",
+				"-i",
+				"-v",
+				"claude-memory:/app/dist",
+				"--rm",
+				"mcp/memory"
+			],
+			"type": "stdio"
+		},
+		"git": {
+			"command": "docker",
+			"args": [
+				"run",
+				"--rm",
+				"-i",
+				"--mount",
+				"type=bind,src=${workspaceFolder},dst=/workspace",
+				"mcp/git"
+			],
+			"type": "stdio"
+		}
+	},
+	"inputs": []
+}
