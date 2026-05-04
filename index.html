@@ -2,10 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://localhost:11434 http://127.0.0.1:11434; img-src 'self' data:; style-src 'self';">
   <title>Cert Study</title>
+  <link rel="manifest" href="/app.webmanifest" />
   <link rel="stylesheet" href="style.css" />
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Cert Study" />
+  <link rel="apple-touch-icon" href="/public/icons/icon-180.png" />
+  <!-- Theme color for browser chrome -->
+  <meta name="theme-color" content="#3b82f6" />
 </head>
 <body>
 

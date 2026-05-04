@@ -12,6 +12,21 @@ Exams in `manifest.json` load automatically. The SC-300 and AWS SAA-C03 exams ar
 
 ---
 
+## iPhone / Mobile (PWA)
+
+The app is a Progressive Web App — install it to your iPhone home screen for a native-like offline experience. No App Store required.
+
+1. Open the app URL in **Safari** (must be Safari, not Chrome, for iOS home screen install)
+2. Tap the **Share** button (box with arrow pointing up)
+3. Scroll down and tap **Add to Home Screen**
+4. Name it "Cert Study" and tap **Add**
+
+The app icon appears on your home screen. All exams and static assets are cached offline — you can study with no internet connection. The AI assistant requires a network connection to reach Ollama, but the quiz engine works fully offline.
+
+> **Hosting options for mobile**: Run `docker compose up` on your laptop and visit `http://<your-laptop-ip>:8080` in Safari on your iPhone while on the same Wi-Fi. Install from there. Once installed, all content is cached offline.
+
+---
+
 ## Docker
 
 ```bash
