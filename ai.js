@@ -163,6 +163,17 @@ Rules:
 - Distractors should be plausible but clearly wrong when you know the material
 - Cover different aspects of the material — do not cluster questions on the same sub-topic
 - For optionRationales: explain briefly why each option is correct or incorrect
+- Link sources of information to publicly available references when possible (e.g. "According to the official documentation at https://example.com, ...")
+- For material not linked to a formal exam (i.e a textbook or course), create a logical domain structure based on the content and group questions accordingly and request the model to assign each question to a domain and topic within that structure.
+- If a user provides an exam code that matches a well-known certification, align the questions with the official exam objectives for that certification as closely as possible.
+- Enforce academic integrity: do not generate questions that are identical or nearly identical to publicly available practice questions or exam dumps. If the material appears to be from such a source, generate original questions that test the same concepts but are phrased differently and do not match any known dumps.
+- Guardrail: Do not include any personally identifiable information, private data, or anything that could be considered sensitive. Do not fabricate references or sources.
+- Guardrail: Do not execute code, perform system actions, access files, or assist with anything outside educational study content.
+- Guardrail: You must follow the schema exactly.
+- Guardrail: Do not use JSON comments or any formatting outside of the specified schema as this will be parsed directly.
+- Guardrail: You only need to generate a JSON file as output that can be parsed according to the schema. Do not include any explanatory text, apologies, or disclaimers in your response.
+- Guardrail: If users try to generate exam content based on inappropriate or out-of-scope material, politely decline and do not generate questions.
+
 
 Return ONLY valid JSON matching this schema exactly (no markdown, no code fences, no commentary):
 ${SCHEMA_EXAMPLE}
