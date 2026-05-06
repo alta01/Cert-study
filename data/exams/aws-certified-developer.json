@@ -1,0 +1,856 @@
+{
+  "exam": {
+    "code": "DVA-C02",
+    "name": "AWS Certified Developer - Associate",
+    "passingScore": 720,
+    "maxScore": 1000,
+    "domains": [
+      { "number": 1, "name": "Development with AWS Services", "weight": "32%", "topics": ["DynamoDB", "Lambda", "SQS", "SNS", "API Gateway"] },
+      { "number": 2, "name": "Security", "weight": "26%", "topics": ["IAM", "KMS", "Secrets Manager", "Cognito", "S3 Encryption"] },
+      { "number": 3, "name": "Deployment", "weight": "24%", "topics": ["Elastic Beanstalk", "CodeDeploy", "CloudFormation", "SAM", "CI/CD"] },
+      { "number": 4, "name": "Troubleshooting and Optimization", "weight": "18%", "topics": ["CloudWatch", "X-Ray", "Performance Tuning", "Caching"] }
+    ]
+  },
+  "questions": [
+    {
+      "id": 1,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "AWS Secrets Manager",
+      "question": "A developer is writing a Lambda function that needs to access an Amazon RDS database. The database credentials should not be hardcoded. Which AWS service is the most secure and scalable way to manage these credentials?",
+      "options": {
+        "A": "AWS Secrets Manager",
+        "B": "AWS Systems Manager Parameter Store (Plaintext)",
+        "C": "Environment Variables with Lambda encryption helpers",
+        "D": "Amazon S3 with server-side encryption"
+      },
+      "answer": "A",
+      "rationale": "AWS Secrets Manager is specifically designed to protect secrets, offering built-in integration for RDS and automatic credential rotation.",
+      "optionRationales": {
+        "A": "This service is specifically designed for secrets and provides automatic rotation for RDS credentials.",
+        "B": "Storing sensitive credentials in plaintext does not meet security best practices.",
+        "C": "Environment variables do not support automatic rotation or the same level of auditing as a dedicated secret store.",
+        "D": "This adds unnecessary latency and complexity compared to using a specialized secrets management service."
+      }
+    },
+    {
+      "id": 2,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "DynamoDB Indexes",
+      "question": "An application uses an Amazon DynamoDB table. The developer needs to perform a query that filters data based on an attribute that is not the partition key. Which feature should be implemented?",
+      "options": {
+        "A": "Global Secondary Index (GSI)",
+        "B": "Local Secondary Index (LSI)",
+        "C": "Scan operation with a FilterExpression",
+        "D": "DynamoDB Streams"
+      },
+      "answer": "A",
+      "rationale": "GSIs allow queries on any non-key attribute across the entire table, providing high flexibility for different access patterns.",
+      "optionRationales": {
+        "A": "GSIs provide the most flexibility by allowing a different partition key and sort key than the base table.",
+        "B": "LSIs are restricted because they must share the same partition key as the base table.",
+        "C": "Scans examine every item in the table before filtering, which is highly inefficient for large datasets.",
+        "D": "Streams are used for capturing changes to items, not for optimizing read queries."
+      }
+    },
+    {
+      "id": 3,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "Messaging Patterns",
+      "question": "A developer wants to implement a 'fan-out' messaging pattern where a single message sent to a topic is delivered to multiple SQS queues. Which service should be the entry point?",
+      "options": {
+        "A": "Amazon SNS",
+        "B": "Amazon Kinesis Data Firehose",
+        "C": "AWS Step Functions",
+        "D": "Amazon MQ"
+      },
+      "answer": "A",
+      "rationale": "The SNS-to-SQS fan-out pattern is a standard architecture for decoupling services and broadcasting messages to multiple subscribers.",
+      "optionRationales": {
+        "A": "SNS is the primary AWS service for pub/sub fan-out logic.",
+        "B": "Firehose is for loading streaming data into data lakes, not for point-to-point application messaging.",
+        "C": "Step Functions coordinate workflows but are not the primary mechanism for message broadcasting.",
+        "D": "Amazon MQ is a managed broker for traditional protocols like MQTT and is not the standard choice for native fan-out."
+      }
+    },
+    {
+      "id": 4,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "Lambda Performance",
+      "question": "In an AWS Lambda function, which configuration determines the amount of CPU power and network bandwidth allocated to the function?",
+      "options": {
+        "A": "Memory",
+        "B": "Timeout",
+        "C": "Concurrency",
+        "D": "Ephemeral storage (/tmp)"
+      },
+      "answer": "A",
+      "rationale": "In Lambda, CPU and other resources are allocated proportionally to the amount of memory configured for the function.",
+      "optionRationales": {
+        "A": "Increasing memory increases the allocated CPU power proportionately.",
+        "B": "Timeout controls the maximum duration of execution but does not change performance speed.",
+        "C": "Concurrency limits the number of simultaneous executions but not the individual resource speed.",
+        "D": "Ephemeral storage only affects the disk space available for temporary files."
+      }
+    },
+    {
+      "id": 5,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "Elastic Beanstalk Configuration",
+      "question": "A developer is deploying a web application on AWS Elastic Beanstalk. Which file should be included in the source bundle to customize the environment and install Linux packages?",
+      "options": {
+        "A": "A file with a .config extension in the .ebextensions folder",
+        "B": "appspec.yml",
+        "C": "buildspec.yml",
+        "D": "procfile"
+      },
+      "answer": "A",
+      "rationale": "Elastic Beanstalk uses configuration files in the .ebextensions directory to define infrastructure changes and software installations.",
+      "optionRationales": {
+        "A": "This is the standard directory for customizing Beanstalk environments and installing software.",
+        "B": "AppSpec files are specific to AWS CodeDeploy.",
+        "C": "BuildSpec files are specific to AWS CodeBuild.",
+        "D": "Procfiles specify the commands used to start the application, not for environment configuration."
+      }
+    },
+    {
+      "id": 6,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "DynamoDB Error Handling",
+      "question": "Which HTTP status code is received from Amazon DynamoDB if the application exceeds the provisioned throughput capacity?",
+      "options": {
+        "A": "400 Bad Request",
+        "B": "503 Service Unavailable",
+        "C": "500 Internal Server Error",
+        "D": "404 Not Found"
+      },
+      "answer": "A",
+      "rationale": "Throttling errors in DynamoDB are returned as 400-series client errors (ProvisionedThroughputExceededException).",
+      "optionRationales": {
+        "A": "Throttling is treated as a client-side error (400) because the client is exceeding defined limits.",
+        "B": "503 usually indicates an unexpected server-side outage or maintenance.",
+        "C": "500 represents an unhandled internal server error, not a standard rate-limit response.",
+        "D": "404 indicates the table or item does not exist."
+      }
+    },
+    {
+      "id": 7,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "Distributed Tracing",
+      "question": "Which AWS service provides a visual representation of the service map and latency for requests passing through API Gateway, Lambda, and DynamoDB?",
+      "options": {
+        "A": "AWS X-Ray",
+        "B": "Amazon CloudWatch Logs",
+        "C": "AWS CloudTrail",
+        "D": "AWS Config"
+      },
+      "answer": "A",
+      "rationale": "X-Ray is the primary tool for distributed tracing, allowing developers to visualize dependencies and identify performance bottlenecks.",
+      "optionRationales": {
+        "A": "X-Ray generates service maps and traces that show timing across multiple AWS services.",
+        "B": "CloudWatch Logs stores text-based logs but does not provide visual tracing across services.",
+        "C": "CloudTrail audits API calls for security but is not designed for performance tracing.",
+        "D": "AWS Config tracks resource state changes over time."
+      }
+    },
+    {
+      "id": 8,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "DynamoDB Optimization",
+      "question": "What is the most efficient way to handle 'Hot Partitions' in DynamoDB when a small number of items are accessed much more frequently than others?",
+      "options": {
+        "A": "Implement an Amazon ElastiCache layer in front of DynamoDB",
+        "B": "Increase the Provisioned Read Capacity Units (RCUs) for the whole table",
+        "C": "Switch to On-Demand capacity mode",
+        "D": "Convert the table to a Global Table"
+      },
+      "answer": "A",
+      "rationale": "Caching frequently accessed items offloads the read burden from DynamoDB, preventing throttling on hot partitions.",
+      "optionRationales": {
+        "A": "Caching move the traffic for 'hot' items to memory, protecting the database throughput.",
+        "B": "This is expensive and inefficient because it doesn't fix the localized partition imbalance.",
+        "C": "While it scales, On-Demand still has per-partition limits that a 'hot' item can easily exceed.",
+        "D": "Global tables replicate data but do not solve local partition hotspots."
+      }
+    },
+    {
+      "id": 9,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "SQS Visibility Timeout",
+      "question": "When configuring an Amazon SQS queue, what does the 'Visibility Timeout' represent?",
+      "options": {
+        "A": "The period during which a message is hidden from other consumers after being picked up",
+        "B": "The maximum time a message can remain in the queue before being deleted",
+        "C": "The amount of time a consumer waits for a message to arrive if the queue is empty",
+        "D": "The delay before a new message becomes available to any consumer"
+      },
+      "answer": "A",
+      "rationale": "Visibility Timeout prevents multiple consumers from processing the same message simultaneously, ensuring at-least-once delivery.",
+      "optionRationales": {
+        "A": "This setting ensures a message is exclusively 'owned' by one consumer for a set time.",
+        "B": "This describes the Message Retention Period.",
+        "C": "This describes Long Polling (WaitTimeSeconds).",
+        "D": "This describes the Delay Seconds setting."
+      }
+    },
+    {
+      "id": 10,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "Deployment Strategies",
+      "question": "A developer is using AWS CodeDeploy to update an application on Amazon EC2 and wants to shift traffic gradually to a new set of instances. Which deployment type is best?",
+      "options": {
+        "A": "Blue/Green deployment",
+        "B": "In-place deployment",
+        "C": "All-at-once deployment",
+        "D": "Rolling update"
+      },
+      "answer": "A",
+      "rationale": "Blue/green deployments allow for the creation of a new environment and a controlled shift of traffic, minimizing downtime and risk.",
+      "optionRationales": {
+        "A": "Blue/Green is the standard for zero-downtime shifts between distinct environments.",
+        "B": "In-place deployments result in downtime because services must be stopped to update.",
+        "C": "All-at-once updates everything simultaneously, which is high risk and causes downtime.",
+        "D": "Rolling updates are safer than all-at-once but less flexible than the Blue/Green model."
+      }
+    },
+    {
+      "id": 11,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "NoSQL Data Modeling",
+      "question": "A serverless application needs to store user profile data with varying schemas for different users. Which storage solution is most appropriate?",
+      "options": {
+        "A": "Amazon DynamoDB",
+        "B": "Amazon RDS (PostgreSQL)",
+        "C": "Amazon Redshift",
+        "D": "Amazon EFS"
+      },
+      "answer": "A",
+      "rationale": "DynamoDB is a NoSQL database that natively supports flexible schemas and key-value storage, ideal for variable user profiles.",
+      "optionRationales": {
+        "A": "NoSQL is ideal for schema flexibility where different records have different attributes.",
+        "B": "Relational databases require a fixed schema which makes varying profiles difficult to manage.",
+        "C": "Redshift is for heavy analytics/OLAP and is not suitable for high-frequency profile lookups.",
+        "D": "EFS is a file system and is inefficient for structured key-value data storage."
+      }
+    },
+    {
+      "id": 12,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "S3 Data Transfer",
+      "question": "A developer is using AWS CLI to upload large files to S3. Which feature ensures that if a network failure occurs, the upload can resume rather than starting over?",
+      "options": {
+        "A": "S3 Multipart Upload",
+        "B": "S3 Transfer Acceleration",
+        "C": "S3 Cross-Region Replication",
+        "D": "Versioning"
+      },
+      "answer": "A",
+      "rationale": "Multipart upload breaks large objects into parts, allowing them to be uploaded in parallel and resumed if specific parts fail.",
+      "optionRationales": {
+        "A": "This allows parallel streams and individual part retries, making large uploads reliable.",
+        "B": "This speeds up the transfer via edge locations but doesn't manage resume logic.",
+        "C": "Replication occurs after the file is already uploaded to the source bucket.",
+        "D": "Versioning tracks changes to existing objects but does not aid the upload process."
+      }
+    },
+    {
+      "id": 13,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "S3 Security",
+      "question": "Which header must be included in an Amazon S3 REST API request to specify Server-Side Encryption with S3-Managed Keys (SSE-S3)?",
+      "options": {
+        "A": "x-amz-server-side-encryption: AES256",
+        "B": "x-amz-server-side-encryption: aws:kms",
+        "C": "Content-MD5",
+        "D": "x-amz-storage-class: GLACIER"
+      },
+      "answer": "A",
+      "rationale": "The header 'x-amz-server-side-encryption: AES256' tells S3 to use the AES-256 algorithm and managed keys to encrypt the data at rest.",
+      "optionRationales": {
+        "A": "AES256 is the specific value required to trigger S3-managed key encryption.",
+        "B": "This value triggers SSE-KMS, which uses a different key management system.",
+        "C": "This is used for integrity checks to ensure the object wasn't corrupted in transit.",
+        "D": "This defines the storage tier for cold data storage."
+      }
+    },
+    {
+      "id": 14,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "SQS Reliability",
+      "question": "What is the purpose of a 'Dead Letter Queue' (DLQ) in Amazon SQS?",
+      "options": {
+        "A": "To store messages that could not be processed successfully after retries",
+        "B": "To act as a backup for messages that have expired",
+        "C": "To store high-priority messages",
+        "D": "To encrypt messages containing sensitive information"
+      },
+      "answer": "A",
+      "rationale": "DLQs isolate problematic messages so developers can inspect them without blocking the rest of the message processing flow.",
+      "optionRationales": {
+        "A": "This isolates 'poison pill' messages for debugging while allowing the system to continue.",
+        "B": "Expired messages are deleted by SQS; they do not move to a DLQ.",
+        "C": "SQS does not support priority routing via DLQs.",
+        "D": "Encryption is handled by SSE settings on the source queue."
+      }
+    },
+    {
+      "id": 15,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "Cognito Authentication",
+      "question": "A developer needs to implement authentication for a mobile app allowing users to sign in using Google or Facebook. Which service should be used?",
+      "options": {
+        "A": "Amazon Cognito User Pools",
+        "B": "Amazon Cognito Identity Pools",
+        "C": "IAM User Groups",
+        "D": "AWS Directory Service"
+      },
+      "answer": "A",
+      "rationale": "User Pools provide a user directory and support federation with social identity providers and OIDC/SAML.",
+      "optionRationales": {
+        "A": "User Pools manage the sign-in, sign-up, and external identity federation.",
+        "B": "Identity Pools provide temporary AWS credentials but don't manage the social sign-in process directly.",
+        "C": "IAM is for internal AWS permissions and not for consumer-facing app users.",
+        "D": "Directory Service is for Active Directory integration, typically for corporate systems."
+      }
+    },
+    {
+      "id": 16,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "VPC Networking",
+      "question": "A Lambda function is timing out while connecting to an RDS instance. Both are in a VPC and security groups are correct. What is a likely cause?",
+      "options": {
+        "A": "The RDS instance is in a private subnet, and the Lambda lacks a route to a NAT Gateway",
+        "B": "The Lambda function does not have an IAM role",
+        "C": "The database is using a different encryption key than the Lambda",
+        "D": "The Lambda function is not configured with enough memory"
+      },
+      "answer": "A",
+      "rationale": "If a Lambda function in a VPC needs to reach the internet or specific cross-subnet resources, it requires a NAT Gateway if in a private subnet.",
+      "optionRationales": {
+        "A": "Connectivity in private subnets requires a NAT gateway or VPC endpoint for outbound traffic.",
+        "B": "A missing IAM role would cause an immediate access error, not a network timeout.",
+        "C": "Encryption mismatches cause data errors, not connection timeouts.",
+        "D": "Low memory might cause slowness or crashes, but not a specific network timeout."
+      }
+    },
+    {
+      "id": 17,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "API Gateway Performance",
+      "question": "A developer is building a serverless API. Which API Gateway feature helps prevent the backend Lambda from being overwhelmed during traffic spikes?",
+      "options": {
+        "A": "Throttling",
+        "B": "Usage Plans",
+        "C": "Caching",
+        "D": "CORS"
+      },
+      "answer": "A",
+      "rationale": "Throttling allows you to set rate limits and burst limits to protect backend services from sudden surges in request volume.",
+      "optionRationales": {
+        "A": "Throttling directly limits the requests per second to match backend capacity.",
+        "B": "Usage plans include throttling but are geared towards tiered customer access.",
+        "C": "Caching helps performance but doesn't prevent volume spikes for unique requests.",
+        "D": "CORS is a browser security feature and has no effect on traffic volume."
+      }
+    },
+    {
+      "id": 18,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "Configuration Management",
+      "question": "Which service managed environment variables and configuration data, supporting both plaintext and encrypted parameters with versioning?",
+      "options": {
+        "A": "AWS Systems Manager Parameter Store",
+        "B": "AWS Secrets Manager",
+        "C": "Amazon DynamoDB",
+        "D": "Amazon S3"
+      },
+      "answer": "A",
+      "rationale": "Parameter Store is a cost-effective way to manage configuration and secrets, providing hierarchical storage and version tracking.",
+      "optionRationales": {
+        "A": "SSM Parameter Store is the standard choice for hierarchical application configuration.",
+        "B": "Secrets Manager is specialized for secrets requiring automatic rotation.",
+        "C": "DynamoDB can store data but doesn't offer native parameter versioning/injection.",
+        "D": "S3 lacks the specialized management and hierarchy features of Parameter Store."
+      }
+    },
+    {
+      "id": 19,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "SQS Optimization",
+      "question": "What is the primary advantage of using 'Long Polling' with Amazon SQS?",
+      "options": {
+        "A": "It reduces the number of empty responses, lowering costs and reducing latency",
+        "B": "It allows messages to be larger than 256 KB",
+        "C": "It guarantees messages are delivered in the exact order sent",
+        "D": "It automatically encrypts the messages in transit"
+      },
+      "answer": "A",
+      "rationale": "By waiting for a message to become available before responding, long polling eliminates frequent 'empty' API calls.",
+      "optionRationales": {
+        "A": "Waiting for a message to arrive reduces the frequency of 'ReceiveMessage' API calls.",
+        "B": "Message size is fixed; larger files must use S3 and the SQS Extended Library.",
+        "C": "Ordering is a property of FIFO queues, not a polling strategy.",
+        "D": "Encryption is a separate configuration setting and not related to polling."
+      }
+    },
+    {
+      "id": 20,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "Lambda Dependencies",
+      "question": "A developer needs to deploy a Lambda function using a specific version of a library shared across multiple functions. What is the best method?",
+      "options": {
+        "A": "AWS Lambda Layers",
+        "B": "Include the library in every deployment ZIP",
+        "C": "Store the library in S3 and download it during execution",
+        "D": "Install the library globally on the underlying OS"
+      },
+      "answer": "A",
+      "rationale": "Layers allow you to pull out common dependencies and share them across multiple functions, reducing deployment package size.",
+      "optionRationales": {
+        "A": "Layers promote code reuse and keep deployment packages small.",
+        "B": "Including it in every ZIP leads to duplication and slower deployments.",
+        "C": "Downloading at runtime increases 'cold start' latency significantly.",
+        "D": "Lambda is serverless; users cannot access the OS to install global packages."
+      }
+    },
+    {
+      "id": 21,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "CloudFormation Reusability",
+      "question": "In CloudFormation, which section allows passing custom values to the template at runtime to make it reusable?",
+      "options": {
+        "A": "Parameters",
+        "B": "Resources",
+        "C": "Mappings",
+        "D": "Outputs"
+      },
+      "answer": "A",
+      "rationale": "Parameters enable you to input custom values each time you create or update a stack, without modifying the template code.",
+      "optionRationales": {
+        "A": "Parameters act as variables for the template at the time of creation.",
+        "B": "The resources section defines the actual AWS items to be created.",
+        "C": "Mappings are static lookup tables used within the template.",
+        "D": "Outputs return information (like a URL) once the stack is complete."
+      }
+    },
+    {
+      "id": 22,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "Cognito Federation",
+      "question": "Which Cognito component exchanges a JWT for temporary AWS credentials to access S3 directly?",
+      "options": {
+        "A": "Cognito Identity Pools",
+        "B": "Cognito User Pools",
+        "C": "Cognito Sync",
+        "D": "IAM Role Aliasing"
+      },
+      "answer": "A",
+      "rationale": "Identity pools (Federated Identities) enable you to obtain temporary, limited-privilege AWS credentials for users.",
+      "optionRationales": {
+        "A": "Identity pools are responsible for providing the actual IAM credentials.",
+        "B": "User Pools provide identity tokens but do not grant IAM permissions.",
+        "C": "Sync is a legacy device-synchronization tool.",
+        "D": "Role Aliasing is not a standard AWS mechanism for Cognito federation."
+      }
+    },
+    {
+      "id": 23,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "Managed Services",
+      "question": "Which service handles capacity provisioning, load balancing, and auto-scaling while the developer just uploads their code?",
+      "options": {
+        "A": "AWS Elastic Beanstalk",
+        "B": "Amazon EC2",
+        "C": "AWS Lambda",
+        "D": "AWS CloudFormation"
+      },
+      "answer": "A",
+      "rationale": "Elastic Beanstalk is a Platform-as-a-Service (PaaS) that automates infrastructure management for web applications.",
+      "optionRationales": {
+        "A": "Beanstalk handles the heavy lifting of infrastructure while running traditional apps.",
+        "B": "EC2 is Infrastructure-as-a-Service and requires manual scaling/balancing setup.",
+        "C": "Lambda is serverless but requires code to be written as functions, not whole apps.",
+        "D": "CloudFormation is for infrastructure as code, not for managed code execution."
+      }
+    },
+    {
+      "id": 24,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "AWS SDK Resilience",
+      "question": "What is the default behavior of the AWS SDK regarding retries for failed API requests like 5xx errors?",
+      "options": {
+        "A": "The SDK automatically performs retries with exponential backoff",
+        "B": "The SDK fails immediately and requires custom retry logic",
+        "C": "The SDK retries exactly once before throwing an exception",
+        "D": "The SDK never retries unless a specific header is present"
+      },
+      "answer": "A",
+      "rationale": "Most AWS SDKs include a default retry handler that implements exponential backoff for transient errors.",
+      "optionRationales": {
+        "A": "SDKs are designed to be resilient to transient network issues out of the box.",
+        "B": "While customizable, the SDK does not fail immediately by default.",
+        "C": "The default retry count is typically 3 or more depending on the service.",
+        "D": "Retry logic is client-side and not strictly dependent on headers."
+      }
+    },
+    {
+      "id": 25,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "DynamoDB Lifecycle",
+      "question": "Which DynamoDB feature should be used to automatically delete data for a specific item after 30 days?",
+      "options": {
+        "A": "Time to Live (TTL)",
+        "B": "DynamoDB Streams",
+        "C": "CloudWatch Events and Lambda",
+        "D": "S3 Lifecycle Policies"
+      },
+      "answer": "A",
+      "rationale": "TTL allows you to define an attribute that specifies when an item expires; DynamoDB deletes it automatically.",
+      "optionRationales": {
+        "A": "TTL is the built-in, no-cost way to handle data expiration in DynamoDB.",
+        "B": "Streams track changes but do not perform automatic deletions.",
+        "C": "This is possible but significantly more complex and expensive than TTL.",
+        "D": "S3 policies only apply to objects in S3 buckets."
+      }
+    },
+    {
+      "id": 26,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "Serverless Frameworks",
+      "question": "Which AWS service allows you to define serverless applications using simplified syntax that expands into CloudFormation?",
+      "options": {
+        "A": "AWS Serverless Application Model (SAM)",
+        "B": "AWS OpsWorks",
+        "C": "AWS CodeDeploy",
+        "D": "Amazon ECS"
+      },
+      "answer": "A",
+      "rationale": "SAM is an open-source framework specifically for building serverless applications using shorthand YAML/JSON templates.",
+      "optionRationales": {
+        "A": "SAM transforms shorthand code into full CloudFormation templates for serverless.",
+        "B": "OpsWorks is for configuration management using Chef or Puppet.",
+        "C": "CodeDeploy handles application updates but not infrastructure definition.",
+        "D": "ECS is for container management, not template abstraction."
+      }
+    },
+    {
+      "id": 27,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "CI/CD Configuration",
+      "question": "Which file name is the default that AWS CodeBuild looks for in the root of the source directory?",
+      "options": {
+        "A": "buildspec.yml",
+        "B": "appspec.yml",
+        "C": "package.json",
+        "D": "dockerfile"
+      },
+      "answer": "A",
+      "rationale": "CodeBuild requires a buildspec.yml file to define the phases, commands, and artifacts for the build process.",
+      "optionRationales": {
+        "A": "The buildspec file is the core configuration for CodeBuild projects.",
+        "B": "AppSpec is used by CodeDeploy to define deployment tasks.",
+        "C": "Package.json is for Node.js dependency management.",
+        "D": "Dockerfiles are for container images, not the build pipeline orchestration."
+      }
+    },
+    {
+      "id": 28,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "Lambda Limits",
+      "question": "What is the maximum execution time (timeout) for an AWS Lambda function?",
+      "options": {
+        "A": "15 minutes",
+        "B": "5 minutes",
+        "C": "1 hour",
+        "D": "There is no limit"
+      },
+      "answer": "A",
+      "rationale": "AWS Lambda functions have a hard limit of 900 seconds (15 minutes) per execution.",
+      "optionRationales": {
+        "A": "15 minutes is the current maximum duration allowed by AWS.",
+        "B": "This was the previous limit before it was increased in 2018.",
+        "C": "Lambda is for short-lived tasks; 1-hour tasks belong on Fargate or EC2.",
+        "D": "All serverless compute functions have a finite duration limit."
+      }
+    },
+    {
+      "id": 29,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "DynamoDB Performance",
+      "question": "In DynamoDB, what is the primary difference between a 'Scan' and a 'Query'?",
+      "options": {
+        "A": "A Query searches based on the primary key; a Scan reads every item in the table",
+        "B": "A Scan is faster than a Query for large datasets",
+        "C": "A Query can only return one item; a Scan returns many",
+        "D": "Scans are only possible on Global Secondary Indexes"
+      },
+      "answer": "A",
+      "rationale": "Queries are efficient because they use indexes; Scans are inefficient as they process all data in the table.",
+      "optionRationales": {
+        "A": "Queries use the partition/sort keys to locate specific data directly.",
+        "B": "Scans are slower for large data because they perform a full table read.",
+        "C": "Queries can return multiple items sharing a partition key.",
+        "D": "Scans can be performed on the base table or any index."
+      }
+    },
+    {
+      "id": 30,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "Workflow Orchestration",
+      "question": "Which AWS service is used to coordinate multiple services into serverless workflows using visual state machines?",
+      "options": {
+        "A": "AWS Step Functions",
+        "B": "AWS Glue",
+        "C": "Amazon SNS",
+        "D": "AWS Data Pipeline"
+      },
+      "answer": "A",
+      "rationale": "Step Functions allow you to design and run workflows that stitch together services like Lambda, Glue, and SageMaker.",
+      "optionRationales": {
+        "A": "Step Functions manage the state and logic of multi-step processes.",
+        "B": "Glue is for ETL and data transformation.",
+        "C": "SNS is for notifications and simple messaging.",
+        "D": "Data Pipeline is for scheduling data movement between AWS services."
+      }
+    },
+    {
+      "id": 31,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "S3 Access Control",
+      "question": "To avoid giving users permanent credentials for S3 uploads, which mechanism should be used?",
+      "options": {
+        "A": "S3 Presigned URLs",
+        "B": "S3 Bucket Policies with 'Allow All'",
+        "C": "IAM User Access Keys hardcoded in the app",
+        "D": "S3 Transfer Acceleration"
+      },
+      "answer": "A",
+      "rationale": "Presigned URLs grant temporary access to a specific S3 object using the credentials of the user who generated it.",
+      "optionRationales": {
+        "A": "This provides a time-limited way to allow users to interact with S3 without an IAM user.",
+        "B": "Allowing public access is a massive security risk.",
+        "C": "Hardcoding credentials in an app is a critical security failure.",
+        "D": "This optimizes speed but does not address the security credentials."
+      }
+    },
+    {
+      "id": 32,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "S3 Storage Classes",
+      "question": "Which Amazon S3 feature can automatically move objects to cheaper storage classes based on age?",
+      "options": {
+        "A": "S3 Lifecycle Management",
+        "B": "S3 Intelligent-Tiering",
+        "C": "S3 Storage Lens",
+        "D": "S3 Object Lock"
+      },
+      "answer": "A",
+      "rationale": "Lifecycle rules define transitions (moving data between classes) and expirations based on object age.",
+      "optionRationales": {
+        "A": "Lifecycle rules are the primary way to manage data aging and cost optimization.",
+        "B": "Intelligent-Tiering moves data based on access patterns, not necessarily age.",
+        "C": "Storage Lens is for visibility and analytics of storage usage.",
+        "D": "Object Lock prevents deletion for compliance purposes."
+      }
+    },
+    {
+      "id": 33,
+      "domain": 2,
+      "domainName": "Security",
+      "topic": "Encryption Best Practices",
+      "question": "Which practice involves using a unique data key to encrypt an item, then encrypting that key with a master key?",
+      "options": {
+        "A": "Envelope Encryption",
+        "B": "Key Rotation",
+        "C": "Asymmetric Encryption",
+        "D": "Multi-Factor Authentication"
+      },
+      "answer": "A",
+      "rationale": "Envelope encryption uses a master key to encrypt a unique data key, which is then used for the actual data.",
+      "optionRationales": {
+        "A": "This reduces the workload on the master key and limits the risk of key exposure.",
+        "B": "Rotation changes the underlying master key but is not the same as data-key wrapping.",
+        "C": "Asymmetric encryption uses public/private pairs, which is different from key-wrapping.",
+        "D": "MFA is for identity verification, not data encryption."
+      }
+    },
+    {
+      "id": 34,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "Monitoring and Alerting",
+      "question": "Which combination of services is best for receiving an email if an application's 4XX errors exceed a threshold?",
+      "options": {
+        "A": "Amazon CloudWatch Alarms and Amazon SNS",
+        "B": "AWS CloudTrail and AWS Config",
+        "C": "Amazon CloudWatch Logs and AWS Lambda",
+        "D": "AWS Health Dashboard and Amazon SES"
+      },
+      "answer": "A",
+      "rationale": "CloudWatch Alarms monitor metrics, and SNS can send notifications when an alarm state is reached.",
+      "optionRationales": {
+        "A": "This is the standard AWS architecture for metric-based alerting.",
+        "B": "These are for auditing and resource state, not real-time error metrics.",
+        "C": "Possible, but requires custom log processing which is less efficient than native metrics.",
+        "D": "Health Dashboard reports on AWS service issues, not application-level errors."
+      }
+    },
+    {
+      "id": 35,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "API Gateway Endpoints",
+      "question": "Which API Gateway 'Endpoint Type' is best for minimizing global latency via the CloudFront network?",
+      "options": {
+        "A": "Edge-optimized",
+        "B": "Regional",
+        "C": "Private",
+        "D": "Global"
+      },
+      "answer": "A",
+      "rationale": "Edge-optimized endpoints automatically route requests through the nearest CloudFront Point of Presence (PoP).",
+      "optionRationales": {
+        "A": "This endpoint uses the global AWS network to reduce the path to the user.",
+        "B": "Regional endpoints are best when users and backend are in the same region.",
+        "C": "Private endpoints are restricted to VPC traffic only.",
+        "D": "This is not a formal AWS API Gateway endpoint classification."
+      }
+    },
+    {
+      "id": 36,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "Application Tracing",
+      "question": "How can a developer identify which specific block of code in a Lambda function is causing latency using X-Ray?",
+      "options": {
+        "A": "Create custom subsegments in the code using the X-Ray SDK",
+        "B": "Enable 'Active Tracing' in the Lambda configuration",
+        "C": "Increase the Lambda memory allocation",
+        "D": "Review CloudWatch Metrics for 'Duration'"
+      },
+      "answer": "A",
+      "rationale": "Subsegments allow you to wrap specific blocks of code to see their individual timing data in X-Ray.",
+      "optionRationales": {
+        "A": "Subsegments provide the granular visibility needed within the function code.",
+        "B": "Active tracing shows the whole function's time but not the inner logic breakdown.",
+        "C": "Memory changes performance but doesn't explain where the time is being spent.",
+        "D": "Metrics show total time, not the internal code path timing."
+      }
+    },
+    {
+      "id": 37,
+      "domain": 4,
+      "domainName": "Troubleshooting and Optimization",
+      "topic": "Lambda Concurrency",
+      "question": "What happens when an AWS Lambda function is configured with 'Reserved Concurrency' set to 10?",
+      "options": {
+        "A": "The function has a maximum of 10 simultaneous executions, which are guaranteed to be available",
+        "B": "The function will always run exactly 10 instances",
+        "C": "The function can handle 10 times more traffic than the default",
+        "D": "10 execution environments will be pre-warmed"
+      },
+      "answer": "A",
+      "rationale": "Reserved concurrency limits the function's maximum capacity while also setting aside that capacity from the account pool.",
+      "optionRationales": {
+        "A": "This ensures other functions can't steal all the account's concurrency from this function.",
+        "B": "Reserved concurrency is not 'always-on' compute.",
+        "C": "It is a limit, typically lower than the account-wide regional limit.",
+        "D": "This describes Provisioned Concurrency, a different setting."
+      }
+    },
+    {
+      "id": 38,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "Source Control",
+      "question": "Which AWS service serves as a managed Git repository to trigger a CodePipeline?",
+      "options": {
+        "A": "AWS CodeCommit",
+        "B": "AWS CodeBuild",
+        "C": "AWS CodeDeploy",
+        "D": "Amazon S3"
+      },
+      "answer": "A",
+      "rationale": "CodeCommit is the secure, managed source control service that hosts private Git repositories.",
+      "optionRationales": {
+        "A": "CodeCommit is the native AWS Git hosting service.",
+        "B": "CodeBuild is for the build phase, not for storing code.",
+        "C": "CodeDeploy handles the distribution of code to targets.",
+        "D": "S3 can store artifacts, but it is not a Git-based version control system."
+      }
+    },
+    {
+      "id": 39,
+      "domain": 1,
+      "domainName": "Development with AWS Services",
+      "topic": "DynamoDB Consistency",
+      "question": "Which DynamoDB consistency model returns the absolute latest written data?",
+      "options": {
+        "A": "Strongly Consistent Reads",
+        "B": "Eventually Consistent Reads",
+        "C": "Transactions",
+        "D": "Global Tables"
+      },
+      "answer": "A",
+      "rationale": "Strongly consistent reads return a result that reflects all successful writes prior to the read.",
+      "optionRationales": {
+        "A": "This ensures you see the most current version of an item immediately.",
+        "B": "This is cheaper but might return data that is slightly out of date.",
+        "C": "Transactions are for ACID operations across items, not single-item consistency settings.",
+        "D": "Global tables actually increase the 'eventual' nature of consistency across regions."
+      }
+    },
+    {
+      "id": 40,
+      "domain": 3,
+      "domainName": "Deployment",
+      "topic": "CloudFormation Updates",
+      "question": "Which CloudFormation feature allows you to preview stack changes before they are applied?",
+      "options": {
+        "A": "Change Sets",
+        "B": "Stack Sets",
+        "C": "Drift Detection",
+        "D": "Termination Protection"
+      },
+      "answer": "A",
+      "rationale": "Change sets allow you to preview how proposed changes to a stack might impact your running resources.",
+      "optionRationales": {
+        "A": "This allows you to see if a resource will be updated or replaced before committing.",
+        "B": "Stack Sets are for deploying to multiple accounts/regions.",
+        "C": "Drift Detection checks if resources were changed manually outside of the template.",
+        "D": "Termination Protection prevents the entire stack from being deleted."
+      }
+    }
+  ]
+}
