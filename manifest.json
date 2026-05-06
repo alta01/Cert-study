@@ -12,6 +12,12 @@
       "file": "data/exams/sc-300.json",
       "title": "SC-300: Microsoft Identity and Access Administrator",
       "category": "Microsoft Certifications"
+    },
+    {
+      "id": "DVA-C02",
+      "file": "data/exams/dva-c02.json",
+      "title": "AWS Certified Developer - Associate (DVA-C02)",
+      "category": "AWS Certifications"
     }
   ]
 }
