@@ -2,6 +2,12 @@
   "version": "1",
   "exams": [
     {
+      "id": "dva-c02",
+      "file": "data/exams/aws-certified-developer.json",
+      "title": "DVA-C02: AWS Certified Developer - Associate",
+      "category": ""
+    },
+    {
       "id": "saa-c03",
       "file": "data/exams/aws-saa-c03.json",
       "title": "SAA-C03: AWS Certified Solutions Architect – Associate",
@@ -14,10 +20,10 @@
       "category": "Microsoft Certifications"
     },
     {
-      "id": "DVA-C02",
-      "file": "data/exams/dva-c02.json",
-      "title": "AWS Certified Developer - Associate (DVA-C02)",
-      "category": "AWS Certifications"
+      "id": "sc-500",
+      "file": "data/exams/sc-500.json",
+      "title": "SC-500: Implementing End-to-End Security Controls for Cloud and AI Workloads",
+      "category": "Microsoft Certifications"
     }
   ]
 }
