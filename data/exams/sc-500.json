@@ -1006,6 +1006,1236 @@
         { "text": "Conditional Access grant controls — Require terms of use", "url": "https://learn.microsoft.com/entra/identity/conditional-access/concept-conditional-access-grant" },
         { "text": "Microsoft Entra terms of use", "url": "https://learn.microsoft.com/entra/identity/conditional-access/terms-of-use" }
       ]
+    },
+    {
+      "id": 41,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — user delegation SAS vs service/account SAS",
+      "question": "An engineer needs to generate short-lived, revocable SAS URLs for blob downloads from a web app. Auditing should attribute SAS-creation actions to specific Microsoft Entra users, and the storage account key must not be deployed to the web app's compute. Which SAS type meets all requirements?",
+      "options": {
+        "A": "Account SAS signed with the storage account key, distributed at app startup.",
+        "B": "Service SAS signed with the storage account key, with a stored access policy for revocation.",
+        "C": "User delegation SAS signed with a user delegation key obtained via the web app's managed identity (which has the Storage Blob Data Contributor role and 'generateUserDelegationKey' permission).",
+        "D": "Shared Key authorization with HMAC-SHA256 signing per request."
+      },
+      "answer": "C",
+      "rationale": "User delegation SAS is signed with a user delegation key obtained from Microsoft Entra rather than with the storage account key. The SAS is attributed to the Entra principal that requested the key (the web app's managed identity), is revocable by revoking the user delegation key or the principal's role assignment, and never exposes the account key to the application. This is Microsoft's recommended SAS pattern.",
+      "optionRationales": {
+        "A": "Account SAS uses the storage account key — directly contradicts the no-key-deployment requirement.",
+        "B": "Service SAS also uses the storage account key.",
+        "C": "Correct. User delegation SAS is the documented, preferred pattern.",
+        "D": "Shared Key authorization is not a SAS and also requires the account key."
+      },
+      "references": [
+        { "text": "Grant limited access to Storage resources using SAS", "url": "https://learn.microsoft.com/azure/storage/common/storage-sas-overview" },
+        { "text": "Create a user delegation SAS", "url": "https://learn.microsoft.com/rest/api/storageservices/create-user-delegation-sas" }
+      ]
+    },
+    {
+      "id": 42,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — disallow Shared Key authorization",
+      "question": "A security team wants to ensure that NO request to a storage account can succeed using the account key (Shared Key) — all access must use Microsoft Entra ID. Which configuration achieves this with the least operational complexity?",
+      "options": {
+        "A": "Rotate the storage account keys every 24 hours via Logic Apps.",
+        "B": "Set 'Allow Shared Key access' to Disabled on the storage account so Shared Key authorization is rejected at the data plane, regardless of who possesses the key.",
+        "C": "Set an Azure Policy that audits Shared Key requests in storage diagnostic logs.",
+        "D": "Delete both storage account keys."
+      },
+      "answer": "B",
+      "rationale": "Setting 'Allow Shared Key access' to Disabled on the storage account (control-plane property) causes the data plane to reject any Shared Key request and any service-or-account SAS (since those are signed with the account key). Only Microsoft Entra-authorized requests and user delegation SAS continue to work.",
+      "optionRationales": {
+        "A": "Rotation doesn't prevent use during the validity window.",
+        "B": "Correct. Disabling Shared Key access is the supported, declarative control.",
+        "C": "Auditing detects after the fact but does not prevent.",
+        "D": "Deleting both keys breaks the account and blocks all rotation paths."
+      },
+      "references": [
+        { "text": "Prevent Shared Key authorization for an Azure Storage account", "url": "https://learn.microsoft.com/azure/storage/common/shared-key-authorization-prevent" }
+      ]
+    },
+    {
+      "id": 43,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — firewall, service endpoint, private endpoint",
+      "question": "A storage account holds data for an Azure Function in the same region. Security requires that traffic between the Function and the storage account never traverse the public internet, that no public endpoint exists, and that the account's public DNS name still resolves so existing on-prem clients (during migration) don't break. Which design meets all requirements?",
+      "options": {
+        "A": "Service endpoint on the Function's subnet + storage firewall allowing only that subnet, leaving public access on.",
+        "B": "Disable public network access, add a private endpoint in the Function's subnet for the blob/file/queue services in use, and configure the corresponding Private DNS zones (privatelink.blob.core.windows.net, etc.) so the storage FQDN resolves to the private IP within the VNet.",
+        "C": "Disable public network access and rely on Function's outbound IP allow-listing in the storage firewall.",
+        "D": "Set the storage account to Premium SKU; private connectivity is automatic."
+      },
+      "answer": "B",
+      "rationale": "Private endpoint + Private DNS removes public exposure (public access disabled) while preserving the public FQDN, which resolves to the private IP within the VNet via the Private DNS zone. Service endpoints leave the storage public endpoint reachable. Outbound IP allow-listing doesn't remove public exposure and is unreliable for Functions on Consumption.",
+      "optionRationales": {
+        "A": "Service endpoints don't remove public exposure.",
+        "B": "Correct. Private endpoint + Private DNS is the documented zero-public-exposure pattern.",
+        "C": "Public access disabled means even the function's outbound IP wouldn't reach the account without a private endpoint.",
+        "D": "SKU choice doesn't enable private connectivity."
+      },
+      "references": [
+        { "text": "Use private endpoints for Azure Storage", "url": "https://learn.microsoft.com/azure/storage/common/storage-private-endpoints" },
+        { "text": "Configure Azure Storage firewalls and virtual networks", "url": "https://learn.microsoft.com/azure/storage/common/storage-network-security" }
+      ]
+    },
+    {
+      "id": 44,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for Storage — malware scanning on upload",
+      "question": "A storage account receives files from external partners through a public upload form. The SecOps team must block malware before it can be downloaded by anyone else and prefers an agentless solution. Which Defender for Storage feature addresses this?",
+      "options": {
+        "A": "Defender for Storage classic plan with hash analysis only.",
+        "B": "Defender for Storage (new plan) with malware scanning enabled at the storage account or subscription level — scans every uploaded blob with Microsoft Defender Antivirus, returns a verdict (Malicious / No threats found / Failed / Skipped) via blob index tags and Event Grid, and supports automated quarantine playbooks.",
+        "C": "Microsoft Defender for Cloud Apps file policies.",
+        "D": "Manual scheduling of an Azure Function with a third-party AV signature library."
+      },
+      "answer": "B",
+      "rationale": "Malware scanning is the dedicated Defender for Storage capability in the new plan. It scans uploaded blobs agentlessly with Microsoft Defender Antivirus, emits results via blob index tags + Event Grid, and integrates with quarantine automation. The classic plan only does hash-based analysis (not full content scanning).",
+      "optionRationales": {
+        "A": "Classic hash analysis is signature-only and limited.",
+        "B": "Correct. Malware scanning in the new Defender for Storage plan is the documented, supported solution.",
+        "C": "Defender for Cloud Apps targets SaaS, not Azure Storage uploads.",
+        "D": "Building your own with Functions is operationally heavy and lacks Microsoft's threat intel."
+      },
+      "references": [
+        { "text": "Overview of malware scanning in Defender for Storage", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-malware-scan" },
+        { "text": "Defender for Storage overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-introduction" }
+      ]
+    },
+    {
+      "id": 45,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for Storage — sensitive data threat detection",
+      "question": "Defender for Storage in the new plan offers sensitive data threat detection. Which statement most accurately describes what this feature does and what it depends on?",
+      "options": {
+        "A": "It encrypts blobs at rest using customer-managed keys.",
+        "B": "It uses the Sensitive Data Discovery engine (the same engine used by Defender CSPM) to identify storage containers with sensitive data (Purview SITs and labels), then prioritizes alerts by sensitivity — e.g., a public-exposure alert on a container with PII becomes higher severity than the same alert on an empty container.",
+        "C": "It performs real-time DLP on every blob download.",
+        "D": "It requires Microsoft Sentinel to function."
+      },
+      "answer": "B",
+      "rationale": "Sensitive data threat detection is configurable in the new Defender for Storage plan. It leverages the agentless Sensitive Data Discovery engine (shared with Defender CSPM) integrated with Microsoft Purview SITs and classification labels. Alerts that involve resources holding sensitive data are prioritized accordingly.",
+      "optionRationales": {
+        "A": "Encryption at rest is unrelated; that's a Storage Service Encryption feature.",
+        "B": "Correct. SDD + Purview integration is the documented mechanism.",
+        "C": "Sensitive data threat detection enriches existing alerts; it is not a real-time DLP enforcement.",
+        "D": "Sentinel is optional, not required."
+      },
+      "references": [
+        { "text": "Sensitive data threat detection in Defender for Storage", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-data-sensitivity" }
+      ]
+    },
+    {
+      "id": 46,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — blob immutability with time-based retention",
+      "question": "A regulatory requirement obligates a company to retain transaction logs unmodifiable for seven years. After commitment, the policy must not be shortenable by any administrator. Which Azure Storage feature meets this?",
+      "options": {
+        "A": "Soft delete with the maximum retention.",
+        "B": "Container-level time-based immutability policy with the policy 'locked' — once locked, the retention can only be extended, not shortened or removed; combined with versioning if the data is overwritten in place.",
+        "C": "Premium block blob tier.",
+        "D": "Storage account resource lock of type CanNotDelete."
+      },
+      "answer": "B",
+      "rationale": "Time-based immutability for blob containers enforces WORM semantics. The policy can be in an 'unlocked' (test) state initially and then 'locked' — once locked, the retention period cannot be shortened or removed and the policy cannot be deleted. This is the documented WORM/compliance feature for blobs.",
+      "optionRationales": {
+        "A": "Soft delete prevents accidental deletion within a window but does not prevent modification or shortening.",
+        "B": "Correct. Locked time-based retention policy provides WORM.",
+        "C": "Storage tier affects performance/cost, not immutability.",
+        "D": "Locks prevent control-plane operations on the resource, not data-plane modifications."
+      },
+      "references": [
+        { "text": "Immutable storage with time-based retention policies", "url": "https://learn.microsoft.com/azure/storage/blobs/immutable-time-based-retention-policy-overview" },
+        { "text": "Set and manage immutability policies", "url": "https://learn.microsoft.com/azure/storage/blobs/immutable-policy-configure-version-scope" }
+      ]
+    },
+    {
+      "id": 47,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — encryption with customer-managed keys",
+      "question": "A storage account must be encrypted with a key the customer controls; key rotation must be automatic with no downtime, and the key vault should be isolated from the storage account's subscription. Which configuration meets this?",
+      "options": {
+        "A": "Configure customer-managed key (CMK) encryption on the storage account, set the key reference to a versionless key URI in a Key Vault (in a separate subscription), and grant the storage account's user-assigned managed identity Key Vault Crypto Service Encryption User role. Auto-rotate the key via Key Vault rotation policy.",
+        "B": "Use Microsoft-managed keys; rotation is automatic and free.",
+        "C": "Store the CMK in the same subscription as the storage account; cross-subscription is not supported.",
+        "D": "Manually rotate the key by editing the storage account's encryption settings every 90 days."
+      },
+      "answer": "A",
+      "rationale": "Storage CMK supports a versionless key URI; when Key Vault's rotation policy rotates the key, the storage account automatically picks up the latest version without manual intervention. The user-assigned managed identity model allows the Key Vault to live in a different subscription. The 'Key Vault Crypto Service Encryption User' role is the least-privilege RBAC role for this scenario.",
+      "optionRationales": {
+        "A": "Correct. Versionless URI + UAMI + Key Vault rotation policy is the documented zero-downtime auto-rotation pattern.",
+        "B": "Microsoft-managed keys don't give the customer control over rotation.",
+        "C": "Cross-subscription Key Vault is supported.",
+        "D": "Manual rotation is unnecessary and brittle when auto-rotation is supported."
+      },
+      "references": [
+        { "text": "Customer-managed keys for Azure Storage encryption", "url": "https://learn.microsoft.com/azure/storage/common/customer-managed-keys-overview" },
+        { "text": "Configure customer-managed keys in the same or a different tenant", "url": "https://learn.microsoft.com/azure/storage/common/customer-managed-keys-configure-key-vault" }
+      ]
+    },
+    {
+      "id": 48,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — TDE service-managed vs customer-managed key",
+      "question": "A company wants TDE on Azure SQL Database where (1) they can revoke key access to render the database inaccessible during an incident, (2) the key lifecycle (rotation, deletion) is fully controlled by the customer, and (3) no re-encryption of database files is needed when transitioning. Which configuration meets all requirements?",
+      "options": {
+        "A": "Service-managed TDE — Microsoft handles the key, no customer control.",
+        "B": "Customer-managed TDE (BYOK) with the key in Azure Key Vault (or Managed HSM); switching from service-managed to CMK only re-encrypts the database encryption key (DEK), which is fast and online — no re-encryption of database files.",
+        "C": "Always Encrypted with deterministic encryption.",
+        "D": "Disable TDE and use cell-level encryption."
+      },
+      "answer": "B",
+      "rationale": "TDE with CMK (BYOK) gives the customer full lifecycle control of the protector key. Switching from service-managed to customer-managed only re-encrypts the DEK (fast/online) — the database files themselves remain encrypted with the same DEK. Revoking key access in Key Vault renders the database inaccessible.",
+      "optionRationales": {
+        "A": "Service-managed TDE doesn't give customer key control.",
+        "B": "Correct. CMK BYOK satisfies all three requirements.",
+        "C": "Always Encrypted protects specific columns; it is not equivalent to TDE encryption-at-rest.",
+        "D": "Disabling TDE removes encryption at rest entirely."
+      },
+      "references": [
+        { "text": "Azure SQL TDE with customer-managed key (BYOK)", "url": "https://learn.microsoft.com/azure/azure-sql/database/transparent-data-encryption-byok-overview" },
+        { "text": "TDE overview for SQL Database and SQL Managed Instance", "url": "https://learn.microsoft.com/azure/azure-sql/database/transparent-data-encryption-tde-overview" }
+      ]
+    },
+    {
+      "id": 49,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — Always Encrypted vs TDE",
+      "question": "A regulated workload requires that the database administrator cannot see clear-text values of credit-card numbers stored in a specific column — the data must remain encrypted at all times in the database engine, even during query processing. Which feature satisfies this?",
+      "options": {
+        "A": "TDE with customer-managed keys.",
+        "B": "Always Encrypted with secure enclaves (or deterministic / randomized encryption without enclaves for limited query patterns) — the column encryption key is held by the client driver, the engine never sees plaintext, and DBAs cannot decrypt the data.",
+        "C": "Dynamic Data Masking on the column.",
+        "D": "Row-level security (RLS) on the column."
+      },
+      "answer": "B",
+      "rationale": "Always Encrypted is the only Azure SQL feature that separates data owners (who can decrypt) from data managers (who cannot). The column encryption key resides on the client; the engine processes only ciphertext. Secure enclaves extend this to allow richer queries (range, pattern matching) while preserving the trust boundary.",
+      "optionRationales": {
+        "A": "TDE only encrypts data at rest — fully decrypted in memory and visible to DBAs.",
+        "B": "Correct. Always Encrypted is the documented separation-of-duties feature.",
+        "C": "Dynamic Data Masking only obscures values in result sets for unprivileged users; data is stored in clear text.",
+        "D": "RLS controls which rows a user can see, not encryption."
+      },
+      "references": [
+        { "text": "Always Encrypted in Azure SQL", "url": "https://learn.microsoft.com/sql/relational-databases/security/encryption/always-encrypted-database-engine" },
+        { "text": "Always Encrypted with secure enclaves", "url": "https://learn.microsoft.com/sql/relational-databases/security/encryption/always-encrypted-enclaves" }
+      ]
+    },
+    {
+      "id": 50,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — Microsoft Entra-only authentication",
+      "question": "A SQL Database server must reject all SQL authentication and only accept Microsoft Entra ID identities (users, groups, service principals, managed identities). Which configuration is correct?",
+      "options": {
+        "A": "Set the server-level admin to a Microsoft Entra group, keep SQL authentication enabled as a fallback for break-glass.",
+        "B": "Enable 'Microsoft Entra-only authentication' on the logical server (or managed instance); SQL authentication is disabled for new connections, even by the SQL administrator account, until the setting is reversed.",
+        "C": "Remove the SQL admin login from master.",
+        "D": "Apply an Azure Policy that denies CREATE LOGIN statements."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra-only authentication is a server-level setting that disables SQL authentication entirely for new connections. Optionally combine it with an Azure Policy (Deny or Audit effect) to enforce it across all SQL servers/managed instances in a subscription.",
+      "optionRationales": {
+        "A": "Keeping SQL auth enabled defeats the requirement.",
+        "B": "Correct. The dedicated 'Entra-only authentication' setting is the supported mechanism.",
+        "C": "Removing the SQL admin login doesn't disable SQL auth for other logins.",
+        "D": "Policies don't run inside the SQL engine; CREATE LOGIN happens internally."
+      },
+      "references": [
+        { "text": "Microsoft Entra-only authentication with Azure SQL", "url": "https://learn.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication" },
+        { "text": "Azure Policy for Microsoft Entra-only authentication", "url": "https://learn.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication-policy" }
+      ]
+    },
+    {
+      "id": 51,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — auditing destinations",
+      "question": "A SOC team needs Azure SQL Database audit events to be queryable in Microsoft Sentinel and retained for 1 year. The storage account that will receive the audit events is configured for Microsoft Entra-only authentication. Which configuration is correct?",
+      "options": {
+        "A": "Send audit events to Event Hubs only; Sentinel doesn't support direct SQL audit ingestion.",
+        "B": "Enable SQL auditing with destinations: Log Analytics workspace (used by Sentinel) and a storage account; for the storage account use managed identity authentication (system-assigned or user-assigned) since the storage account requires Microsoft Entra authentication. Set retention to 365 days.",
+        "C": "Use storage account keys as the storage authentication type for SQL auditing.",
+        "D": "Enable auditing only on the database, not the server — server-level auditing is deprecated."
+      },
+      "answer": "B",
+      "rationale": "SQL auditing supports multiple simultaneous destinations: Storage account, Log Analytics workspace, and Event Hubs. When the storage account enforces Entra-only authentication, the SQL server's managed identity must be used (not storage access keys). Sentinel queries data already in its Log Analytics workspace.",
+      "optionRationales": {
+        "A": "Sentinel reads from Log Analytics; SQL audit can write directly to Log Analytics.",
+        "B": "Correct. Multi-destination + managed identity for storage is the documented configuration.",
+        "C": "Storage keys are not accepted when the storage account is Entra-only.",
+        "D": "Server-level auditing is preferred for inheritance, not deprecated."
+      },
+      "references": [
+        { "text": "Set up auditing for Azure SQL Database", "url": "https://learn.microsoft.com/azure/azure-sql/database/auditing-setup" },
+        { "text": "Auditing for Azure SQL Database — limitations", "url": "https://learn.microsoft.com/azure/azure-sql/database/auditing-overview" }
+      ]
+    },
+    {
+      "id": 52,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for Databases — what's covered",
+      "question": "Which statement about Microsoft Defender for Databases is correct?",
+      "options": {
+        "A": "It is a single plan that covers Azure SQL, SQL on VMs, PostgreSQL/MySQL, and Cosmos DB at one price.",
+        "B": "It is an umbrella covering four separately-priced plans: Defender for Azure SQL Databases, Defender for SQL Servers on Machines, Defender for Open-Source Relational Databases (PostgreSQL/MySQL/MariaDB on Azure and AWS RDS), and Defender for Azure Cosmos DB. Each can be enabled per subscription.",
+        "C": "It requires Microsoft Sentinel.",
+        "D": "It is enabled automatically by Defender CSPM."
+      },
+      "answer": "B",
+      "rationale": "Defender for Databases is the umbrella term; it bundles four independent plans with separate pricing. Each plan can be enabled at the subscription level or on individual resources, and provides threat detection (anomalous activity, brute force, SQL injection) specific to that database type.",
+      "optionRationales": {
+        "A": "There is no single unified price; the four plans are billed independently.",
+        "B": "Correct. Four plans, separately priced, enabled per subscription or per resource.",
+        "C": "Sentinel integration is optional.",
+        "D": "Defender CSPM is a separate plan focused on posture; it does not auto-enable database threat protection."
+      },
+      "references": [
+        { "text": "Overview of Microsoft Defender for Databases", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-overview" },
+        { "text": "Protect databases with Defender for Databases", "url": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-databases-plan" }
+      ]
+    },
+    {
+      "id": 53,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for SQL — vulnerability assessment baseline",
+      "question": "Defender for Azure SQL Databases includes vulnerability assessment (VA). After the first scan, dozens of findings appear that the team considers acceptable for this database (e.g., a specific user permission that is intentional). How should the team prevent these from re-appearing as findings without globally suppressing the check?",
+      "options": {
+        "A": "Disable Defender for SQL on the database.",
+        "B": "Approve the current state as the new baseline for those specific rules on that database; subsequent scans compare against the baseline, and matching findings show as Pass.",
+        "C": "Add a Defender for Cloud suppression rule that excludes the SQL database entirely.",
+        "D": "Edit the VA rules XML to remove the checks."
+      },
+      "answer": "B",
+      "rationale": "VA in Defender for Azure SQL Databases supports per-database baselines: marking the current state as the baseline for a specific rule causes future scans to compare against it. Acceptable deviations show as Pass while genuinely new deviations from the baseline are flagged.",
+      "optionRationales": {
+        "A": "Disabling Defender loses protection broadly.",
+        "B": "Correct. Per-rule baseline is the documented mechanism.",
+        "C": "Suppressing the whole database loses too much coverage.",
+        "D": "VA rules cannot be edited as XML."
+      },
+      "references": [
+        { "text": "Vulnerability assessment for Azure SQL Database", "url": "https://learn.microsoft.com/azure/azure-sql/database/sql-vulnerability-assessment" }
+      ]
+    },
+    {
+      "id": 54,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for SQL Servers on Machines — onboarding",
+      "question": "An on-premises SQL Server 2019 instance running on a Windows VM must receive Defender for SQL threat protection. The VM is already connected to Azure with Azure Arc. Which steps are required?",
+      "options": {
+        "A": "Install SQL Server on an Azure VM and migrate the database.",
+        "B": "Enable Defender for SQL Servers on Machines on the Azure subscription containing the Arc-enabled VM; the Defender for SQL extension is deployed automatically via Azure Arc Machines, gathers SQL telemetry, and surfaces threat alerts and vulnerability assessment findings in Defender for Cloud.",
+        "C": "Forward SQL audit logs to Microsoft Sentinel via syslog.",
+        "D": "Install Microsoft Defender for Endpoint on the VM; Defender for SQL coverage is included."
+      },
+      "answer": "B",
+      "rationale": "Defender for SQL Servers on Machines extends SQL threat protection (anomalous queries, SQL injection, brute force) and vulnerability assessment to non-Azure SQL Server instances via Azure Arc-enabled servers. Enabling the plan triggers automatic extension deployment.",
+      "optionRationales": {
+        "A": "Migration is not required.",
+        "B": "Correct. Arc + Defender for SQL Servers on Machines is the documented onboarding path.",
+        "C": "Sentinel forwarding doesn't provide Defender for SQL's analytics.",
+        "D": "Defender for Endpoint provides separate EDR protection."
+      },
+      "references": [
+        { "text": "Defender for SQL Servers on Machines overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-introduction" },
+        { "text": "Enable Defender for SQL Servers on Machines", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-usage" }
+      ]
+    },
+    {
+      "id": 55,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for Open-Source DBs — supported types",
+      "question": "An organization runs Azure Database for PostgreSQL Flexible Server and Azure Database for MySQL Flexible Server. Which Defender plan should be enabled, and what does it detect?",
+      "options": {
+        "A": "Defender for Azure SQL Databases — covers all Azure databases.",
+        "B": "Defender for Open-Source Relational Databases — detects anomalous activity such as granular brute-force attempts, behavioral deviations in access patterns, and threat-intelligence-based detections for Azure Database for MySQL and PostgreSQL (and AWS RDS variants).",
+        "C": "Defender for Cosmos DB — covers any non-SQL database.",
+        "D": "Defender for Storage — databases are stored on Azure Storage so this is sufficient."
+      },
+      "answer": "B",
+      "rationale": "Defender for Open-Source Relational Databases is the dedicated plan for Azure Database for MySQL and PostgreSQL (plus AWS RDS variants in preview/GA). It provides brute-force attack detection, behavioral baselines, and threat-intelligence-based alerts for these engines.",
+      "optionRationales": {
+        "A": "Defender for Azure SQL is only for Azure SQL Database/MI.",
+        "B": "Correct. Defender for Open-Source Relational Databases is the right plan.",
+        "C": "Defender for Cosmos DB is specific to Cosmos DB, not MySQL/PostgreSQL.",
+        "D": "Defender for Storage protects storage accounts, not database engines."
+      },
+      "references": [
+        { "text": "Enable Defender for open-source relational databases on Azure", "url": "https://learn.microsoft.com/azure/defender-for-cloud/enable-defender-for-databases-azure" },
+        { "text": "Defender for Databases overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-overview" }
+      ]
+    },
+    {
+      "id": 56,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Defender for Cosmos DB — what it monitors",
+      "question": "Which event would Microsoft Defender for Azure Cosmos DB most likely raise as a security alert?",
+      "options": {
+        "A": "An anomalous extraction of a large volume of documents from a Cosmos DB account by a previously-unused identity, suggesting potential data exfiltration.",
+        "B": "A failed ARM deployment to a Cosmos DB account.",
+        "C": "An expired primary read/write key.",
+        "D": "A request from a known Azure datacenter IP."
+      },
+      "answer": "A",
+      "rationale": "Defender for Cosmos DB detects suspicious data-access patterns: data exfiltration anomalies, suspicious access from rare locations or IP reputations, and key-misuse patterns. ARM deployment failures, expired keys, and Azure-internal IPs are normal operational events.",
+      "optionRationales": {
+        "A": "Correct. Exfiltration-style anomalies are a core Defender for Cosmos DB detection.",
+        "B": "Deployment failures are not security alerts.",
+        "C": "Cosmos keys don't expire automatically.",
+        "D": "Azure datacenter IPs are not suspicious."
+      },
+      "references": [
+        { "text": "Microsoft Defender for Azure Cosmos DB", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-defender-for-cosmos" },
+        { "text": "Enable Defender for Azure Cosmos DB", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-enable-cosmos-protections" }
+      ]
+    },
+    {
+      "id": 57,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — Dynamic Data Masking",
+      "question": "An application returns credit card numbers to a CRM. Service representatives must only see the last four digits, while a small group of compliance analysts must see the full value for audits. Database admins should bypass the masking. Which feature meets this?",
+      "options": {
+        "A": "Always Encrypted with deterministic encryption.",
+        "B": "Dynamic Data Masking on the credit-card column with a partial mask exposing the last 4 digits, plus the compliance analysts and dbo group added to the masking exemption list.",
+        "C": "Row-Level Security with security predicates.",
+        "D": "Cell-level encryption."
+      },
+      "answer": "B",
+      "rationale": "Dynamic Data Masking is presentation-layer masking — it changes what a query sees in the result set based on the principal. Admins (db_owner) bypass masking by default; analysts can be added to the exempted users list. Always Encrypted hides values from everyone including the engine, which is too strong for this dual-audience requirement.",
+      "optionRationales": {
+        "A": "Always Encrypted would prevent service reps from getting even the last 4 digits in plaintext.",
+        "B": "Correct. DDM is the presentation-layer masking with exemption lists.",
+        "C": "RLS filters rows, not column values.",
+        "D": "Cell-level encryption requires application-side key management and doesn't address the dual audience cleanly."
+      },
+      "references": [
+        { "text": "Dynamic data masking — Azure SQL", "url": "https://learn.microsoft.com/azure/azure-sql/database/dynamic-data-masking-overview" }
+      ]
+    },
+    {
+      "id": 58,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — Microsoft Defender for SQL alert response (SQL injection)",
+      "question": "Defender for Azure SQL raises a 'Potential SQL injection' alert on a public-facing application. The alert details show vulnerable code constructed query strings with user input. What is the most appropriate immediate response and longer-term remediation?",
+      "options": {
+        "A": "Disable the alert and accept the risk because the database is restored from backup nightly.",
+        "B": "Investigate the alert (which calling identity, target query, source IP); throttle or block the offending source if active; coordinate with the development team to refactor the affected code to use parameterized queries / stored procedures, and add web application firewall (WAF) rules in front of the app.",
+        "C": "Restore the database from a backup.",
+        "D": "Enable Always Encrypted on every column in the schema."
+      },
+      "answer": "B",
+      "rationale": "SQL injection alerts indicate a real application vulnerability. The standard response is investigate scope and impact, block the active source if exploitation is occurring, then remediate by switching to parameterized queries and adding a WAF as defense-in-depth. Backups and Always Encrypted do not address the injection vector.",
+      "optionRationales": {
+        "A": "Ignoring is unsafe and not a response.",
+        "B": "Correct. Investigate + active blocking + code fix + WAF is the documented full response.",
+        "C": "Restore doesn't prevent re-exploitation.",
+        "D": "Always Encrypted protects column values but doesn't fix the injection vector."
+      },
+      "references": [
+        { "text": "Defender for Azure SQL alerts reference", "url": "https://learn.microsoft.com/azure/defender-for-cloud/alerts-azure-sql-db-and-warehouse" },
+        { "text": "Defender for Azure SQL overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-introduction" }
+      ]
+    },
+    {
+      "id": 59,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — Azure Files identity-based access (Kerberos)",
+      "question": "An Azure Files share replaces a legacy on-prem SMB file server. Existing Windows clients must authenticate using their domain identity (no separate share key) and existing NTFS-style permissions must still apply. Which authentication mode is most appropriate?",
+      "options": {
+        "A": "AD DS authentication for Azure Files (or Microsoft Entra Kerberos for hybrid identities) with on-premises ACLs preserved.",
+        "B": "Storage account key only.",
+        "C": "Shared access signatures for every user.",
+        "D": "Public anonymous access with allow-listed IP ranges."
+      },
+      "answer": "A",
+      "rationale": "Azure Files supports identity-based access over SMB using on-premises AD DS, Microsoft Entra Kerberos (for hybrid identities), or Microsoft Entra Domain Services. With AD DS or Entra Kerberos, share-level RBAC + Windows NTFS ACLs control access, so existing permissions can be preserved.",
+      "optionRationales": {
+        "A": "Correct. AD DS / Entra Kerberos with NTFS ACLs is the documented mode for this scenario.",
+        "B": "Storage account key is a shared secret — not per-user.",
+        "C": "SAS per user is operationally heavy and not SMB-compatible.",
+        "D": "Public anonymous access exposes sensitive files."
+      },
+      "references": [
+        { "text": "Overview of identity-based authentication for Azure Files", "url": "https://learn.microsoft.com/azure/storage/files/storage-files-active-directory-overview" }
+      ]
+    },
+    {
+      "id": 60,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — anonymous blob access prevention",
+      "question": "A SecOps team wants to ensure that no container in any storage account in a subscription is configured to allow anonymous (unauthenticated) blob access — i.e., 'public access level' must be 'Private' on every container. Which combination of controls is most effective?",
+      "options": {
+        "A": "Trust users to use the portal correctly.",
+        "B": "Set the storage account's 'Allow Blob anonymous access' property to false (disables anonymous access at the account level regardless of container settings), and assign the built-in Azure Policy 'Storage accounts should prevent blob anonymous access' to audit/deny across the subscription.",
+        "C": "Set container ACLs to deny everyone after creation.",
+        "D": "Enable Defender for Storage; it blocks anonymous access automatically."
+      },
+      "answer": "B",
+      "rationale": "Disabling 'Allow Blob anonymous access' at the account level is an absolute control: container-level public access flags are ignored. Pair with the built-in Azure Policy that audits or denies storage accounts permitting anonymous access for full tenant coverage.",
+      "optionRationales": {
+        "A": "Manual hygiene fails at scale.",
+        "B": "Correct. Account-level control + Azure Policy is the documented pattern.",
+        "C": "Per-container fix doesn't prevent new accounts/containers from being misconfigured.",
+        "D": "Defender for Storage alerts on suspicious public-exposure changes but does not block anonymous access."
+      },
+      "references": [
+        { "text": "Remediate anonymous public read access for blob data", "url": "https://learn.microsoft.com/azure/storage/blobs/anonymous-read-access-prevent" }
+      ]
+    },
+    {
+      "id": 61,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "NSGs and ASGs — micro-segmentation",
+      "question": "A three-tier app (web / app / db) is being deployed into a single VNet with three subnets. NSG rules must allow only the documented inter-tier flows (web→app on 443, app→db on 1433), and the rule definitions must remain stable as VMs scale in/out of each tier. Which design best fits?",
+      "options": {
+        "A": "Hard-code each VM's private IP into NSG rules and update the NSG when VMs scale.",
+        "B": "Create one ASG per tier (asg-web, asg-app, asg-db), assign each VM's NIC to the appropriate ASG on creation, and write NSG rules referencing ASGs as source/destination (e.g., allow asg-app → asg-db on 1433).",
+        "C": "Place each tier in its own VNet and disable peering.",
+        "D": "Use service tags such as VirtualNetwork as both source and destination to allow only intra-VNet traffic."
+      },
+      "answer": "B",
+      "rationale": "Application Security Groups let you express NSG rules in terms of application roles rather than IP addresses. VMs joining/leaving a tier simply update ASG membership; NSG rules stay stable. This is the documented pattern for scalable, role-based micro-segmentation within a VNet.",
+      "optionRationales": {
+        "A": "Hard-coded IPs don't scale.",
+        "B": "Correct. ASGs are the documented mechanism for role-based segmentation.",
+        "C": "Separate VNets without peering blocks all communication, breaking the app.",
+        "D": "VirtualNetwork tag matches the entire VNet — no inter-tier isolation."
+      },
+      "references": [
+        { "text": "Application security groups overview", "url": "https://learn.microsoft.com/azure/virtual-network/application-security-groups" },
+        { "text": "Network security groups overview", "url": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview" }
+      ]
+    },
+    {
+      "id": 62,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "NSG default rules and service tags",
+      "question": "A new subnet's NSG has no custom rules. A VM in it can reach the internet but cannot be reached from an Azure Load Balancer health probe even though no explicit deny rules exist. What explains this and what is the correct fix?",
+      "options": {
+        "A": "Default outbound rules block Azure Load Balancer; add an explicit outbound allow.",
+        "B": "The default inbound rule 'AllowAzureLoadBalancerInBound' allows probes from the AzureLoadBalancer service tag, but if a custom rule with higher priority denies it, the probe is blocked. Remove the conflicting rule, or add an explicit rule with higher priority allowing the AzureLoadBalancer service tag.",
+        "C": "Load Balancer health probes require an NSG attached to the load balancer's frontend IP.",
+        "D": "Probes are blocked when the VM uses a private IP; assign a public IP to the VM."
+      },
+      "answer": "B",
+      "rationale": "NSGs have three default inbound rules: AllowVnetInBound, AllowAzureLoadBalancerInBound, and DenyAllInBound. Probes come from the AzureLoadBalancer service tag and are allowed by default — unless a custom rule with higher priority (lower number) denies them. Identifying and fixing the conflicting rule (or adding an explicit allow above it) is the fix.",
+      "optionRationales": {
+        "A": "Outbound default rules allow Internet — probes are inbound.",
+        "B": "Correct. The AzureLoadBalancer service tag default allow is being overridden by a custom rule.",
+        "C": "NSGs cannot be attached to LB frontend IPs.",
+        "D": "Internal probes use a documented source IP range (168.63.129.16 / AzureLoadBalancer tag); public IP is unrelated."
+      },
+      "references": [
+        { "text": "Network security group default rules", "url": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview#default-security-rules" },
+        { "text": "Service tags overview", "url": "https://learn.microsoft.com/azure/virtual-network/service-tags-overview" }
+      ]
+    },
+    {
+      "id": 63,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Network flow logs — VNet flow logs vs NSG flow logs",
+      "question": "An organization currently uses NSG flow logs. Microsoft has announced a migration path to a successor product that captures all flows for a virtual network (including subnets without an NSG) and integrates with Traffic Analytics. Which is the recommended successor and what is the migration guidance?",
+      "options": {
+        "A": "Continue using NSG flow logs — there is no successor.",
+        "B": "Virtual Network flow logs — they capture flows at the VNet level (not dependent on NSG attachment), are recommended for new deployments, and Microsoft provides documented steps to migrate existing NSG flow log configurations.",
+        "C": "Replace NSG flow logs with Azure Activity logs.",
+        "D": "Use Azure Monitor diagnostic settings on the subnet — flow logs are deprecated."
+      },
+      "answer": "B",
+      "rationale": "Virtual Network flow logs are the documented successor to NSG flow logs. They are enabled at the VNet level (not per-NSG), capture all flows in the VNet, integrate with Traffic Analytics, and have a documented migration path from NSG flow logs.",
+      "optionRationales": {
+        "A": "NSG flow logs have a documented successor.",
+        "B": "Correct. VNet flow logs are the recommended successor.",
+        "C": "Activity logs cover control-plane operations, not data-plane traffic.",
+        "D": "Subnet diagnostic settings don't replace flow logs."
+      },
+      "references": [
+        { "text": "Virtual network flow logs overview", "url": "https://learn.microsoft.com/azure/network-watcher/vnet-flow-logs-overview" },
+        { "text": "Migrate NSG flow logs to VNet flow logs", "url": "https://learn.microsoft.com/azure/network-watcher/nsg-flow-logs-migrate" }
+      ]
+    },
+    {
+      "id": 64,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Virtual Network Manager — security admin rules",
+      "question": "A network security admin needs to enforce a deny of inbound SSH/RDP from the Internet across all VNets in the tenant, overriding any future application-team NSG misconfigurations. Application teams should retain control over their own NSGs for less sensitive rules. Which AVNM capability addresses this?",
+      "options": {
+        "A": "Force application teams to remove NSGs from all subnets.",
+        "B": "Create an AVNM instance with scope at the intermediate root management group, define a network group containing all VNets (dynamically via Azure Policy), and create a security admin configuration with a 'Deny inbound SSH/RDP from Internet' rule — security admin rules are evaluated before NSGs and cannot be overridden by NSG rules.",
+        "C": "Use Azure Policy to delete any NSG rule that allows SSH/RDP.",
+        "D": "Use Azure Firewall as the default gateway and block SSH/RDP at the firewall."
+      },
+      "answer": "B",
+      "rationale": "AVNM security admin rules are evaluated before NSGs and cannot be overridden by NSG rules; this is the documented mechanism for enforcing tenant-wide network policy without taking NSGs away from app teams. Dynamic membership via Azure Policy ensures new VNets are picked up automatically.",
+      "optionRationales": {
+        "A": "Removing NSGs eliminates app-team control entirely.",
+        "B": "Correct. Security admin rules + dynamic network group is the documented pattern.",
+        "C": "Policy-based rule deletion is fragile and after-the-fact.",
+        "D": "Azure Firewall doesn't enforce intra-VNet traffic by default and requires UDRs."
+      },
+      "references": [
+        { "text": "Security admin rules in Azure Virtual Network Manager", "url": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins" },
+        { "text": "Protect high-risk network ports with Security Admin Rules", "url": "https://learn.microsoft.com/azure/virtual-network-manager/how-to-block-high-risk-ports" }
+      ]
+    },
+    {
+      "id": 65,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "AVNM — security admin rules with SQL MI and Databricks",
+      "question": "An AVNM security admin configuration has a Deny rule for inbound port 1433 from the Internet. A subscription has Azure SQL Managed Instance subnets. What is the default behavior of AVNM security admin rules with respect to those subnets, and how can the admin allow other allow-rules to apply while still preserving service connectivity?",
+      "options": {
+        "A": "All security admin rules apply uniformly; this will break SQL Managed Instance.",
+        "B": "By default, security admin rules are NOT applied to VNets containing SQL Managed Instance or Azure Databricks because the service's network intent policy enforces its own requirements. The admin can opt in to apply Allow-only rules by using AllowRulesOnly in the security configuration.",
+        "C": "Security admin rules are always evaluated, but SQL MI's service-aided subnet configuration overrides only deny rules.",
+        "D": "Security admin rules require a network intent policy exemption per resource."
+      },
+      "answer": "B",
+      "rationale": "AVNM security admin rules are skipped by default for VNets containing SQL Managed Instance or Azure Databricks — both rely on network intent policies. The admin can opt these VNets into Allow-only rules via the AllowRulesOnly setting in the security configuration, applying only allow rules while leaving deny enforcement to the service.",
+      "optionRationales": {
+        "A": "Default behavior is to skip these VNets, not break them.",
+        "B": "Correct. Default skip + AllowRulesOnly opt-in is the documented model.",
+        "C": "SQL MI doesn't override AVNM deny rules — AVNM simply skips.",
+        "D": "There's no per-resource exemption requirement."
+      },
+      "references": [
+        { "text": "Security admin rules — non-application", "url": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins" }
+      ]
+    },
+    {
+      "id": 66,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Virtual WAN — Routing Intent",
+      "question": "A Virtual WAN secured hub has Azure Firewall. The network architect wants ALL inter-hub, branch-to-VNet, and branch-to-branch traffic to flow through Azure Firewall without authoring custom UDRs. Which feature is required and supports this configuration?",
+      "options": {
+        "A": "Manual UDRs on every spoke pointing to the firewall private IP.",
+        "B": "Virtual WAN Routing Intent — configure private and internet routing intent to send all V2V, B2V, V2I, B2I, and branch-to-branch traffic through the firewall; UDR authoring is automated, including the inter-hub case which is otherwise complex.",
+        "C": "BGP route filters with custom prefixes.",
+        "D": "Network Security Groups on the firewall subnet."
+      },
+      "answer": "B",
+      "rationale": "Routing Intent is the documented Virtual WAN feature for automating UDR-style policy: select 'Send via Azure Firewall' for private and/or internet traffic and Virtual WAN programs all the necessary routing automatically, including inter-hub and branch-to-branch. Without Routing Intent, inter-hub firewall routing is not enforced cleanly.",
+      "optionRationales": {
+        "A": "Manual UDRs are exactly what Routing Intent is designed to avoid.",
+        "B": "Correct. Routing Intent is the documented mechanism.",
+        "C": "BGP filters don't replace UDR-based forced routing.",
+        "D": "NSGs aren't relevant for traffic steering."
+      },
+      "references": [
+        { "text": "Routing intent in Virtual WAN", "url": "https://learn.microsoft.com/azure/virtual-wan/how-to-routing-policies" },
+        { "text": "What is a secured virtual hub?", "url": "https://learn.microsoft.com/azure/firewall-manager/secured-virtual-hub" }
+      ]
+    },
+    {
+      "id": 67,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Firewall Premium — TLS inspection",
+      "question": "A workload requires inspection of encrypted HTTPS traffic between Azure VMs and external SaaS. The corporate root CA must be used to sign the inspection certificates so client TLS validation succeeds. Which Azure Firewall capability is required?",
+      "options": {
+        "A": "Azure Firewall Standard with FQDN-based application rules.",
+        "B": "Azure Firewall Premium with TLS inspection enabled — requires an intermediate CA certificate stored in Azure Key Vault and a managed identity on the firewall to read it; combined with IDPS for signature-based inspection of decrypted traffic.",
+        "C": "Azure Web Application Firewall on Application Gateway.",
+        "D": "Azure Front Door Premium with managed TLS."
+      },
+      "answer": "B",
+      "rationale": "Azure Firewall Premium is the SKU that performs egress TLS inspection. It requires an intermediate CA cert (signed by the org root) loaded into Key Vault and a managed identity granted Get on Key Vault secrets. With TLS inspection, the Premium firewall also runs IDPS signatures against decrypted traffic.",
+      "optionRationales": {
+        "A": "Standard SKU does FQDN-aware application rules but doesn't decrypt TLS.",
+        "B": "Correct. Premium SKU + intermediate CA in Key Vault is the documented topology.",
+        "C": "WAF inspects HTTP(S) inbound to web apps, not VM egress.",
+        "D": "Front Door is an entry point for HTTP(S), not a VM egress proxy."
+      },
+      "references": [
+        { "text": "Azure Firewall Premium features — TLS inspection", "url": "https://learn.microsoft.com/azure/firewall/premium-features#tls-inspection" },
+        { "text": "Deploy and configure Azure Firewall Premium", "url": "https://learn.microsoft.com/azure/firewall/premium-deploy" }
+      ]
+    },
+    {
+      "id": 68,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Firewall — DNS proxy and FQDN tag rules",
+      "question": "A team wants to write Azure Firewall network rules using FQDN destinations (e.g., 'allow VMs to reach api.contoso.com on TCP 443') instead of IP addresses, so that backend IP changes don't break rules. Which configuration is required?",
+      "options": {
+        "A": "Use application rules — they support FQDN natively for HTTP/HTTPS regardless of DNS proxy settings.",
+        "B": "Enable DNS proxy on Azure Firewall and configure VMs to use the firewall's private IP as DNS server; FQDN-in-network-rules then resolves consistently inside the firewall. Combined with FQDN tags (built-in like AzureBackup, WindowsUpdate) for common service flows.",
+        "C": "Apply Azure Private DNS zones to the VNet.",
+        "D": "Use service tags (e.g., AzureCloud) — service tags are equivalent to FQDNs."
+      },
+      "answer": "B",
+      "rationale": "FQDNs in network rules require DNS proxy to be enabled on Azure Firewall and VMs to use the firewall as DNS. This ensures the firewall and VMs resolve the FQDN to the same IPs, avoiding inconsistent matching. Application rules support FQDNs for HTTP(S) natively; for non-HTTP protocols (e.g., MSSQL TCP), DNS proxy is required.",
+      "optionRationales": {
+        "A": "Application rules support FQDN for HTTP(S) but the scenario is about network rules.",
+        "B": "Correct. DNS proxy + firewall as DNS server is the documented configuration.",
+        "C": "Private DNS zones don't affect Azure Firewall's FQDN resolution.",
+        "D": "Service tags are IP-range collections, not FQDNs."
+      },
+      "references": [
+        { "text": "Azure Firewall DNS settings", "url": "https://learn.microsoft.com/azure/firewall/dns-settings" },
+        { "text": "FQDN filtering in network rules", "url": "https://learn.microsoft.com/azure/firewall/fqdn-filtering-network-rules" }
+      ]
+    },
+    {
+      "id": 69,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure VPN Gateway — Point-to-Site Microsoft Entra ID authentication",
+      "question": "A company migrates remote-worker VPN from RADIUS-based authentication to Microsoft Entra ID-based authentication using Conditional Access policies. Which combination of tunnel type and gateway SKU is required?",
+      "options": {
+        "A": "IKEv2 tunnel type with the Basic SKU.",
+        "B": "OpenVPN tunnel type (Entra ID authentication is only supported with OpenVPN); a SKU above Basic (VpnGw1+); users authenticate via the Azure VPN Client, which obtains an Entra ID token and is subject to Conditional Access targeting the Azure VPN enterprise application.",
+        "C": "SSTP tunnel type with certificate authentication.",
+        "D": "IKEv2 with Entra ID — fully supported on all SKUs."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra ID authentication on Azure VPN Gateway requires the OpenVPN tunnel type and the Azure VPN Client. The Basic SKU does not support OpenVPN or RADIUS. Conditional Access policies targeting the Azure VPN enterprise application enforce per-user controls.",
+      "optionRationales": {
+        "A": "Basic SKU doesn't support OpenVPN; IKEv2 doesn't support Entra ID auth.",
+        "B": "Correct. OpenVPN + non-Basic SKU + Azure VPN Client is the documented configuration.",
+        "C": "SSTP doesn't support Entra ID authentication.",
+        "D": "IKEv2 does not support Microsoft Entra ID authentication."
+      },
+      "references": [
+        { "text": "About Point-to-Site VPN authentication", "url": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-about" },
+        { "text": "Configure P2S VPN Gateway for Microsoft Entra ID authentication", "url": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-entra-gateway" }
+      ]
+    },
+    {
+      "id": 70,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Microsoft Entra Private Access — Quick Access vs per-app",
+      "question": "An organization is replacing a legacy VPN with Microsoft Entra Private Access. The team begins with Quick Access to publish a broad set of internal FQDNs/IPs. They now want per-application Conditional Access (e.g., require compliant device for HR app, require phishing-resistant MFA for finance app). Which approach is required?",
+      "options": {
+        "A": "Conditional Access policies can only be applied to Quick Access as a whole.",
+        "B": "Create individual Global Secure Access enterprise applications for each internal app with their FQDN/IP segments, then apply per-app Conditional Access policies; reduce or disable Quick Access as apps migrate to per-app access.",
+        "C": "Microsoft Entra Private Access does not support Conditional Access.",
+        "D": "Use Azure AD App Proxy instead; Private Access has no per-app concept."
+      },
+      "answer": "B",
+      "rationale": "Quick Access is a single bucket of FQDNs/IPs; per-app access lets you publish individual apps with their own segments, allowing per-app Conditional Access policies (compliant device, authentication strength, etc.). The documented migration path is to progressively move from Quick Access to per-app access.",
+      "optionRationales": {
+        "A": "Per-app CA is one of the core differentiators.",
+        "B": "Correct. Per-app Global Secure Access apps + per-app CA is the documented mechanism.",
+        "C": "Private Access has deep CA integration.",
+        "D": "App Proxy is a related but separate, older feature."
+      },
+      "references": [
+        { "text": "Microsoft Entra Private Access overview", "url": "https://learn.microsoft.com/entra/global-secure-access/concept-private-access" },
+        { "text": "Apply Conditional Access policies to Private Access apps", "url": "https://learn.microsoft.com/entra/global-secure-access/how-to-target-resource-private-access-apps" }
+      ]
+    },
+    {
+      "id": 71,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Microsoft Entra Internet Access — source IP restoration",
+      "question": "A SaaS application's Conditional Access policy uses named locations based on corporate egress IP. After deploying Microsoft Entra Internet Access (Global Secure Access client) on user devices, sign-ins to the SaaS appear to come from Microsoft's edge IPs and the named-location-based policy stops matching. What feature solves this?",
+      "options": {
+        "A": "Disable Microsoft Entra Internet Access for the SaaS app.",
+        "B": "Enable Global Secure Access source IP restoration — preserves the original client public IP in sign-in logs and exposes it to Conditional Access named locations as the source IP, so location-based policies continue to evaluate against the user's actual egress.",
+        "C": "Whitelist Microsoft's Global Secure Access service IPs as a named location.",
+        "D": "Configure a static egress IP on the GSA tenant."
+      },
+      "answer": "B",
+      "rationale": "Source IP restoration is a Global Secure Access feature that preserves the original user public IP for the purposes of Conditional Access named-location evaluation and log visibility. Without it, traffic appears to originate from the GSA service edge.",
+      "optionRationales": {
+        "A": "Disabling defeats the purpose of GSA.",
+        "B": "Correct. Source IP restoration is the documented feature.",
+        "C": "GSA service IPs are shared across many tenants; not appropriate as a named location.",
+        "D": "There is no per-tenant static egress option that solves this."
+      },
+      "references": [
+        { "text": "Global Secure Access source IP restoration", "url": "https://learn.microsoft.com/entra/global-secure-access/how-to-source-ip-restoration" }
+      ]
+    },
+    {
+      "id": 72,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure private endpoint vs Private Link service",
+      "question": "Which statement best distinguishes Azure Private Endpoints from Azure Private Link Services?",
+      "options": {
+        "A": "They are the same thing with different names.",
+        "B": "A Private Endpoint is a private IP in YOUR VNet that connects you to a service (Azure-provided like Storage, or someone else's PaaS); a Private Link Service is what a SERVICE PROVIDER (e.g., your team running a VM behind a Standard Load Balancer) publishes so consumers in other tenants/VNets can connect to it via Private Endpoints.",
+        "C": "Private Link Service is used for inbound only; Private Endpoint is used for outbound only.",
+        "D": "Private Endpoints require ExpressRoute; Private Link Services do not."
+      },
+      "answer": "B",
+      "rationale": "Private Endpoint = consumer side (a NIC in your VNet that resolves a target service to a private IP). Private Link Service = provider side (you publish a service behind a Standard Load Balancer with PLS, then consumers create Private Endpoints to connect to it). Together they enable private connectivity across tenants/VNets without exposing public IPs.",
+      "optionRationales": {
+        "A": "They are distinct concepts.",
+        "B": "Correct. Consumer vs provider distinction is the right framing.",
+        "C": "Both serve bi-directional inbound from the consumer's perspective.",
+        "D": "Neither requires ExpressRoute."
+      },
+      "references": [
+        { "text": "What is Azure Private Endpoint?", "url": "https://learn.microsoft.com/azure/private-link/private-endpoint-overview" },
+        { "text": "What is Azure Private Link Service?", "url": "https://learn.microsoft.com/azure/private-link/private-link-service-overview" }
+      ]
+    },
+    {
+      "id": 73,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Network Watcher — Effective Security Rules",
+      "question": "After deploying a complex stack of NSGs (subnet + NIC) and AVNM security admin rules, an operator is unsure which rules actually apply to a specific VM NIC and in which order. Which Network Watcher feature gives the consolidated, authoritative answer?",
+      "options": {
+        "A": "Connection Monitor.",
+        "B": "Effective security rules (Network Watcher / VM Networking) — shows the merged, evaluated set of NSG rules and AVNM admin rules in priority order as they apply to the specific NIC.",
+        "C": "IP Flow Verify.",
+        "D": "Connection Troubleshoot."
+      },
+      "answer": "B",
+      "rationale": "Effective security rules consolidate all NSGs (NIC-level + subnet-level) and AVNM admin rules into one ordered view per NIC — the authoritative answer to 'which rules apply'. IP Flow Verify tests a specific 5-tuple; Connection Monitor/Troubleshoot test connectivity.",
+      "optionRationales": {
+        "A": "Connection Monitor is for ongoing reachability testing.",
+        "B": "Correct. Effective security rules is the documented diagnostic for rule resolution.",
+        "C": "IP Flow Verify checks one specific 5-tuple, not the full ruleset.",
+        "D": "Connection Troubleshoot is for path-level diagnostics."
+      },
+      "references": [
+        { "text": "View effective security rules — Network Watcher", "url": "https://learn.microsoft.com/azure/network-watcher/diagnose-vm-network-traffic-filtering-problem" }
+      ]
+    },
+    {
+      "id": 74,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure DDoS Protection — Network vs IP Protection",
+      "question": "A small organization has a handful of public IPs and wants DDoS Protection telemetry and mitigation guarantees, but doesn't have the budget for the flat-rate plan. Which Azure DDoS offering fits?",
+      "options": {
+        "A": "DDoS IP Protection — per-public-IP billing, the same L3/L4 protections as DDoS Network Protection, suitable for organizations that need to protect a small number of public IPs without committing to the higher fixed monthly fee of Network Protection.",
+        "B": "DDoS Network Protection only — there is no per-IP option.",
+        "C": "Azure Front Door's built-in WAF; DDoS protection is not separate.",
+        "D": "Azure Bastion — provides DDoS protection for VM management."
+      },
+      "answer": "A",
+      "rationale": "Azure DDoS has two SKUs: Network Protection (flat-rate, covers all public IPs in protected VNets) and IP Protection (per-public-IP billing, same mitigation but no SLA-tied DDoS Rapid Response credits or attack analytics). IP Protection is the affordable per-IP option for smaller deployments.",
+      "optionRationales": {
+        "A": "Correct. DDoS IP Protection is the per-IP SKU.",
+        "B": "Network Protection is not the only SKU; IP Protection exists.",
+        "C": "Front Door's WAF is L7; DDoS is L3/L4 and is a separate offering.",
+        "D": "Bastion is a management plane access tool, unrelated to DDoS."
+      },
+      "references": [
+        { "text": "Azure DDoS Protection SKU comparison", "url": "https://learn.microsoft.com/azure/ddos-protection/ddos-protection-sku-comparison" }
+      ]
+    },
+    {
+      "id": 75,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "WAF — Application Gateway WAF vs Front Door WAF",
+      "question": "A globally distributed app needs WAF at the global edge with anycast routing and OWASP Core Rule Set 3.2. Which WAF offering fits?",
+      "options": {
+        "A": "Azure Application Gateway WAF v2 — regional, runs in your VNet.",
+        "B": "Azure Web Application Firewall on Azure Front Door — runs at Microsoft's global edge POPs, supports OWASP CRS, bot protection, and geo-blocking before traffic reaches the origin.",
+        "C": "Azure Firewall Premium WAF.",
+        "D": "Network Security Group with web rules."
+      },
+      "answer": "B",
+      "rationale": "WAF can be deployed on Application Gateway (regional, inside your VNet) or on Azure Front Door (global edge). The global anycast / 'block at the edge' requirement points to Front Door WAF; Application Gateway WAF is the right answer for regional, in-VNet deployments.",
+      "optionRationales": {
+        "A": "App Gateway WAF is regional, not at global edge.",
+        "B": "Correct. Front Door WAF is the global-edge offering.",
+        "C": "Azure Firewall doesn't include a WAF.",
+        "D": "NSGs operate at L4."
+      },
+      "references": [
+        { "text": "Azure Web Application Firewall on Front Door", "url": "https://learn.microsoft.com/azure/web-application-firewall/afds/afds-overview" },
+        { "text": "Azure WAF on Application Gateway", "url": "https://learn.microsoft.com/azure/web-application-firewall/ag/ag-overview" }
+      ]
+    },
+    {
+      "id": 76,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "ExpressRoute — private peering vs Microsoft peering",
+      "question": "A company runs an ExpressRoute circuit to access Azure resources privately. They want their VMs to reach Azure SQL via private peering (private IPs over the ExpressRoute), but they currently see traffic going through Microsoft peering to public IPs. What configuration is required?",
+      "options": {
+        "A": "Add a private endpoint for Azure SQL in the on-premises-connected VNet; the FQDN of the SQL server then resolves to a private IP reachable over private peering.",
+        "B": "Enable BGP route filters on Microsoft peering.",
+        "C": "Disable Microsoft peering and recreate the circuit.",
+        "D": "Use a service endpoint on the on-premises side."
+      },
+      "answer": "A",
+      "rationale": "ExpressRoute private peering carries VNet-to-on-prem private IP traffic. To reach Azure SQL privately, deploy a private endpoint for SQL in the VNet connected to the circuit — the FQDN resolves to a private IP that on-prem hosts can reach over private peering via the VNet.",
+      "optionRationales": {
+        "A": "Correct. Private endpoint in the connected VNet is the documented pattern.",
+        "B": "BGP filters don't relocate the SQL endpoint to a private IP.",
+        "C": "Microsoft peering is not the problem; the SQL endpoint must be private.",
+        "D": "Service endpoints only work within Azure VNets."
+      },
+      "references": [
+        { "text": "Use private endpoints for Azure SQL Database with ExpressRoute", "url": "https://learn.microsoft.com/azure/azure-sql/database/private-endpoint-overview" },
+        { "text": "ExpressRoute peering options", "url": "https://learn.microsoft.com/azure/expressroute/expressroute-circuit-peerings" }
+      ]
+    },
+    {
+      "id": 77,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Bastion — Standard SKU features",
+      "question": "A SecOps team wants to remove RDP/SSH public IPs from all production VMs and provide just-in-time management access via Azure Bastion. They also want operators to be able to use their own desktop's native RDP/SSH client (not just the browser portal), to record sessions, and to scale connections to hundreds of concurrent users. Which Bastion SKU is required?",
+      "options": {
+        "A": "Bastion Basic SKU.",
+        "B": "Bastion Standard or Premium SKU — Standard adds native client support (mstsc / ssh from your desktop via az network bastion), host scaling units, and IP-based connection; Premium adds session recording and other advanced features. Basic supports only browser-based portal connections.",
+        "C": "Bastion Developer SKU with private endpoint.",
+        "D": "Bastion is not a feature; use Just-in-Time VM Access only."
+      },
+      "answer": "B",
+      "rationale": "Bastion Basic only supports browser-based connections to VMs in the same VNet. Standard adds native client (mstsc/ssh) support, host scaling for higher concurrency, and IP-based connection. Premium adds session recording. JIT VM Access is complementary (opens the management port for a window) but doesn't replace Bastion's connectivity model.",
+      "optionRationales": {
+        "A": "Basic SKU lacks the required features.",
+        "B": "Correct. Standard (or Premium for recording) is required.",
+        "C": "Developer SKU is for single dev/test scenarios, not scaled production.",
+        "D": "JIT and Bastion are complementary; JIT alone doesn't solve the public-IP-removal goal."
+      },
+      "references": [
+        { "text": "Azure Bastion SKUs", "url": "https://learn.microsoft.com/azure/bastion/configuration-settings#skus" },
+        { "text": "Azure Bastion — connect using native client", "url": "https://learn.microsoft.com/azure/bastion/connect-native-client-windows" }
+      ]
+    },
+    {
+      "id": 78,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "AVNM — connectivity configurations (hub-and-spoke + direct connectivity)",
+      "question": "A network architect uses AVNM hub-and-spoke connectivity configuration so spokes can transit through the hub firewall. Two specific spokes also need high-throughput, low-latency communication between themselves without going through the firewall. Which AVNM feature handles this?",
+      "options": {
+        "A": "Manually peer the two spokes; AVNM doesn't support direct spoke-to-spoke.",
+        "B": "In the hub-and-spoke connectivity configuration, place the two spokes in a network group with 'Direct connectivity' enabled — AVNM creates direct connections between members of the group, bypassing the hub for that pair, while preserving the hub-and-spoke topology for other spokes.",
+        "C": "Use Virtual WAN instead.",
+        "D": "Use a User Defined Route from each spoke to the other's private IP."
+      },
+      "answer": "B",
+      "rationale": "Direct connectivity is an option in AVNM's hub-and-spoke connectivity configuration: members of a network group with direct connectivity enabled get direct virtual network connections between each other (effectively forming a connected group) while still being spokes of the hub.",
+      "optionRationales": {
+        "A": "Manual peering defeats AVNM's centralized management.",
+        "B": "Correct. Direct connectivity is the documented AVNM feature.",
+        "C": "Virtual WAN is an alternative architecture, not the targeted solution.",
+        "D": "UDRs without an underlying peering won't carry traffic between VNets."
+      },
+      "references": [
+        { "text": "Connectivity configurations in Azure Virtual Network Manager", "url": "https://learn.microsoft.com/azure/virtual-network-manager/concept-connectivity-configuration" }
+      ]
+    },
+    {
+      "id": 79,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Front Door — Private Link to origin",
+      "question": "An organization wants their Azure Front Door Premium profile to reach the origin (an App Service) over Private Link so the origin's public endpoint can be disabled. Which configuration is required?",
+      "options": {
+        "A": "Azure Front Door Standard or Premium supports Private Link to origin.",
+        "B": "Azure Front Door Premium with a Private Link Service connection — the origin (App Service Premium, App Service Environment, internal Standard Load Balancer, Storage, etc.) is configured to require Private Link approval; Front Door's connection request is approved and the origin can have public network access disabled.",
+        "C": "Azure Front Door Standard is required for Private Link to origin.",
+        "D": "Front Door cannot reach origins privately; private origins require Application Gateway."
+      },
+      "answer": "B",
+      "rationale": "Private Link to origin is a Premium-tier Front Door feature. The Front Door Premium profile establishes a Private Link to supported origins (App Service Premium, ASE, Internal SLB, Storage, etc.); after approval on the origin, the origin's public network access can be disabled.",
+      "optionRationales": {
+        "A": "Standard does not support Private Link to origin.",
+        "B": "Correct. Front Door Premium + Private Link approval is the documented path.",
+        "C": "Wrong tier — it's Premium, not Standard.",
+        "D": "Front Door does support private origins via Private Link."
+      },
+      "references": [
+        { "text": "Secure origins with Private Link in Azure Front Door Premium", "url": "https://learn.microsoft.com/azure/frontdoor/private-link" }
+      ]
+    },
+    {
+      "id": 80,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Firewall — forced tunneling",
+      "question": "A regulated workload requires that all outbound Internet traffic from an Azure Firewall be forced through an on-premises proxy/firewall for inspection, rather than egressing directly from Azure. Which configuration enables this?",
+      "options": {
+        "A": "There is no way to force Azure Firewall outbound traffic to on-premises.",
+        "B": "Deploy Azure Firewall in forced tunneling mode (requires the firewall to be created with the Management subnet and the 'Forced Tunneling' feature enabled) and add a UDR on the AzureFirewallSubnet pointing 0.0.0.0/0 to the on-premises NVA next-hop; the firewall management plane uses the dedicated Management subnet to remain reachable.",
+        "C": "Configure UDRs on the AzureFirewallSubnet pointing 0.0.0.0/0 to on-premises; no other configuration is required.",
+        "D": "Disable the firewall's public IP."
+      },
+      "answer": "B",
+      "rationale": "Forced tunneling on Azure Firewall requires the firewall to be deployed with a dedicated Management subnet (AzureFirewallManagementSubnet) and the Forced Tunneling feature enabled at creation. Without the management subnet, applying a 0.0.0.0/0 UDR on AzureFirewallSubnet pointing to on-premises would break the firewall's management plane.",
+      "optionRationales": {
+        "A": "Forced tunneling is supported.",
+        "B": "Correct. Management subnet + Forced Tunneling feature + UDR is required.",
+        "C": "Missing the management subnet prerequisite — the firewall will lose management connectivity.",
+        "D": "Disabling the public IP isn't sufficient or supported in this scenario."
+      },
+      "references": [
+        { "text": "Azure Firewall forced tunneling", "url": "https://learn.microsoft.com/azure/firewall/forced-tunneling" }
+      ]
+    },
+    {
+      "id": 81,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Private endpoint — Private DNS zone integration",
+      "question": "After deploying a Private Endpoint for an Azure Storage Blob service, a VM in the connected VNet still resolves the storage account FQDN to the public IP. What is the most likely root cause and the fix?",
+      "options": {
+        "A": "Private Endpoints don't change DNS resolution; the public IP is always returned.",
+        "B": "The VNet is not linked to the privatelink.blob.core.windows.net Private DNS zone (or no A record exists). Link the Private DNS zone to the VNet (auto-registration off, A record pointing the storage account FQDN to the private endpoint's private IP — either by enabling private DNS zone integration when creating the endpoint, or by configuring the zone manually).",
+        "C": "Storage account requires public access to be enabled for Private Endpoint to work.",
+        "D": "The VM must be rebooted after Private Endpoint creation."
+      },
+      "answer": "B",
+      "rationale": "Private Endpoints require correct Private DNS configuration to resolve the service FQDN to the private IP. Either enable Private DNS zone integration during endpoint creation (auto-creates and links the appropriate privatelink.* zone) or configure the zone manually. Without the zone linked to the VNet, public DNS continues to return the public IP.",
+      "optionRationales": {
+        "A": "Private Endpoints rely on Private DNS to redirect the FQDN.",
+        "B": "Correct. Private DNS zone linked to the VNet + correct A record is the documented configuration.",
+        "C": "Public access disabled is fine; DNS resolution is independent.",
+        "D": "VM reboot doesn't help if DNS isn't configured."
+      },
+      "references": [
+        { "text": "Azure Private Endpoint DNS configuration", "url": "https://learn.microsoft.com/azure/private-link/private-endpoint-dns" }
+      ]
+    },
+    {
+      "id": 82,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Firewall Premium — IDPS",
+      "question": "Azure Firewall Premium IDPS detects a known exploit attempt against a backend VM. The team wants this specific class of traffic to be blocked, not just alerted on, but only for HTTPS (TLS-inspected) flows. Which configuration achieves this?",
+      "options": {
+        "A": "Enable IDPS in Alert mode globally; IDPS blocks automatically when TLS inspection is on.",
+        "B": "Configure IDPS to Alert and deny mode globally; with TLS inspection enabled, IDPS can inspect decrypted HTTPS traffic and block signature matches. Tune by adding IDPS signature exclusions for false positives and IDPS bypass rules for specific source/destination/protocol combinations.",
+        "C": "IDPS only supports Alert mode; blocking requires a Network Virtual Appliance.",
+        "D": "Enable IDPS in deny-only mode; alerts are suppressed and only blocks logged."
+      },
+      "answer": "B",
+      "rationale": "IDPS in Azure Firewall Premium supports Alert and Deny modes. To block on signature matches, set Alert and deny. TLS inspection is required for IDPS to evaluate encrypted HTTPS traffic. Signature exclusions (per signature ID) and bypass rules (per 5-tuple) handle tuning.",
+      "optionRationales": {
+        "A": "Alert mode never blocks.",
+        "B": "Correct. Alert and deny + TLS inspection + exclusions/bypass is the documented configuration.",
+        "C": "IDPS supports Deny mode.",
+        "D": "There is no deny-only mode that suppresses alerts."
+      },
+      "references": [
+        { "text": "Azure Firewall Premium IDPS", "url": "https://learn.microsoft.com/azure/firewall/premium-features#idps" },
+        { "text": "Configure IDPS signature rules", "url": "https://learn.microsoft.com/azure/firewall/premium-deploy-certificates-enterprise-ca" }
+      ]
+    },
+    {
+      "id": 83,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — auditing tamper resistance",
+      "question": "A regulator demands that Azure SQL audit logs cannot be deleted or altered for 90 days. Audit destination is a storage account. Which combination addresses this?",
+      "options": {
+        "A": "Set the storage account to LRS redundancy.",
+        "B": "Enable immutable blob storage with a time-based retention policy (90 days, locked) on the storage container that receives SQL audit logs; configure 'Allow protected append writes' to Block and append blobs or Append blobs so SQL auditing can continue to append.",
+        "C": "Enable soft delete on the storage account.",
+        "D": "Set the audit retention on the SQL server to 90 days; the storage account need not be immutable."
+      },
+      "answer": "B",
+      "rationale": "Immutable storage with a locked time-based retention policy provides the WORM control regulators expect. SQL auditing requires the 'Allow protected append writes' setting to be configured for Append blobs (or Block + Append) so audit log writes can continue while immutability is enforced. The 'None' option is not supported for SQL audit.",
+      "optionRationales": {
+        "A": "Redundancy doesn't prevent deletion or modification.",
+        "B": "Correct. Immutable storage + 'protected append writes' enabled is the documented configuration.",
+        "C": "Soft delete is not WORM; it merely delays delete.",
+        "D": "SQL audit retention setting doesn't prevent admin from deleting blobs in storage."
+      },
+      "references": [
+        { "text": "Auditing for Azure SQL Database — immutable log store", "url": "https://learn.microsoft.com/azure/azure-sql/database/auditing-overview" },
+        { "text": "Immutable storage with time-based retention", "url": "https://learn.microsoft.com/azure/storage/blobs/immutable-time-based-retention-policy-overview" }
+      ]
+    },
+    {
+      "id": 84,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Database for PostgreSQL — network controls",
+      "question": "An Azure Database for PostgreSQL Flexible Server must be reachable only from a specific Azure VNet's subnet and never from the Internet. Which deployment option supports this most directly?",
+      "options": {
+        "A": "Public access (firewall) with the subnet's outbound IPs allow-listed.",
+        "B": "Private access (VNet integration) — deploy the Flexible Server with VNet integration into the target subnet (delegated to Microsoft.DBforPostgreSQL/flexibleServers) and configure a Private DNS zone so the server FQDN resolves to the private IP from within the VNet.",
+        "C": "Configure a Private Endpoint on Single Server only.",
+        "D": "Use Azure Bastion to reach the database."
+      },
+      "answer": "B",
+      "rationale": "Flexible Server supports either Public access (with firewall rules) or Private access (VNet integration). VNet integration places the server in a delegated subnet with a private IP — no public endpoint. Combine with a Private DNS zone for FQDN resolution within the VNet.",
+      "optionRationales": {
+        "A": "Public access leaves a public endpoint exposed.",
+        "B": "Correct. Private access (VNet integration) on Flexible Server is the documented option.",
+        "C": "Single Server is largely deprecated; Flexible Server is the current model.",
+        "D": "Bastion is for VM SSH/RDP, not database connections."
+      },
+      "references": [
+        { "text": "Networking with private access in Azure Database for PostgreSQL Flexible Server", "url": "https://learn.microsoft.com/azure/postgresql/flexible-server/concepts-networking-private" }
+      ]
+    },
+    {
+      "id": 85,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — service tag with NSG vs Private Endpoint",
+      "question": "A team wants Azure VMs in one subnet to be the only Azure resources that can reach a specific storage account, but they also want to keep using the storage account's standard public FQDN with no DNS changes. Which combination of controls is appropriate?",
+      "options": {
+        "A": "Service endpoint on the subnet + storage firewall allowing only that subnet, plus 'Allow Azure services on the trusted services list' if needed.",
+        "B": "Private Endpoint in the subnet + Private DNS zone — but this changes DNS resolution.",
+        "C": "NSG on the subnet allowing outbound to the Storage service tag.",
+        "D": "Network Watcher Connection Monitor with allow lists."
+      },
+      "answer": "A",
+      "rationale": "Service endpoints + storage firewall rules let you allow only specific VNet subnets to access the storage account while continuing to use the public FQDN (no DNS changes). Private Endpoints change DNS resolution to a private IP, which the scenario explicitly wants to avoid.",
+      "optionRationales": {
+        "A": "Correct. Service endpoint + firewall meets the requirement without DNS changes.",
+        "B": "Private Endpoint changes DNS, which the scenario rules out.",
+        "C": "NSG outbound to a service tag controls VM-side egress to all Storage IPs, not which storage accounts allow them in.",
+        "D": "Connection Monitor measures connectivity; it doesn't enforce access."
+      },
+      "references": [
+        { "text": "Configure storage firewalls and virtual networks", "url": "https://learn.microsoft.com/azure/storage/common/storage-network-security" },
+        { "text": "Virtual network service endpoints", "url": "https://learn.microsoft.com/azure/virtual-network/virtual-network-service-endpoints-overview" }
+      ]
+    },
+    {
+      "id": 86,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL Managed Instance — connectivity types",
+      "question": "An Azure SQL Managed Instance must be reachable from on-premises over ExpressRoute but never from the public Internet. Which configuration is correct?",
+      "options": {
+        "A": "Set the connection type to 'Proxy' and assign a public endpoint.",
+        "B": "Deploy SQL Managed Instance in a delegated subnet of a VNet connected via ExpressRoute private peering; do not configure a public endpoint on the managed instance; on-prem clients reach the MI's private IP over the ExpressRoute / VNet peering.",
+        "C": "Enable the public endpoint on the managed instance and use NSGs to allow only the on-prem IP range.",
+        "D": "Place the MI in a public subnet and apply a service endpoint policy."
+      },
+      "answer": "B",
+      "rationale": "SQL Managed Instance is deployed in a delegated subnet of a VNet. By default the public endpoint is disabled — on-prem clients connect over ExpressRoute private peering (or S2S VPN) to the MI's private IP. Public endpoint is optional and disabled by default in this scenario.",
+      "optionRationales": {
+        "A": "Connection type 'Proxy' affects how clients route through the gateway, not whether MI is public.",
+        "B": "Correct. Private MI deployment + ExpressRoute is the documented topology.",
+        "C": "Enabling the public endpoint exposes MI to the internet — not what's required.",
+        "D": "MI is always in a private/delegated subnet; there is no 'public subnet'."
+      },
+      "references": [
+        { "text": "SQL Managed Instance connectivity architecture", "url": "https://learn.microsoft.com/azure/azure-sql/managed-instance/connectivity-architecture-overview" }
+      ]
+    },
+    {
+      "id": 87,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure Firewall — Threat Intelligence based filtering",
+      "question": "Azure Firewall's Threat Intelligence-based filtering must alert and deny traffic to/from known malicious IPs and domains. Which configuration is correct?",
+      "options": {
+        "A": "Threat Intelligence is automatically Alert-only and cannot be set to Deny.",
+        "B": "Set Threat Intelligence mode in the firewall policy to 'Alert and deny'; configure allow-lists for known false positives (specific IPs/FQDNs that the org needs to reach despite TI flagging).",
+        "C": "Threat Intelligence requires Defender for Cloud and is configured there.",
+        "D": "Threat Intelligence is per-rule, not global; add 'TI' as an attribute on each network rule."
+      },
+      "answer": "B",
+      "rationale": "Threat Intelligence-based filtering in Azure Firewall is configured at the firewall policy level with modes Off / Alert only / Alert and deny. Allow-lists handle known false positives by exempting specific IPs/FQDNs from TI evaluation.",
+      "optionRationales": {
+        "A": "Deny mode exists and is the recommended production configuration.",
+        "B": "Correct. Alert and deny + allow-list is the documented configuration.",
+        "C": "Threat Intelligence is a firewall capability, configured in the firewall policy.",
+        "D": "Threat Intelligence is a global setting, not per-rule."
+      },
+      "references": [
+        { "text": "Azure Firewall threat intelligence-based filtering", "url": "https://learn.microsoft.com/azure/firewall/threat-intel" }
+      ]
+    },
+    {
+      "id": 88,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Azure SQL — Conditional Access on Microsoft Entra authentication",
+      "question": "A SQL Database is configured for Microsoft Entra-only authentication. The DBA wants to require MFA + compliant device for all interactive logins to the database via SSMS or Azure Data Studio. Where is this control enforced?",
+      "options": {
+        "A": "Inside Azure SQL — assign the 'sqladmin' role with MFA required.",
+        "B": "Conditional Access policy targeting the 'Azure SQL Database' enterprise app (well-known service principal); the policy applies when SSMS / Azure Data Studio obtains an Entra ID token to call SQL, including MFA and compliant-device grants.",
+        "C": "Azure Policy denyAction effect on SQL connections.",
+        "D": "TDE with CMK rotation requiring MFA."
+      },
+      "answer": "B",
+      "rationale": "Conditional Access policies apply to Microsoft Entra token acquisition. Targeting the Azure SQL Database service principal lets you enforce MFA and compliant-device requirements on any client (SSMS, ADS, app) requesting a SQL token. This is the documented mechanism for MFA-gated SQL access.",
+      "optionRationales": {
+        "A": "Azure SQL doesn't have a 'sqladmin role with MFA' setting.",
+        "B": "Correct. Conditional Access on the Azure SQL service principal is the mechanism.",
+        "C": "Azure Policy doesn't gate token acquisition.",
+        "D": "TDE encrypts data at rest; unrelated to login MFA."
+      },
+      "references": [
+        { "text": "Use Conditional Access with Azure SQL Database", "url": "https://learn.microsoft.com/azure/azure-sql/database/conditional-access-configure" }
+      ]
+    },
+    {
+      "id": 89,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Storage — SAS expiration policy",
+      "question": "Auditors discover that a storage account has issued SAS tokens valid for 10 years. The team wants to ensure all future SAS tokens generated from the account have a maximum recommended validity of 7 days, with warnings/log entries when a longer SAS is generated. Which configuration achieves this?",
+      "options": {
+        "A": "Disable SAS entirely on the storage account.",
+        "B": "Configure a SAS expiration policy on the storage account specifying a 7-day recommended interval; SAS generation operations whose expiration exceeds the interval produce a warning and (when Azure Storage logging via Azure Monitor is enabled) emit a log entry to the storage logs.",
+        "C": "Use Azure Policy to deny SAS generation.",
+        "D": "Force user delegation SAS only; SAS expiration policies don't apply to user delegation SAS."
+      },
+      "answer": "B",
+      "rationale": "SAS expiration policy is a per-account setting that specifies a recommended SAS validity interval. SAS generations that exceed the interval produce a warning (and a log entry when Azure Storage logging is on). The policy applies to service and account SAS; user delegation SAS use their own expiration limits.",
+      "optionRationales": {
+        "A": "Disabling SAS breaks all legitimate use cases.",
+        "B": "Correct. SAS expiration policy + Storage logging is the documented mechanism.",
+        "C": "Azure Policy doesn't see SAS generation, which is client-side.",
+        "D": "User delegation SAS aren't affected by this policy and the policy is still valuable for service/account SAS."
+      },
+      "references": [
+        { "text": "Create an expiration policy for shared access signatures", "url": "https://learn.microsoft.com/azure/storage/common/sas-expiration-policy" }
+      ]
+    },
+    {
+      "id": 90,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "topic": "Network Watcher — Connection Troubleshoot",
+      "question": "A user reports that a VM in a hub-and-spoke topology cannot reach an Azure SQL Database over port 1433. The SecOps team must determine whether the packet is being dropped by an NSG, AVNM admin rule, UDR, Azure Firewall, or DNS — and at which hop. Which Network Watcher feature gives this end-to-end diagnosis?",
+      "options": {
+        "A": "Connection Monitor — for continuous synthetic probes.",
+        "B": "Connection Troubleshoot — on-demand reachability test from the source VM to a destination (IP/FQDN/port); returns next-hop, latency, and any blocking rule (NSG / route / firewall) along the path.",
+        "C": "Topology — visualizes the network only.",
+        "D": "Packet Capture — captures raw traffic for offline analysis."
+      },
+      "answer": "B",
+      "rationale": "Connection Troubleshoot is the on-demand point-in-time reachability test. It identifies the blocking component (NSG, UDR, firewall) and hop on the path, plus latency. Connection Monitor is the continuous version. Both rely on Network Watcher.",
+      "optionRationales": {
+        "A": "Connection Monitor is for continuous baseline monitoring.",
+        "B": "Correct. Connection Troubleshoot is the on-demand path analyzer.",
+        "C": "Topology only visualizes the layout.",
+        "D": "Packet capture is for raw traffic, not a guided path analysis."
+      },
+      "references": [
+        { "text": "Network Watcher Connection Troubleshoot overview", "url": "https://learn.microsoft.com/azure/network-watcher/connection-troubleshoot-overview" }
+      ]
     }
   ]
 }
