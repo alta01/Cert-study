@@ -3105,6 +3105,863 @@
         { "text": "Defender for Cloud overview — Data and AI security dashboard", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction" },
         { "text": "Data security dashboard in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/data-security-dashboard" }
       ]
+    },
+    {
+      "id": 126,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Foundational CSPM vs Defender CSPM",
+      "question": "An organization enables Defender for Cloud on a new subscription. They see a free 'Foundational CSPM' tier with the secure score and security recommendations, but cannot find attack path analysis or the cloud security graph. What is missing?",
+      "options": {
+        "A": "Nothing — Foundational CSPM includes attack path analysis; check the navigation pane.",
+        "B": "The paid Defender CSPM plan must be enabled separately. Defender CSPM adds attack path analysis, cloud security graph (cloud security explorer), agentless scanning, data-aware security posture, AI security posture management, EASM integration, and permissions management — capabilities not in the free Foundational CSPM tier.",
+        "C": "Defender for Servers Plan 2 is required.",
+        "D": "Microsoft Sentinel must be enabled."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud's CSPM has two tiers: Foundational (free, includes secure score, MCSB recommendations, asset inventory, workflow automation) and Defender CSPM (paid, adds attack path analysis, cloud security graph, agentless scanning, data-aware posture, AI security posture, CIEM, EASM insights). Both are separate from workload protection plans (Defender for Servers, Storage, etc.).",
+      "optionRationales": {
+        "A": "Attack path analysis is Defender CSPM only.",
+        "B": "Correct. Defender CSPM is the paid plan with advanced posture features.",
+        "C": "Defender for Servers Plan 2 enables agentless scanning when CSPM doesn't but isn't required for attack path analysis at the CSPM level.",
+        "D": "Sentinel is unrelated."
+      },
+      "references": [
+        { "text": "What is Cloud Security Posture Management (CSPM)?", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-cloud-security-posture-management" },
+        { "text": "Attack path analysis in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path" }
+      ]
+    },
+    {
+      "id": 127,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Attack path analysis — how paths are constructed",
+      "question": "Defender CSPM's attack path analysis surfaces a path: 'Internet-exposed VM with critical CVE → managed identity with Storage Blob Data Contributor → storage account containing sensitive PII'. Which statement most accurately describes what this means and what enabled the detection?",
+      "options": {
+        "A": "The VM has been actively breached and credentials were stolen.",
+        "B": "Cloud security graph identified an exploitable chain: real external exposure (internet entry point), exploitable weakness (critical CVE), lateral movement via identity permissions, and a high-impact target (sensitive PII). Requires Defender CSPM AND either agentless scanning for VMs (CSPM/DfS P2) or VM vulnerability assessment (DfS), plus data-aware security posture for the sensitive-data classification.",
+        "C": "An attack-path-analysis subscription must be purchased separately.",
+        "D": "Attack paths only exist for Azure-native resources, not for resources running in AWS/GCP."
+      },
+      "answer": "B",
+      "rationale": "Attack path analysis is the cloud security graph's analytics layer. Paths require: exposure context (internet exposure, identity reach, lateral movement) + an exploitable weakness (CVE, misconfig) + a critical target. The data and capability requirements are Defender CSPM (graph + APA) plus agentless scanning or VM vulnerability assessment for vulnerability data, and data-aware security posture for sensitive data classification on storage/DB.",
+      "optionRationales": {
+        "A": "An attack path is potential, not confirmed exploitation.",
+        "B": "Correct. APA requires Defender CSPM + supporting data sources.",
+        "C": "APA is bundled with Defender CSPM.",
+        "D": "APA works across Azure, AWS, and GCP."
+      },
+      "references": [
+        { "text": "Security explorer and attack paths in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path" },
+        { "text": "Manage attack paths", "url": "https://learn.microsoft.com/azure/defender-for-cloud/how-to-manage-attack-path" }
+      ]
+    },
+    {
+      "id": 128,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Cloud Security Explorer — graph queries",
+      "question": "A security team needs to ad-hoc find all 'Internet-exposed virtual machines that have a managed identity with Owner role on any subscription'. Which Defender CSPM capability supports this question?",
+      "options": {
+        "A": "Azure Resource Graph queries.",
+        "B": "Cloud Security Explorer — runs graph-based queries against the cloud security graph (combining inventory, identity, network exposure, vulnerabilities, permissions, sensitivity labels) with built-in query templates and a custom query builder, surfacing matches across Azure / AWS / GCP.",
+        "C": "Microsoft Sentinel KQL queries.",
+        "D": "Microsoft Purview eDiscovery."
+      },
+      "answer": "B",
+      "rationale": "Cloud Security Explorer is the documented query interface for the cloud security graph. It lets the SOC pivot on multi-hop relationships (exposure → identity → permissions → target) that single-table queries can't express. Built-in templates address common questions; custom queries handle novel ones.",
+      "optionRationales": {
+        "A": "Azure Resource Graph is a property-level query over Azure resources; it doesn't include cross-resource graph relationships, identity reach, vulnerability data, or sensitive data labels in one view.",
+        "B": "Correct. Cloud Security Explorer is the documented Defender CSPM query interface.",
+        "C": "Sentinel KQL queries are over log tables, not the security graph.",
+        "D": "Purview eDiscovery is for content discovery in M365."
+      },
+      "references": [
+        { "text": "Cloud security explorer", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path" },
+        { "text": "Build queries with Cloud Security Explorer", "url": "https://learn.microsoft.com/azure/defender-for-cloud/how-to-manage-cloud-security-explorer" }
+      ]
+    },
+    {
+      "id": 129,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "AWS connector — Default vs Least Privilege access",
+      "question": "While onboarding an AWS account to Defender for Cloud, the security team must choose between Default access and Least Privilege access for the IAM role created by the CloudFormation template. The team wants to grant only the minimum permissions needed for the currently enabled Defender plans, and be notified if additional permissions are needed later. Which configuration should they choose?",
+      "options": {
+        "A": "Default access — it's safer because Microsoft pre-selects everything.",
+        "B": "Least Privilege access — grants only the permissions required for currently enabled plans/extensions; if additional capabilities are enabled later, the connector reports a permission gap and the CloudFormation template must be regenerated to apply the new permissions.",
+        "C": "Custom IAM role authored by the AWS team without using the CloudFormation template.",
+        "D": "Default access — it's the only supported option for AWS management accounts."
+      },
+      "answer": "B",
+      "rationale": "Least Privilege access grants only the permissions required by enabled Defender plans/extensions. The trade-off is that adding new plans requires reconfiguring access (re-running the CloudFormation template). Default access includes permissions for current and future capabilities. Both are documented; the choice depends on the org's stance on least-privilege vs operational simplicity.",
+      "optionRationales": {
+        "A": "Default access is convenient but over-grants relative to least-privilege requirements.",
+        "B": "Correct. Least Privilege access is the documented minimum-permission choice.",
+        "C": "Custom roles outside the template aren't supported.",
+        "D": "Both options are supported for management accounts."
+      },
+      "references": [
+        { "text": "Connect AWS accounts to Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws" },
+        { "text": "Authentication architecture for AWS connectors", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-authentication-architecture-aws" }
+      ]
+    },
+    {
+      "id": 130,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "AWS management account onboarding",
+      "question": "An enterprise has hundreds of AWS accounts under a single AWS Organization with a management account. The security team wants every existing AND newly-created child account to be automatically onboarded to Defender for Cloud. Which approach is correct?",
+      "options": {
+        "A": "Run the CloudFormation template separately in every child account, manually.",
+        "B": "Connect the AWS management account in Defender for Cloud; the platform uses AWS StackSets to deploy required IAM roles to all member accounts, and autoprovisioning enrolls newly discovered child accounts.",
+        "C": "Use AWS Single Sign-On (IAM Identity Center) to grant Defender for Cloud read access to all child accounts.",
+        "D": "Connect each child account by SSH from a centralized jump host."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud uses AWS StackSets when connecting a management account — IAM roles and resources are deployed across all member accounts automatically. Autoprovisioning is enabled by default for newly discovered child accounts. This is the documented enterprise-scale onboarding pattern.",
+      "optionRationales": {
+        "A": "Manual per-account onboarding is the anti-pattern.",
+        "B": "Correct. Management account + StackSets + autoprovisioning is the documented mechanism.",
+        "C": "IAM Identity Center handles human authentication; it isn't the Defender connector model.",
+        "D": "SSH is unrelated to Defender for Cloud connectors."
+      },
+      "references": [
+        { "text": "Connect AWS accounts — management account & StackSets", "url": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws" }
+      ]
+    },
+    {
+      "id": 131,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Microsoft Cloud Security Benchmark (MCSB) — secure score",
+      "question": "Which statement best describes how the secure score in Defender for Cloud is calculated?",
+      "options": {
+        "A": "It's the average percent of recommendations marked 'remediated' regardless of standard.",
+        "B": "It's based ONLY on the built-in recommendations from the Microsoft Cloud Security Benchmark (MCSB) standard; additional standards (NIST, PCI DSS, custom) appear in the Regulatory Compliance dashboard but do not affect the secure score. To raise the score, remediate MCSB recommendations.",
+        "C": "It's the count of high-severity Defender for Cloud alerts in the last 7 days.",
+        "D": "It's calculated only when Defender CSPM (paid) is enabled."
+      },
+      "answer": "B",
+      "rationale": "The classic secure score in the Azure portal is based exclusively on MCSB-derived recommendations. Other regulatory standards influence the Regulatory Compliance dashboard but don't change the secure score number. The newer Cloud Secure Score (risk-based) in the Defender portal additionally factors in asset risk and criticality.",
+      "optionRationales": {
+        "A": "Not all recommendations affect secure score.",
+        "B": "Correct. MCSB drives the classic secure score.",
+        "C": "Alerts are separate from posture.",
+        "D": "Secure score is available with Foundational CSPM."
+      },
+      "references": [
+        { "text": "Secure score in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/secure-score-security-controls" },
+        { "text": "Microsoft cloud security benchmark in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-regulatory-compliance" }
+      ]
+    },
+    {
+      "id": 132,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Regulatory Compliance dashboard — adding standards",
+      "question": "An auditor needs to demonstrate continuous compliance against PCI DSS v4 and NIST 800-53 R5 for a multicloud environment (Azure + AWS). How is this configured in Defender for Cloud?",
+      "options": {
+        "A": "Open Microsoft Sentinel and configure analytics rules per standard.",
+        "B": "In Defender for Cloud Environment settings, select the subscription/AWS account and add PCI DSS v4 and NIST 800-53 R5 as security standards; the Regulatory Compliance dashboard then continuously assesses resources against each control set and produces per-control compliance results that are exportable.",
+        "C": "Build a custom Azure Policy initiative manually mapping every control.",
+        "D": "Use Compliance Manager only; Defender for Cloud doesn't track regulatory standards."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud's Regulatory Compliance dashboard lets you add built-in standards (NIST, ISO, PCI DSS, CIS, etc.) per subscription/AWS account/GCP project. Each control is automatically mapped to Azure Policy assessments and the dashboard surfaces real-time compliance with the ability to export evidence.",
+      "optionRationales": {
+        "A": "Sentinel handles detection/response, not regulatory compliance assessment.",
+        "B": "Correct. Add built-in standards in Environment settings is the documented mechanism.",
+        "C": "Manual initiatives duplicate built-in standards work.",
+        "D": "Compliance Manager is broader but Defender for Cloud has its own continuous Azure compliance assessment."
+      },
+      "references": [
+        { "text": "Improve regulatory compliance in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/regulatory-compliance-dashboard" },
+        { "text": "Update regulatory compliance packages", "url": "https://learn.microsoft.com/azure/defender-for-cloud/update-regulatory-compliance-packages" }
+      ]
+    },
+    {
+      "id": 133,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Microsoft Defender EASM — discovery seeds and recursion",
+      "question": "A security team starts a Defender EASM custom discovery. What are 'discovery seeds' and how does Defender EASM use them to map the attack surface?",
+      "options": {
+        "A": "Seeds are SSL certificates that EASM imports; the tool exclusively maps cert chains.",
+        "B": "Seeds are known assets owned by the organization (domains, IP blocks, hosts, email contacts, ASNs, Whois orgs). EASM recursively follows observed connections — Whois records, DNS records, SSL certs, ASN records — to surface progressively more assets owned by the org, until reaching the periphery of the org's management responsibility.",
+        "C": "Seeds are random crawler entry points generated by Microsoft.",
+        "D": "Seeds are existing Defender for Cloud asset inventory items only."
+      },
+      "answer": "B",
+      "rationale": "EASM's discovery model starts from organization-owned seeds and recursively discovers connected infrastructure through inferences over Whois, DNS, SSL, and ASN data. Seeds can include any of the seven supported asset types. The recursion continues until the inferred connection strength falls below the threshold for inclusion in confirmed inventory.",
+      "optionRationales": {
+        "A": "Seeds are broader than certificates.",
+        "B": "Correct. Seeds + recursive inference is the documented EASM model.",
+        "C": "Discovery is org-specific, not random.",
+        "D": "EASM can use Defender for Cloud assets as seeds but isn't limited to them."
+      },
+      "references": [
+        { "text": "What is EASM discovery?", "url": "https://learn.microsoft.com/azure/external-attack-surface-management/what-is-discovery" },
+        { "text": "EASM inventory assets", "url": "https://learn.microsoft.com/azure/external-attack-surface-management/understanding-inventory-assets" }
+      ]
+    },
+    {
+      "id": 134,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender EASM — discovery groups",
+      "question": "An EASM customer has two business units (Acme Retail, Acme Healthcare) with different domain/IP ranges and wants each business unit's discovery to run on its own schedule and produce its own inventory delta reports. Which capability supports this?",
+      "options": {
+        "A": "Create separate Azure subscriptions per business unit and onboard each to EASM.",
+        "B": "Use Discovery Groups in EASM — each group is an independent seed cluster with its own recurrence schedule, run history, and inventory delta reports; common to organize by responsible team/business unit, brands, or subsidiaries.",
+        "C": "Use Azure Resource Graph queries to filter EASM inventory.",
+        "D": "Discovery is global and cannot be partitioned."
+      },
+      "answer": "B",
+      "rationale": "Discovery Groups are the documented EASM partitioning mechanism. Each group bundles its own seeds, schedule, and run history. Common organizing axes are business units, brands, or subsidiaries.",
+      "optionRationales": {
+        "A": "Multiple EASM instances is heavyweight; Discovery Groups solve this within one EASM resource.",
+        "B": "Correct. Discovery Groups are the documented partitioning capability.",
+        "C": "Resource Graph filtering doesn't drive discovery schedules.",
+        "D": "Discovery is partitionable via Discovery Groups."
+      },
+      "references": [
+        { "text": "Use and manage discovery in Defender EASM", "url": "https://learn.microsoft.com/azure/external-attack-surface-management/using-and-managing-discovery" }
+      ]
+    },
+    {
+      "id": 135,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender EASM — automated attack surfaces",
+      "question": "When provisioning Defender EASM for a new customer, what is the recommended first step before authoring custom discoveries?",
+      "options": {
+        "A": "Immediately create a Discovery Group with all your domains.",
+        "B": "From Getting Started, search for the organization in the list of pre-configured automated attack surfaces Microsoft has built and select 'Build my Attack Surface' — this seeds inventory quickly using already-discovered org-related infrastructure, after which you can run customized discoveries to find outliers.",
+        "C": "Delete the EASM resource and start over.",
+        "D": "Manually upload a CSV of every IP and hostname."
+      },
+      "answer": "B",
+      "rationale": "Microsoft pre-configures attack surfaces for many organizations. The documented first step is to search for the org in the Getting Started list and choose 'Build my Attack Surface' — this gives the customer immediate inventory based on known associations, after which custom discoveries find anything missing.",
+      "optionRationales": {
+        "A": "Custom discovery is the second step.",
+        "B": "Correct. Automated attack surfaces is the documented quickstart.",
+        "C": "Don't delete the resource.",
+        "D": "Manual CSV upload isn't the documented onboarding."
+      },
+      "references": [
+        { "text": "Use and manage discovery — Access your automated attack surface", "url": "https://learn.microsoft.com/azure/external-attack-surface-management/using-and-managing-discovery" }
+      ]
+    },
+    {
+      "id": 136,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Microsoft Defender Vulnerability Management — security baselines",
+      "question": "A SecOps team wants to continuously measure Windows 11 endpoints against the CIS Level 1 benchmark, with the ability to customize specific configuration thresholds and to grant per-device exceptions where mitigations exist. Which MDVM feature supports this?",
+      "options": {
+        "A": "Defender for Endpoint web content filtering.",
+        "B": "MDVM Security Baselines Assessment — create CIS or STIG profiles (Windows 10/11, Windows Server 2008 R2+), customize threshold values per configuration, and add exceptions for specific devices or configurations with justification + duration. Requires MDVM Standalone or the MDVM add-on for Defender for Endpoint P2.",
+        "C": "Azure Policy Guest Configuration only.",
+        "D": "Microsoft Sentinel SOC analyzer workbook."
+      },
+      "answer": "B",
+      "rationale": "MDVM Security Baselines Assessment continuously evaluates devices against CIS or STIG benchmarks (Windows 10/11, Windows Server). Profiles are customizable per-configuration, and per-device exceptions with justification + duration are supported. Requires MDVM Standalone or MDVM add-on for MDE P2.",
+      "optionRationales": {
+        "A": "Web content filtering is unrelated.",
+        "B": "Correct. MDVM Security Baselines Assessment is the documented feature.",
+        "C": "Azure Policy Guest Config audits in-VM settings but doesn't ship CIS/STIG profiles with per-control customization the way MDVM Baselines does.",
+        "D": "Sentinel workbooks visualize but don't perform baseline assessment."
+      },
+      "references": [
+        { "text": "Security baselines assessment — MDVM", "url": "https://learn.microsoft.com/defender-vulnerability-management/tvm-security-baselines" }
+      ]
+    },
+    {
+      "id": 137,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "MDVM — vulnerable application blocking",
+      "question": "MDVM finds that Acme Reader 9.x has a critical RCE CVE. Patches are 30 days away. The team needs to immediately prevent users from launching vulnerable versions while preserving access for already-patched versions. Which MDVM feature is appropriate?",
+      "options": {
+        "A": "Run a Defender for Endpoint custom indicator (IOC) by file hash for every Acme Reader binary.",
+        "B": "Use MDVM 'Block vulnerable applications' (available in Defender for Servers P2 with MDVM premium / standalone) — blocks all currently-known vulnerable versions, while optionally showing a customizable warning to users; gives IT teams time to patch without security worrying about exploitation.",
+        "C": "Create an AppLocker policy on every endpoint.",
+        "D": "Disable the user's account until patching completes."
+      },
+      "answer": "B",
+      "rationale": "MDVM's vulnerable application blocking is purpose-built for this scenario. It blocks (or warns about) all known vulnerable versions of a specific app while leaving patched versions usable. Available in Defender for Servers Plan 2 with MDVM premium and MDVM Standalone — not the free agent-based scanning.",
+      "optionRationales": {
+        "A": "Custom IOCs work but require per-hash maintenance, which is what MDVM block automates.",
+        "B": "Correct. MDVM vulnerable application blocking is the documented feature.",
+        "C": "AppLocker requires per-endpoint policy authoring.",
+        "D": "Disabling users is not proportionate."
+      },
+      "references": [
+        { "text": "Block vulnerable applications with MDVM", "url": "https://learn.microsoft.com/defender-vulnerability-management/tvm-block-vuln-apps" }
+      ]
+    },
+    {
+      "id": 138,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "MDVM — authenticated scan for Windows",
+      "question": "An organization has 200 Windows endpoints that are unmanaged (not enrolled in Intune, no MDE sensor). MDVM should still scan them for software vulnerabilities by remoting in with provided credentials. Which MDVM capability supports this?",
+      "options": {
+        "A": "Defender for Endpoint sensor must be installed first.",
+        "B": "Authenticated scan for Windows — provide MDVM with credentials (a dedicated scanning account) to remotely access unmanaged Windows devices on a schedule and inventory installed software / vulnerabilities; useful for unmanaged or appliance-style devices.",
+        "C": "Microsoft Intune compliance policies.",
+        "D": "Microsoft Sentinel honeypot deception."
+      },
+      "answer": "B",
+      "rationale": "MDVM's Authenticated Scan for Windows is purpose-built for unmanaged Windows devices: MDVM uses provided credentials to remotely scan and inventory software / vulnerabilities without installing the MDE sensor. Complements the sensor-based scanning model.",
+      "optionRationales": {
+        "A": "The MDE sensor is the alternative path; the scenario specifically rules out sensor installation.",
+        "B": "Correct. Authenticated scan for Windows is the documented MDVM feature.",
+        "C": "Intune requires device enrollment.",
+        "D": "Deception is unrelated."
+      },
+      "references": [
+        { "text": "Authenticated scan for Windows in MDVM", "url": "https://learn.microsoft.com/defender-vulnerability-management/windows-authenticated-scan" }
+      ]
+    },
+    {
+      "id": 139,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "MDVM — network share assessment",
+      "question": "MDVM's network share assessment helps detect risky configurations on Windows file shares (anonymous access, world-writable, etc.). Which capability requirement is correct?",
+      "options": {
+        "A": "Available for free with Defender for Endpoint Plan 1.",
+        "B": "Available with Microsoft Defender Vulnerability Management Standalone, or the MDVM add-on for Defender for Endpoint Plan 2; identifies misconfigurations like 'share write permission set to Everyone' and 'shares on root folder' that are commonly used for lateral movement and exfiltration.",
+        "C": "Available only with Microsoft Sentinel.",
+        "D": "Available only with Azure Files, not on-premises Windows shares."
+      },
+      "answer": "B",
+      "rationale": "Network share assessment is an MDVM enhanced assessment, available with MDVM Standalone or the MDVM add-on for Defender for Endpoint Plan 2. It flags common misconfigurations on Windows network shares that attackers exploit for lateral movement and exfiltration.",
+      "optionRationales": {
+        "A": "Not included in MDE P1 free tier.",
+        "B": "Correct. Requires MDVM Standalone or the MDVM add-on for MDE P2.",
+        "C": "Sentinel is unrelated.",
+        "D": "Targets Windows network shares, not Azure Files."
+      },
+      "references": [
+        { "text": "Network share analysis in MDVM", "url": "https://learn.microsoft.com/defender-vulnerability-management/tvm-network-share-assessment" }
+      ]
+    },
+    {
+      "id": 140,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender CSPM — Permissions Management (CIEM) integration",
+      "question": "A multicloud environment (Azure / AWS / GCP) needs a single view of unused identity permissions and a per-identity Permission Creep Index, integrated with Defender for Cloud. What is the supported way to enable this?",
+      "options": {
+        "A": "Manually export role assignments from each cloud and reconcile in Excel.",
+        "B": "Enable Permissions Management (CIEM) as a Defender CSPM extension on the connected AWS / GCP / Azure environment; requires Security Admin role at the relevant scope; surfaces unused permissions and PCI in Defender for Cloud + Permissions Management portal.",
+        "C": "Use Microsoft Sentinel UEBA only.",
+        "D": "Permissions Management requires a separate, standalone product with no Defender for Cloud integration."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra Permissions Management (CIEM) is integrated into Defender for Cloud as a CIEM extension under Defender CSPM. Once enabled on Azure subs / AWS accounts / GCP projects, it discovers identities, computes Permission Creep Index, and surfaces findings in Defender for Cloud.",
+      "optionRationales": {
+        "A": "Manual reconciliation doesn't scale.",
+        "B": "Correct. Enable CIEM extension in Defender CSPM.",
+        "C": "Sentinel UEBA is for user behavior analytics, not entitlement analysis.",
+        "D": "Permissions Management has both standalone and Defender CSPM-integrated experiences."
+      },
+      "references": [
+        { "text": "Enable cloud infrastructure entitlement management (CIEM)", "url": "https://learn.microsoft.com/azure/defender-for-cloud/enable-permissions-management" },
+        { "text": "Microsoft Entra Permissions Management overview", "url": "https://learn.microsoft.com/entra/permissions-management/overview" }
+      ]
+    },
+    {
+      "id": 141,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender for Cloud — data-aware security posture",
+      "question": "Defender CSPM's data-aware security posture extends attack-path analysis with sensitive data context. What does it actually detect, and what plans are required?",
+      "options": {
+        "A": "Detects encrypted vs unencrypted disks; requires Defender for Storage only.",
+        "B": "Discovers and classifies sensitive data in storage and databases across multicloud, then enriches attack paths and Cloud Security Explorer queries — e.g., 'Internet-exposed VM → managed identity → storage account containing PII'. Requires Defender CSPM (and benefits from Defender for Storage's Sensitive Data Discovery for storage coverage).",
+        "C": "Requires Microsoft Purview eDiscovery.",
+        "D": "Only available for Azure SQL databases."
+      },
+      "answer": "B",
+      "rationale": "Data-aware security posture (under Defender CSPM) discovers and classifies sensitive data across multicloud storage and databases, and enriches the cloud security graph so that attack paths and explorer queries can prioritize chains that reach sensitive targets. SDD is shared with Defender for Storage's sensitive data threat detection.",
+      "optionRationales": {
+        "A": "Disk encryption isn't the focus.",
+        "B": "Correct. Data-aware security posture is the documented Defender CSPM feature.",
+        "C": "eDiscovery is for M365 content discovery.",
+        "D": "Coverage spans storage and multiple database engines, not just Azure SQL."
+      },
+      "references": [
+        { "text": "About data security posture management", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-data-security-posture" }
+      ]
+    },
+    {
+      "id": 142,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender for Cloud workload protection plans — enablement order",
+      "question": "An admin enables Defender for Cloud on a brand-new subscription. They want to enable Defender CSPM, Defender for Servers Plan 2, Defender for Storage, and Defender for Databases all at once. What is the correct order or constraint?",
+      "options": {
+        "A": "Defender CSPM must be enabled first; other workload protection plans depend on it.",
+        "B": "There is no required enable order; each Defender plan is independent and billed separately. Multiple plans can be enabled simultaneously from the Defender for Cloud Environment settings page per subscription.",
+        "C": "Defender for Servers must be enabled before Defender for Storage.",
+        "D": "All plans require enabling Microsoft Sentinel first."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud plans (CSPM, Servers, Storage, Databases, Containers, App Service, Key Vault, Resource Manager, DNS, APIs, AI Services) are independent. Each can be enabled per subscription and is billed separately. No specific order is required.",
+      "optionRationales": {
+        "A": "Plans don't have an enablement dependency on each other.",
+        "B": "Correct. Plans are independent and can be enabled simultaneously.",
+        "C": "False ordering requirement.",
+        "D": "Sentinel is optional, not required."
+      },
+      "references": [
+        { "text": "Defender for Cloud plans and pricing", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction" },
+        { "text": "Enable Defender for Cloud plans", "url": "https://learn.microsoft.com/azure/defender-for-cloud/enable-enhanced-security" }
+      ]
+    },
+    {
+      "id": 143,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender for Cloud — exempting recommendations",
+      "question": "A subscription has a Defender for Cloud recommendation that's marked 'unhealthy' for a specific resource that has a documented compensating control. The team wants the recommendation to stop counting against secure score and stop appearing as unhealthy for that resource, with an auditable justification and an expiration date. Which mechanism is correct?",
+      "options": {
+        "A": "Delete the recommendation via the API.",
+        "B": "Create a Defender for Cloud exemption on that recommendation for the specific resource, with category 'Mitigated' or 'Waiver', a justification, and an expiration date — the resource is excluded from that recommendation's evaluation and from secure score impact for the exemption period.",
+        "C": "Edit the underlying Azure Policy definition to remove the resource type.",
+        "D": "Disable Defender for Cloud entirely on the subscription."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud exemptions are the documented mechanism for documented, scoped, expirable exceptions to recommendations. The category ('Mitigated' vs 'Waiver') is preserved for audit and the exemption can be scoped to specific resources within the recommendation.",
+      "optionRationales": {
+        "A": "You can't delete built-in recommendations.",
+        "B": "Correct. Exemptions are the supported, audit-friendly mechanism.",
+        "C": "Editing the underlying policy is global and not audit-friendly.",
+        "D": "Disabling Defender removes far more than the exemption."
+      },
+      "references": [
+        { "text": "Exempt recommendations and resources in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/exempt-resource" }
+      ]
+    },
+    {
+      "id": 144,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender for Cloud — Enforce vs Deny on recommendations",
+      "question": "A Defender for Cloud recommendation 'Storage accounts should disable public network access' is healthy on most resources but a few new accounts keep appearing in violation. The team wants Defender for Cloud to PREVENT creation of non-compliant resources at deployment time. Which option achieves this?",
+      "options": {
+        "A": "Set the recommendation severity to High.",
+        "B": "Use Defender for Cloud's 'Enforce' option on the recommendation — assigns the corresponding Azure Policy with DeployIfNotExists or Modify effect; or use the 'Deny' option, which assigns the policy with a Deny effect to block non-compliant resource creation at deployment time.",
+        "C": "Add an Azure Lock to the subscription.",
+        "D": "Manually email developers to fix it."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud's recommendation pages expose 'Enforce' (DeployIfNotExists / Modify) and 'Deny' (block at create) actions that author the appropriate Azure Policy assignment in one click. This is the documented preventive control.",
+      "optionRationales": {
+        "A": "Severity is a labeling choice.",
+        "B": "Correct. Enforce and Deny on recommendations are the documented preventive actions.",
+        "C": "Locks don't prevent creation of new resources.",
+        "D": "Manual emails aren't preventive."
+      },
+      "references": [
+        { "text": "Prevent misconfigurations with Enforce/Deny", "url": "https://learn.microsoft.com/azure/defender-for-cloud/prevent-misconfigurations" }
+      ]
+    },
+    {
+      "id": 145,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Defender for Cloud — custom recommendations and standards",
+      "question": "A company has its own internal security policy (Acme InfoSec Standard v3) with controls not covered by built-in MCSB / NIST / CIS standards. They want these controls to be assessed continuously by Defender for Cloud alongside built-in standards. Which capability supports this?",
+      "options": {
+        "A": "Only built-in standards are supported.",
+        "B": "Custom recommendations and custom security standards in Defender for Cloud — author Azure Policy / Cloud Security Explorer based recommendations and group them into a custom standard; the standard appears in the Regulatory Compliance dashboard and contributes to assessments.",
+        "C": "Custom standards are supported only via Microsoft Sentinel.",
+        "D": "Microsoft Purview Compliance Manager only."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud supports authoring custom recommendations (via Azure Policy or cloud security graph queries) and grouping them into custom security standards. These standards appear in the Regulatory Compliance dashboard and are continuously assessed.",
+      "optionRationales": {
+        "A": "Custom standards are supported.",
+        "B": "Correct. Custom recommendations + custom standards is the documented capability.",
+        "C": "Sentinel is for SOC; this is Defender for Cloud.",
+        "D": "Compliance Manager is broader but Defender for Cloud is the right tool for Azure-scope custom standards."
+      },
+      "references": [
+        { "text": "Create custom security standards and recommendations", "url": "https://learn.microsoft.com/azure/defender-for-cloud/custom-security-policies" }
+      ]
+    },
+    {
+      "id": 146,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — workspace and Sentinel-in-Defender",
+      "question": "A SecOps team plans to deploy Microsoft Sentinel as a SIEM today. Given Microsoft's published direction, what is the recommended deployment model and the upcoming change to be aware of?",
+      "options": {
+        "A": "Deploy Sentinel only in the Azure portal; the Defender portal experience is for old customers only.",
+        "B": "Deploy Microsoft Sentinel on a Log Analytics workspace, then connect (onboard) the Sentinel workspace to the Microsoft Defender portal to use the unified SecOps experience. After March 31, 2027, Sentinel will no longer be supported in the Azure portal — customers will be redirected to the Defender portal exclusively.",
+        "C": "Deploy Sentinel without a Log Analytics workspace; it's now serverless.",
+        "D": "Deploy Sentinel only in the Defender portal; Azure portal is no longer supported today."
+      },
+      "answer": "B",
+      "rationale": "Sentinel still requires a Log Analytics workspace. Microsoft now recommends onboarding the Sentinel workspace to the Defender portal to use the unified Defender SecOps experience. The Azure portal Sentinel experience is being retired on March 31, 2027 — customers should plan their transition.",
+      "optionRationales": {
+        "A": "Microsoft is moving in the opposite direction — toward the Defender portal.",
+        "B": "Correct. Sentinel + Log Analytics + onboard to Defender portal is the documented model with the 2027 Azure-portal retirement.",
+        "C": "Sentinel still uses a Log Analytics workspace.",
+        "D": "Azure portal Sentinel is supported until March 31, 2027."
+      },
+      "references": [
+        { "text": "Microsoft Sentinel in the Defender portal", "url": "https://learn.microsoft.com/azure/sentinel/move-to-defender" },
+        { "text": "Sentinel overview — Azure portal retirement timeline", "url": "https://learn.microsoft.com/azure/sentinel/overview" }
+      ]
+    },
+    {
+      "id": 147,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — roles",
+      "question": "A SOC team must grant analysts the minimum role that lets them triage and update incidents in Microsoft Sentinel (assign owner, change status, add comments, run playbooks on incidents) but NOT modify analytics rules. Which role fits?",
+      "options": {
+        "A": "Microsoft Sentinel Contributor.",
+        "B": "Microsoft Sentinel Responder — allows incident triage actions (assign, comment, change status), but does not allow editing analytics rules or workspace settings. (To actually run a playbook, the Microsoft Sentinel Playbook Operator role is also needed.)",
+        "C": "Microsoft Sentinel Reader.",
+        "D": "Owner on the resource group."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Sentinel Responder is purpose-built for incident triage and modifications without allowing analytics rule edits. Microsoft Sentinel Reader is read-only. Contributor exceeds the minimum needed. To run playbooks on incidents, the Responder needs Playbook Operator as well, and Sentinel needs the Automation Contributor role on the playbook's resource group.",
+      "optionRationales": {
+        "A": "Contributor exceeds the minimum.",
+        "B": "Correct. Responder is the minimum for incident triage.",
+        "C": "Reader doesn't permit modifications.",
+        "D": "Owner is excessive."
+      },
+      "references": [
+        { "text": "Roles and permissions in Microsoft Sentinel", "url": "https://learn.microsoft.com/azure/sentinel/roles" }
+      ]
+    },
+    {
+      "id": 148,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — Content Hub solutions",
+      "question": "An analyst wants to deploy a packaged set of data connectors, analytics rules, hunting queries, parsers, workbooks, and playbooks for Fortinet FortiGate appliances in one step. Which Sentinel experience supports this?",
+      "options": {
+        "A": "Search the Azure Marketplace and install individual ARM templates.",
+        "B": "Use the Microsoft Sentinel Content Hub — install the Fortinet solution which bundles the data connector (Syslog/CEF), analytics rules, hunting queries, parsers, workbooks, and playbooks; one-click install and version-managed updates.",
+        "C": "Upload custom Logic Apps from GitHub manually.",
+        "D": "Use Microsoft Defender for Cloud recommendations to enable Fortinet support."
+      },
+      "answer": "B",
+      "rationale": "Content Hub is the central catalog for Sentinel solutions (vendor or domain bundles). A solution packages connectors, analytics rules, hunting queries, parsers, workbooks, and playbooks for a specific product or use case, with one-click install and version management.",
+      "optionRationales": {
+        "A": "Marketplace ARM templates are the old way; Content Hub supersedes.",
+        "B": "Correct. Content Hub solutions are the documented packaging mechanism.",
+        "C": "Custom Logic Apps don't replace solutions.",
+        "D": "Defender for Cloud doesn't manage Sentinel solutions."
+      },
+      "references": [
+        { "text": "Discover and manage Sentinel out-of-the-box content (Content Hub)", "url": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy" }
+      ]
+    },
+    {
+      "id": 149,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — Syslog/CEF via AMA",
+      "question": "An organization needs to ingest CEF logs from a Palo Alto firewall into Sentinel. Which architecture is the current supported approach?",
+      "options": {
+        "A": "Install the deprecated Log Analytics agent (MMA) on the firewall.",
+        "B": "Install the Microsoft Sentinel CEF solution from Content Hub; create a Data Collection Rule (DCR) for the 'Common Event Format (CEF) via AMA' connector; install the Azure Monitor Agent (AMA) on a Linux log-forwarder VM (Azure or on-prem); run the AMA installer script that configures rsyslog/syslog-ng to listen on port 514 and forward to the local AMA on TCP 28330 (AMA 1.28.11+); point the Palo Alto to the log forwarder.",
+        "C": "Send CEF logs directly to Sentinel's REST API.",
+        "D": "Use Azure Event Hubs as the ingestion endpoint exclusively."
+      },
+      "answer": "B",
+      "rationale": "MMA is deprecated. The current model is: Content Hub solution + DCR for CEF via AMA + Linux log forwarder with AMA + run the installer script + point appliance at the forwarder. CEF events land in the CommonSecurityLog table. AMA 1.28.11+ uses TCP port 28330 internally between syslog-ng/rsyslog and AMA.",
+      "optionRationales": {
+        "A": "MMA is deprecated.",
+        "B": "Correct. CEF via AMA + log forwarder is the documented architecture.",
+        "C": "Direct REST ingestion is not the supported CEF path.",
+        "D": "Event Hubs is one mechanism but isn't the documented CEF appliance path."
+      },
+      "references": [
+        { "text": "Syslog and CEF via AMA connectors for Microsoft Sentinel", "url": "https://learn.microsoft.com/azure/sentinel/cef-syslog-ama-overview" },
+        { "text": "Ingest syslog and CEF messages with AMA", "url": "https://learn.microsoft.com/azure/sentinel/connect-cef-syslog-ama" }
+      ]
+    },
+    {
+      "id": 150,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — Windows Security Events via AMA with XPath filtering",
+      "question": "A team must ingest a specific subset of Windows Security Events (only events 4624, 4625, 4672, and 4688) from a fleet of Azure Arc-enabled servers into Sentinel — to reduce ingestion cost. Which configuration is correct?",
+      "options": {
+        "A": "Use the 'Security Events via Legacy Agent' connector — the legacy agent is the only one that supports filtering.",
+        "B": "Use the 'Windows Security Events via AMA' connector with a Data Collection Rule that uses XPath queries to filter events (e.g., 'Security!*[System[(EventID=4624 or EventID=4625 or EventID=4672 or EventID=4688)]]'), so filtering happens at the source and only matching events are ingested into the SecurityEvent table.",
+        "C": "Use the pre-built 'Minimal' event set which only includes 4624 and 4688.",
+        "D": "Ingest All events then drop unwanted ones with a Logic App."
+      },
+      "answer": "B",
+      "rationale": "Windows Security Events via AMA supports per-DCR XPath queries that filter at the source — only matching events leave the machine, saving ingestion cost. Pre-built sets (All, Common, Minimal) are convenient but the custom XPath gives the precise control described. The legacy agent is deprecated.",
+      "optionRationales": {
+        "A": "Legacy agent is deprecated; AMA supports XPath filtering.",
+        "B": "Correct. AMA + DCR + XPath is the documented source-side filtering.",
+        "C": "Minimal includes more than just 4624 and 4688; XPath gives exact control.",
+        "D": "Ingest-then-drop wastes the ingestion charge."
+      },
+      "references": [
+        { "text": "Windows Security Events via AMA — DCR and XPath filtering", "url": "https://learn.microsoft.com/azure/sentinel/connect-services-windows-based" },
+        { "text": "Filter Windows event collection with XPath", "url": "https://learn.microsoft.com/azure/azure-monitor/agents/data-collection-windows-events" }
+      ]
+    },
+    {
+      "id": 151,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — custom log tables via AMA",
+      "question": "A legacy in-house application writes JSON log lines to /var/log/acme/app.log on Linux servers. The SOC team needs these events in a custom Sentinel table (acme_app_CL) with parsing applied at ingestion (split fields, drop noisy entries). Which connector is appropriate?",
+      "options": {
+        "A": "Syslog via AMA — log files are read as syslog automatically.",
+        "B": "Custom Logs via AMA — create a DCR that targets the file path, defines the destination as a custom table (_CL suffix), and applies a KQL transform in the DCR to parse fields and filter rows at ingestion before storing to the workspace.",
+        "C": "Diagnostic settings on the VM.",
+        "D": "Microsoft Defender XDR connector."
+      },
+      "answer": "B",
+      "rationale": "Custom Logs via AMA reads text/JSON log files and writes to custom tables (_CL suffix). A KQL transform in the DCR can parse and filter at ingestion. This is the documented mechanism for app log files on Windows/Linux that aren't sent via syslog.",
+      "optionRationales": {
+        "A": "Syslog via AMA collects from the syslog daemon, not arbitrary text files.",
+        "B": "Correct. Custom Logs via AMA + DCR transform is the documented path.",
+        "C": "Diagnostic settings don't read arbitrary text files.",
+        "D": "Defender XDR connector is for Defender XDR alerts."
+      },
+      "references": [
+        { "text": "Custom logs via AMA in Microsoft Sentinel", "url": "https://learn.microsoft.com/azure/sentinel/unified-connector-custom-device" }
+      ]
+    },
+    {
+      "id": 152,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — automation rules vs alert-triggered playbooks",
+      "question": "Sentinel offers both 'incident-triggered' and 'alert-triggered' playbook automation. Which scenario REQUIRES alert-triggered automation rather than incident-triggered?",
+      "options": {
+        "A": "Adding a comment to incidents as they're created.",
+        "B": "Sending alerts directly to an external ticketing system that creates a ticket per alert without grouping into incidents — or any case where the analytics rule has incident creation DISABLED (e.g., when the Sentinel workspace is onboarded to the Defender portal and incident creation rules in Sentinel must be disabled).",
+        "C": "Tagging incidents with a category.",
+        "D": "Assigning incidents to a specific analyst."
+      },
+      "answer": "B",
+      "rationale": "Incident-triggered automation is the default and preferred model because incidents aggregate alerts and add metadata. Alert-triggered is needed when there is no incident — either because incident creation is disabled in the analytics rule (e.g., Sentinel-in-Defender workspaces, where incident creation happens in the Defender portal), or because external logic decides per-alert routing.",
+      "optionRationales": {
+        "A": "Comments are an incident-level action.",
+        "B": "Correct. Alert-triggered is required when incidents aren't being created in Sentinel.",
+        "C": "Tagging is incident-level.",
+        "D": "Assignment is incident-level."
+      },
+      "references": [
+        { "text": "Automate threat response with automation rules in Microsoft Sentinel", "url": "https://learn.microsoft.com/azure/sentinel/automate-incident-handling-with-automation-rules" }
+      ]
+    },
+    {
+      "id": 153,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel playbooks — Microsoft Sentinel Automation Contributor",
+      "question": "An automation rule attempts to run a playbook (Logic App) located in a different resource group than the Sentinel workspace, and fails with a permissions error. Which role assignment is required, and on what scope?",
+      "options": {
+        "A": "Owner role on the Sentinel workspace.",
+        "B": "The Sentinel service principal must have the 'Microsoft Sentinel Automation Contributor' role on the resource group that contains the playbook (Logic App). This role exists specifically to allow Sentinel automation rules to run playbooks in that resource group.",
+        "C": "Logic App Contributor on the user.",
+        "D": "Microsoft Sentinel Reader on the Sentinel workspace."
+      },
+      "answer": "B",
+      "rationale": "Sentinel uses a service account to run playbooks from automation rules. That service account must have 'Microsoft Sentinel Automation Contributor' on the resource group containing the playbook. The grant requires an Owner or User Access Administrator to perform.",
+      "optionRationales": {
+        "A": "Owner on the workspace doesn't grant Sentinel the right to invoke playbooks elsewhere.",
+        "B": "Correct. Microsoft Sentinel Automation Contributor on the playbook's RG is the documented requirement.",
+        "C": "Logic App Contributor on the user is for the user running playbooks manually, not the service account.",
+        "D": "Reader is insufficient."
+      },
+      "references": [
+        { "text": "Automate threat response with playbooks — Required permissions", "url": "https://learn.microsoft.com/azure/sentinel/automation/automate-responses-with-playbooks" }
+      ]
+    },
+    {
+      "id": 154,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Sentinel — analytics tier vs data lake tier",
+      "question": "A SOC wants to keep firewall logs available for forensic search for 3 years but only needs the last 90 days for real-time analytics rules and hunting. Which Sentinel tier configuration minimizes cost while meeting both needs?",
+      "options": {
+        "A": "Ingest everything into the Analytics tier with 3-year retention.",
+        "B": "Configure the firewall log table for the Microsoft Sentinel data lake tier — minimal ingestion cost, up to 12-year retention; Sentinel data lake supports KQL and Spark jobs over the data. Optionally keep a 90-day window in the Analytics tier (interactive retention) for real-time alerts and hunting.",
+        "C": "Ingest only the last 90 days and discard older data.",
+        "D": "Export everything to Azure Storage and rely on Azure Storage queries."
+      },
+      "answer": "B",
+      "rationale": "The Sentinel data lake tier (formerly auxiliary) offers significantly reduced ingestion cost and up to 12-year total retention, with KQL/Spark/Notebooks access for forensic search. For real-time alerting, the Analytics tier (90 days interactive retention by default for Sentinel) is appropriate. The two tiers can be combined.",
+      "optionRationales": {
+        "A": "All-Analytics is the most expensive option.",
+        "B": "Correct. Data lake tier for long retention + Analytics tier for the hot window is the documented cost-optimized pattern.",
+        "C": "Discards forensic capability.",
+        "D": "Loses the KQL-driven investigation experience."
+      },
+      "references": [
+        { "text": "Log retention tiers in Microsoft Sentinel", "url": "https://learn.microsoft.com/azure/sentinel/log-plans" },
+        { "text": "Manage data tiers and retention in Microsoft Sentinel", "url": "https://learn.microsoft.com/azure/sentinel/manage-data-overview" }
+      ]
+    },
+    {
+      "id": 155,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Microsoft Purview Audit — query in Defender XDR",
+      "question": "An incident investigator must query Microsoft 365 mailbox and SharePoint audit events for a specific user during a 60-day window without leaving the SOC's primary tool. The org has Microsoft 365 E5 (Purview Audit Premium). Where should they run the query?",
+      "options": {
+        "A": "Purview portal — Audit search exclusively.",
+        "B": "Microsoft Defender XDR — Advanced Hunting includes the AuditLogs / CloudAppEvents tables (sourced from Microsoft Purview Audit) so KQL queries can search M365 audit events directly from the Defender SOC workflow.",
+        "C": "Microsoft Sentinel custom KQL only; Defender XDR doesn't expose Purview Audit.",
+        "D": "Microsoft Entra audit logs only."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Defender XDR Advanced Hunting exposes Purview Audit data via the unified schemas (CloudAppEvents and related tables), enabling KQL queries from the same SOC workflow used for incident investigation. Purview Audit Premium retains audit logs for up to 1 year by default (extendable).",
+      "optionRationales": {
+        "A": "Purview portal works but the SOC is already in Defender XDR.",
+        "B": "Correct. Defender XDR Advanced Hunting surfaces Purview Audit data.",
+        "C": "Sentinel can also access this, but the question asks about the primary SOC tool (Defender XDR).",
+        "D": "Entra audit is a separate, narrower source."
+      },
+      "references": [
+        { "text": "Advanced hunting in Microsoft Defender XDR", "url": "https://learn.microsoft.com/defender-xdr/advanced-hunting-overview" },
+        { "text": "Microsoft Purview Audit overview", "url": "https://learn.microsoft.com/purview/audit-solutions-overview" }
+      ]
+    },
+    {
+      "id": 156,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Microsoft Security Copilot — Owner vs Contributor roles",
+      "question": "Microsoft Security Copilot defines two platform RBAC roles: Copilot owner and Copilot contributor. Which statement correctly distinguishes them?",
+      "options": {
+        "A": "Owner and Contributor are interchangeable; both grant full administrative access.",
+        "B": "Copilot owner can configure platform settings (plugin availability, capacity management, data sharing, file upload usage), manage role assignments, and publish custom plugins for the tenant. Copilot contributor can create sessions, run promptbooks, manage personal promptbooks, and (by default) upload files — but cannot configure platform settings.",
+        "C": "Owner has no access to security data; Contributor has all access.",
+        "D": "Copilot owner is a Microsoft Entra role; Contributor is an Azure RBAC role."
+      },
+      "answer": "B",
+      "rationale": "Security Copilot RBAC defines Owner (platform settings, plugin/tenant configuration, role assignments, capacity) and Contributor (session creation, promptbook execution). Neither inherently grants access to security data — that's still controlled by Entra ID / Azure RBAC / service-specific RBAC (e.g., Microsoft Sentinel Reader to access Sentinel data through Copilot).",
+      "optionRationales": {
+        "A": "They are different roles.",
+        "B": "Correct. Owner = platform configuration; Contributor = use.",
+        "C": "Both roles' access to security data is controlled by separate service RBAC.",
+        "D": "Both are Security Copilot RBAC roles, not Entra / Azure RBAC."
+      },
+      "references": [
+        { "text": "Understand authentication in Microsoft Security Copilot", "url": "https://learn.microsoft.com/copilot/security/authentication" }
+      ]
+    },
+    {
+      "id": 157,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Security Copilot — on-behalf-of authentication to plugins",
+      "question": "An analyst with Copilot Contributor role asks Security Copilot to look up an incident in Microsoft Sentinel. Copilot returns 'no data found' even though the incident exists. What is the most likely cause and the fix?",
+      "options": {
+        "A": "The Sentinel plugin is not Microsoft-signed.",
+        "B": "Security Copilot uses on-behalf-of (OBO) authentication to plugins, meaning it inherits the user's permissions on the underlying service. The user must have an appropriate Sentinel RBAC role (e.g., Microsoft Sentinel Reader/Responder) on the workspace. Grant the necessary Sentinel role to the analyst.",
+        "C": "Copilot needs Global Administrator to access Sentinel.",
+        "D": "Promote the analyst to Copilot Owner."
+      },
+      "answer": "B",
+      "rationale": "Security Copilot doesn't go beyond a user's own access. The Copilot Contributor role grants access to the Copilot platform but not to security data — each plugin enforces its own service RBAC (Sentinel Reader/Responder for Sentinel, Intune RBAC for Intune, Defender XDR Unified RBAC for Defender, etc.).",
+      "optionRationales": {
+        "A": "Sentinel plugin is Microsoft-published.",
+        "B": "Correct. OBO + service RBAC is the documented authentication model.",
+        "C": "Global Admin is excessive and shouldn't be assigned for Copilot.",
+        "D": "Copilot Owner doesn't grant Sentinel data access either."
+      },
+      "references": [
+        { "text": "Understand authentication in Microsoft Security Copilot", "url": "https://learn.microsoft.com/copilot/security/authentication" },
+        { "text": "Microsoft Sentinel roles and permissions", "url": "https://learn.microsoft.com/azure/sentinel/roles" }
+      ]
+    },
+    {
+      "id": 158,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Security Copilot — Recommended Microsoft Security roles vs Everyone",
+      "question": "A Security Copilot administrator wants to ensure that only users who already have security access via Microsoft Entra roles get Copilot Contributor access — not literally everyone in the tenant. Which configuration achieves this?",
+      "options": {
+        "A": "Leave the default 'Everyone' security group assigned to Copilot Contributor.",
+        "B": "Remove the 'Everyone' group from Copilot Contributor and assign the built-in 'Recommended Microsoft Security roles' bundle (which includes users with Entra roles like Security Reader, Security Operator, Security Administrator, etc.). Users without security access lose Copilot access; users with appropriate Entra security roles gain Copilot Contributor access.",
+        "C": "Assign Global Administrator to every analyst.",
+        "D": "Use Conditional Access targeting the Copilot enterprise application instead."
+      },
+      "answer": "B",
+      "rationale": "The 'Recommended Microsoft Security roles' bundle gives Copilot Contributor access to users who already hold relevant Microsoft security Entra roles. Microsoft recommends removing the 'Everyone' group and using either this bundle or a Custom group to scope Copilot access to security-tooled users.",
+      "optionRationales": {
+        "A": "'Everyone' creates a confusing experience for users without security data access.",
+        "B": "Correct. Recommended Microsoft Security roles is the documented bundle.",
+        "C": "Global Admin is the opposite of least privilege.",
+        "D": "Conditional Access controls authentication; it doesn't determine Copilot RBAC."
+      },
+      "references": [
+        { "text": "Security Copilot authentication — Recommended roles", "url": "https://learn.microsoft.com/copilot/security/authentication" }
+      ]
+    },
+    {
+      "id": 159,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Security Copilot — promptbooks and custom plugins",
+      "question": "A SOC team wants to (1) reuse a multi-step investigation workflow (lookup incident → enrich with TI → summarize) for any incident with one click, and (2) integrate their internal threat intelligence platform so Copilot can query it. Which two Security Copilot features address these?",
+      "options": {
+        "A": "Logic Apps automation rules and Sentinel hunting queries.",
+        "B": "(1) Promptbooks — reusable sequences of prompts; create personal or share with the tenant. (2) Custom plugins — extend Copilot to call non-Microsoft APIs (e.g., the internal TI platform) using OpenAPI specs, KQL plugins, or GPT-skills. Both are first-class Security Copilot features.",
+        "C": "Power Automate flows and Microsoft Forms.",
+        "D": "Microsoft Sentinel watchlists and bookmarks."
+      },
+      "answer": "B",
+      "rationale": "Promptbooks are reusable multi-prompt workflows in Security Copilot. Custom plugins (OpenAPI/KQL/GPT) let teams extend Copilot to query their own systems. Together they address both reusable workflows and custom-source integration.",
+      "optionRationales": {
+        "A": "Logic Apps and Sentinel hunting queries are different tools.",
+        "B": "Correct. Promptbooks + custom plugins are the documented Copilot features.",
+        "C": "Power Automate is unrelated.",
+        "D": "Watchlists/bookmarks are Sentinel features, not Copilot."
+      },
+      "references": [
+        { "text": "Build your own promptbook in Security Copilot", "url": "https://learn.microsoft.com/copilot/security/build-promptbooks" },
+        { "text": "Manage plugins in Security Copilot", "url": "https://learn.microsoft.com/copilot/security/manage-plugins" }
+      ]
+    },
+    {
+      "id": 160,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "topic": "Security Copilot — Security Store agents and MSSP access",
+      "question": "Microsoft positions Security Copilot to ship with Microsoft agents (Phishing Triage agent in Defender, Conditional Access Optimization agent in Entra, etc.) and partner-built agents from the Microsoft Security Store. Which statement most accurately describes how access is granted, and how MSSP/multitenant access is supported?",
+      "options": {
+        "A": "Security Store agents require no role configuration; everyone can run them.",
+        "B": "Each Microsoft agent has its own role requirements (often a specific Entra/service role) that determine who can configure and use it. Cross-tenant / MSSP access to Security Copilot is supported via Azure B2B/Guest accounts with tenant switching, Granular Delegated Admin Privileges (GDAP) through Partner Center, or Azure Lighthouse.",
+        "C": "Security Store agents run only in Microsoft Sentinel, not in Defender XDR or Entra.",
+        "D": "MSSP access requires re-provisioning Security Copilot per managed tenant."
+      },
+      "answer": "B",
+      "rationale": "Each Security Copilot agent (Microsoft or partner from the Security Store) defines its own role requirements; analysts need both Copilot platform access and the agent's required role. Cross-tenant access for MSSPs uses Azure B2B with tenant switching, GDAP, or Azure Lighthouse — Copilot doesn't need to be provisioned in every managed tenant.",
+      "optionRationales": {
+        "A": "Per-agent role requirements apply.",
+        "B": "Correct. Per-agent roles + B2B/GDAP/Lighthouse for MSSP is the documented model.",
+        "C": "Agents span Defender, Entra, Purview, and partner sources.",
+        "D": "Provisioning in every managed tenant isn't required; tenant switching/GDAP/Lighthouse solve the cross-tenant case."
+      },
+      "references": [
+        { "text": "Microsoft Entra agents (Conditional Access optimization, etc.)", "url": "https://learn.microsoft.com/entra/security-copilot/entra-agents" },
+        { "text": "Grant MSSPs access to Microsoft Security Copilot", "url": "https://learn.microsoft.com/copilot/security/grant-access-external-users" }
+      ]
     }
   ]
 }
