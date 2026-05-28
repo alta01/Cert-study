@@ -58,6 +58,19 @@
         "D": { "type": "string" }
       },
       "additionalProperties": false
+    },
+    "references": {
+      "description": "Optional list of supporting documentation links rendered under the answer in the UI.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "text": { "type": "string" },
+          "url": { "type": "string", "format": "uri", "pattern": "^https://" }
+        },
+        "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false
