@@ -2236,6 +2236,875 @@
       "references": [
         { "text": "Network Watcher Connection Troubleshoot overview", "url": "https://learn.microsoft.com/azure/network-watcher/connection-troubleshoot-overview" }
       ]
+    },
+    {
+      "id": 91,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "VM disk encryption — Encryption at host vs Azure Disk Encryption",
+      "question": "A security team must encrypt VM data — including OS, data, temp disks, and disk caches — end-to-end without using VM CPU for encryption, and with customer-managed keys. They are starting from scratch (no existing ADE deployment). Which option is the Microsoft-recommended path going forward?",
+      "options": {
+        "A": "Azure Disk Encryption (ADE) using BitLocker (Windows) or DM-Crypt (Linux).",
+        "B": "Encryption at host with a Disk Encryption Set (DES) referencing a customer-managed key in Azure Key Vault — encrypts OS, data, temp disks, and caches, doesn't use VM CPU, and is Microsoft's recommended path; ADE is scheduled for retirement on September 15, 2028.",
+        "C": "Storage Service Encryption only (the default).",
+        "D": "Disable disk encryption and rely on Defender for Storage."
+      },
+      "answer": "B",
+      "rationale": "Encryption at host is the documented forward-going recommendation. It encrypts OS, data, and temp disks and caches at the host level, doesn't consume VM CPU, and supports customer-managed keys via Disk Encryption Sets. ADE is scheduled for retirement on September 15, 2028; Microsoft directs new deployments to encryption at host.",
+      "optionRationales": {
+        "A": "ADE is retiring; new deployments should use encryption at host.",
+        "B": "Correct. Encryption at host + CMK is the recommended path.",
+        "C": "SSE alone doesn't cover temp disk or caches.",
+        "D": "Defender for Storage doesn't encrypt VM disks."
+      },
+      "references": [
+        { "text": "Overview of managed disk encryption options", "url": "https://learn.microsoft.com/azure/virtual-machines/disk-encryption-overview" },
+        { "text": "Server-side encryption of Azure Disk Storage", "url": "https://learn.microsoft.com/azure/virtual-machines/disk-encryption" }
+      ]
+    },
+    {
+      "id": 92,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Confidential VMs — confidential OS disk encryption",
+      "question": "A workload handles regulated data and must run on hardware where memory contents are encrypted and isolated from the hypervisor and host OS, with a secure boot chain and a virtual TPM whose attestation can be verified at runtime. Which VM type is appropriate?",
+      "options": {
+        "A": "Generation 1 VM with TDE on Azure SQL.",
+        "B": "Azure Confidential VMs (DCasv5 / ECasv5 series) with confidential OS disk encryption — memory is encrypted by AMD SEV-SNP, secure boot and vTPM are present, and attestation can be verified via Microsoft Azure Attestation.",
+        "C": "Generation 2 VM with encryption at host.",
+        "D": "Spot VM with low-priority pricing."
+      },
+      "answer": "B",
+      "rationale": "Confidential VMs (DCasv5/ECasv5) use AMD SEV-SNP to encrypt VM memory and provide hardware-rooted attestation. Confidential OS disk encryption binds the disk keys to the VM's TPM. Microsoft Azure Attestation verifies the boot/runtime state. This is the documented path for hardware-isolated, attestable workloads.",
+      "optionRationales": {
+        "A": "TDE protects DB files at rest in storage, not VM memory or boot.",
+        "B": "Correct. Confidential VMs with confidential OS disk encryption are the documented solution.",
+        "C": "Gen 2 + encryption at host is a good baseline but doesn't provide memory encryption or attestation.",
+        "D": "VM pricing tier is irrelevant to confidentiality."
+      },
+      "references": [
+        { "text": "Confidential VM overview (DCasv5/ECasv5)", "url": "https://learn.microsoft.com/azure/confidential-computing/confidential-vm-overview" }
+      ]
+    },
+    {
+      "id": 93,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure Bastion — Standard SKU and native client",
+      "question": "Operators need to SSH from their local terminal (via az network bastion ssh) into Azure VMs without public IPs, and to RDP via mstsc.exe with copy-paste enabled. Which Bastion configuration is required?",
+      "options": {
+        "A": "Bastion Basic SKU with portal-only access.",
+        "B": "Bastion Standard SKU (or higher) with the native client support setting enabled; users connect via az network bastion ssh / rdp from their local terminal/mstsc.",
+        "C": "Bastion Developer SKU on a per-VNet basis.",
+        "D": "Use a jump box VM with a public IP instead."
+      },
+      "answer": "B",
+      "rationale": "Bastion Basic only allows browser-based portal connections. Standard SKU adds native client support (Windows/macOS/Linux), IP-based connection, host scaling, custom port, and shareable links. The native client experience (az network bastion ssh and mstsc) is the documented Standard SKU feature.",
+      "optionRationales": {
+        "A": "Basic doesn't support native client.",
+        "B": "Correct. Standard SKU + native client feature is the documented configuration.",
+        "C": "Developer SKU is for single dev/test VMs without scale.",
+        "D": "A jump box with a public IP defeats the security goal."
+      },
+      "references": [
+        { "text": "Azure Bastion configuration settings (SKUs and features)", "url": "https://learn.microsoft.com/azure/bastion/configuration-settings" },
+        { "text": "Connect to a VM using Bastion native client", "url": "https://learn.microsoft.com/azure/bastion/connect-native-client-windows" }
+      ]
+    },
+    {
+      "id": 94,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "JIT VM Access — prerequisites",
+      "question": "A SecOps team plans to enable Just-in-Time (JIT) VM access on production Azure VMs. Which Defender for Cloud plan is required, and what is a prerequisite for the VM itself?",
+      "options": {
+        "A": "Defender for Cloud free tier; no other prerequisites.",
+        "B": "Microsoft Defender for Servers Plan 2 enabled on the subscription; the VM must be deployed via Azure Resource Manager (not Classic) and have an NSG or be protected by Azure Firewall (excluding Firewall Manager).",
+        "C": "Defender CSPM only; JIT is a CSPM feature.",
+        "D": "Microsoft Defender for Endpoint license per VM and a public IP on the VM."
+      },
+      "answer": "B",
+      "rationale": "JIT VM Access requires Defender for Servers Plan 2 on the subscription. Supported VMs are ARM-deployed (not Classic), protected by an NSG or by Azure Firewall (not Azure Firewall Manager-managed). On request, JIT temporarily opens the requested port for the requesting IP and time window.",
+      "optionRationales": {
+        "A": "JIT requires Defender for Servers Plan 2.",
+        "B": "Correct. Plan 2 + ARM deployment + NSG/Firewall is the documented prerequisite set.",
+        "C": "JIT is a Defender for Servers feature, not Defender CSPM.",
+        "D": "MDE license is for EDR, separate from JIT. JIT works on VMs without public IPs (e.g., behind Bastion)."
+      },
+      "references": [
+        { "text": "Enable just-in-time VM access", "url": "https://learn.microsoft.com/azure/defender-for-cloud/enable-just-in-time-access" },
+        { "text": "JIT VM access overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/just-in-time-access-overview" }
+      ]
+    },
+    {
+      "id": 95,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Servers — Plan 1 vs Plan 2",
+      "question": "A team enables Defender for Servers Plan 1 and is missing the following features they expected: agentless scanning, JIT VM access, File Integrity Monitoring, and OS configuration assessment against MCSB. What is the gap?",
+      "options": {
+        "A": "These features require enabling Defender for Endpoint separately.",
+        "B": "Those features are Plan 2-only. Plan 1 provides Defender for Endpoint integration (EDR) and agent-based vulnerability assessment; Plan 2 adds agentless scanning, JIT VM access, FIM, OS configuration assessment, regulatory compliance, premium MDVM features, and free data ingestion benefits.",
+        "C": "Those features are deprecated; use Defender CSPM.",
+        "D": "Those features require Defender for Cloud Apps."
+      },
+      "answer": "B",
+      "rationale": "Defender for Servers Plan 1 focuses on EDR (Defender for Endpoint integration) and agent-based vulnerability assessment. Plan 2 is the superset, adding agentless scanning, JIT, FIM, OS configuration assessment against the Microsoft Cloud Security Benchmark, regulatory compliance, premium MDVM features, and the free Log Analytics ingestion benefit for specific data types.",
+      "optionRationales": {
+        "A": "MDE is included in both plans; not the gap.",
+        "B": "Correct. Plan 2 is required for the listed features.",
+        "C": "These features are not deprecated; they are Plan 2.",
+        "D": "Defender for Cloud Apps is a separate product."
+      },
+      "references": [
+        { "text": "Select a Defender for Servers plan", "url": "https://learn.microsoft.com/azure/defender-for-cloud/plan-defender-for-servers-select-plan" },
+        { "text": "Defender for Servers overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-servers-overview" }
+      ]
+    },
+    {
+      "id": 96,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Servers — agentless vulnerability scanning vs agent-based",
+      "question": "A team wants vulnerability scanning that doesn't require deploying or maintaining any agent on the VM, supports Azure / AWS EC2 / GCP instances, and works on machines without inbound network connectivity. Which capability fits, and what plan is required?",
+      "options": {
+        "A": "Agent-based scanning via Defender for Endpoint sensor; Plan 1 is sufficient.",
+        "B": "Agentless vulnerability scanning powered by Microsoft Defender Vulnerability Management; requires Defender for Servers Plan 2 (or Defender CSPM). Uses snapshot-based scanning of the disk via Azure backbone — no agent needed.",
+        "C": "Qualys BYOL scanner; included with all plans.",
+        "D": "Azure Update Manager; covers vulnerability assessment."
+      },
+      "answer": "B",
+      "rationale": "Agentless vulnerability scanning takes disk snapshots and analyzes them out-of-band — no agent installation or network connectivity is required on the VM. It uses Microsoft Defender Vulnerability Management for analysis. Available with Defender for Servers Plan 2 or Defender CSPM.",
+      "optionRationales": {
+        "A": "Defender for Endpoint sensor is an agent; the scenario excludes agents.",
+        "B": "Correct. Agentless vulnerability scanning is the documented capability.",
+        "C": "Qualys BYOL is supported but is not the answer for this scenario.",
+        "D": "Azure Update Manager handles patching, not vulnerability assessment."
+      },
+      "references": [
+        { "text": "Agentless machine scanning", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-agentless-data-collection" },
+        { "text": "Configure vulnerability scanning for machines", "url": "https://learn.microsoft.com/azure/defender-for-cloud/auto-deploy-vulnerability-assessment" }
+      ]
+    },
+    {
+      "id": 97,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure Arc — onboard non-Azure servers to Defender",
+      "question": "A SOC must extend Defender for Servers protection to an on-premises Linux server and an AWS EC2 instance. Both should appear in Defender for Cloud with EDR, vulnerability scanning, and posture recommendations. What is the canonical path?",
+      "options": {
+        "A": "Install Microsoft Monitoring Agent (MMA) on both machines directly.",
+        "B": "Connect AWS via the AWS connector in Defender for Cloud; install Azure Connected Machine Agent on the on-prem Linux server to onboard it as an Azure Arc-enabled server; enable Defender for Servers on the relevant subscription; the Defender for Endpoint extension is auto-provisioned.",
+        "C": "Migrate both machines to Azure VMs.",
+        "D": "Use Microsoft Sentinel agents on both machines."
+      },
+      "answer": "B",
+      "rationale": "Azure Arc-enabled servers brings non-Azure machines into Azure as first-class resources. For AWS, the AWS connector in Defender for Cloud automates onboarding (or Arc onboarding scripts). Once Arc-enabled, enabling Defender for Servers on the subscription auto-deploys the Defender for Endpoint extension and surfaces all Defender for Servers features.",
+      "optionRationales": {
+        "A": "MMA is deprecated; Azure Arc + Defender extensions is the current pattern.",
+        "B": "Correct. Arc + Defender for Cloud connectors + Defender for Servers plan is the documented onboarding.",
+        "C": "Migration isn't required.",
+        "D": "Sentinel agents handle log collection, not Defender for Servers protection."
+      },
+      "references": [
+        { "text": "Onboard servers to Defender for Cloud (multicloud and hybrid)", "url": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-machines" },
+        { "text": "Connect AWS account to Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws" }
+      ]
+    },
+    {
+      "id": 98,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "File Integrity Monitoring — Defender for Servers Plan 2",
+      "question": "After enabling Defender for Servers Plan 2, the team must monitor critical OS files and registry keys for tampering. Which mechanism does Microsoft now use for File Integrity Monitoring (FIM)?",
+      "options": {
+        "A": "FIM continues to use the Log Analytics agent (MMA).",
+        "B": "FIM is enabled via the Defender for Endpoint sensor (already deployed when DfS Plan 1/2 is on); configure baselines and tracked paths in Defender for Cloud; MMA-based FIM is deprecated.",
+        "C": "FIM requires a separate Sentinel solution.",
+        "D": "FIM is no longer available."
+      },
+      "answer": "B",
+      "rationale": "FIM has been migrated to use the Defender for Endpoint sensor (which DfS deploys automatically). The legacy MMA-based FIM is being deprecated. Baselines and monitored paths are configured in the Defender for Cloud portal.",
+      "optionRationales": {
+        "A": "MMA is deprecated.",
+        "B": "Correct. FIM via the MDE sensor is the current model.",
+        "C": "FIM is a Defender for Servers feature, not a separate Sentinel solution.",
+        "D": "FIM is still available."
+      },
+      "references": [
+        { "text": "File integrity monitoring (FIM) in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/file-integrity-monitoring-overview" },
+        { "text": "Enable FIM with Defender for Endpoint", "url": "https://learn.microsoft.com/azure/defender-for-cloud/file-integrity-monitoring-enable-defender-endpoint" }
+      ]
+    },
+    {
+      "id": 99,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure Machine Configuration — guest assignments",
+      "question": "An auditor requires that all Azure VMs in scope must have a specific local password policy and BitLocker enabled, with continuous attestation that the configuration is in place. Which Azure capability achieves this with a deny effect option?",
+      "options": {
+        "A": "Azure Update Manager for security patches.",
+        "B": "Azure Machine Configuration (formerly Guest Configuration) — assigns and audits in-guest configurations to VMs via Azure Policy, with built-in compute security baselines (MCSB) and the option to combine with Policy denyAction effects to block non-compliant configurations.",
+        "C": "Azure Bastion — enforces compliance at access time.",
+        "D": "Microsoft Defender for Endpoint baselines only."
+      },
+      "answer": "B",
+      "rationale": "Azure Machine Configuration extends Azure Policy into the VM guest OS — it can audit (and optionally remediate, for supported guest configurations) in-guest settings like local accounts, registry values, BitLocker state, and compliance against the MCSB compute security baseline. Integrates with Defender for Servers Plan 2 OS configuration assessment.",
+      "optionRationales": {
+        "A": "Update Manager is for OS patching, not configuration.",
+        "B": "Correct. Machine Configuration is the documented in-guest audit/remediation mechanism.",
+        "C": "Bastion is for management plane access.",
+        "D": "MDE baselines exist but the comprehensive in-guest configuration audit is via Machine Configuration."
+      },
+      "references": [
+        { "text": "Azure Machine Configuration overview", "url": "https://learn.microsoft.com/azure/governance/machine-configuration/overview" },
+        { "text": "Compute security baselines in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/operating-system-misconfiguration" }
+      ]
+    },
+    {
+      "id": 100,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Containers — Defender sensor architecture",
+      "question": "An AKS cluster is enrolled in Defender for Containers. The team sees DaemonSet pods named 'microsoft-defender-collector-ds-*' running in the kube-system namespace and notices the cluster requires outbound HTTPS connectivity. What is the role of these pods?",
+      "options": {
+        "A": "They collect Kubernetes audit logs from the AKS control plane.",
+        "B": "They are the Defender sensor — a lightweight eBPF-based DaemonSet on every node that collects runtime telemetry (process events, network, Kubernetes events) and sends it outbound to the Defender for Cloud backend for runtime threat detection.",
+        "C": "They are the Azure Policy for Kubernetes (Gatekeeper) admission controller.",
+        "D": "They are an ingress controller required by Defender."
+      },
+      "answer": "B",
+      "rationale": "The Defender sensor is a DaemonSet that uses eBPF to collect runtime telemetry from each AKS node and publishes it (outbound HTTPS) to the Defender for Cloud backend. AKS control-plane audit logs are collected agentlessly via the AKS resource provider, separately. Azure Policy for Kubernetes is a different add-on (Gatekeeper).",
+      "optionRationales": {
+        "A": "Control-plane audit logs are collected by AKS natively, not by the sensor.",
+        "B": "Correct. The Defender sensor is the runtime telemetry collector.",
+        "C": "Azure Policy for Kubernetes is a separate add-on.",
+        "D": "Defender doesn't deploy ingress controllers."
+      },
+      "references": [
+        { "text": "Defender for Containers architecture", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-architecture" },
+        { "text": "Defender for Containers overview", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction" }
+      ]
+    },
+    {
+      "id": 101,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Containers — runtime antimalware blocking",
+      "question": "An AKS cluster is enrolled in Defender for Containers and the team enables runtime antimalware in blocking mode. Which statement most accurately describes the prerequisites and behavior?",
+      "options": {
+        "A": "Antimalware is provided by Microsoft Defender for Endpoint installed inside containers.",
+        "B": "Runtime antimalware blocking is an enhanced Defender sensor capability — requires the Defender sensor (Helm-provisioned latest GA version for AKS, or k8s-extension with antimalware collector enabled for Arc-enabled K8s) and Security Admin permissions to author/modify antimalware policies; can detect and optionally block malicious file execution in real time.",
+        "C": "Antimalware blocking requires a Linux kernel module and root daemonset access to the host.",
+        "D": "Antimalware is delivered as a sidecar injected by an admission webhook into every Pod."
+      },
+      "answer": "B",
+      "rationale": "Runtime antimalware in Defender for Containers extends the Defender sensor with a malware scanning engine. AKS requires Helm provisioning of the sensor (latest GA version); Arc-enabled multicloud requires the k8s-extension with antimalwareCollector enabled. Security Admin permissions are needed to author/modify antimalware policies; Security Reader is needed to view them.",
+      "optionRationales": {
+        "A": "MDE is not deployed into containers.",
+        "B": "Correct. Enhanced Defender sensor with antimalware capability is the documented architecture.",
+        "C": "It uses eBPF, not a custom kernel module.",
+        "D": "Defender does not inject sidecars."
+      },
+      "references": [
+        { "text": "Container runtime antimalware detection and blocking", "url": "https://learn.microsoft.com/azure/defender-for-cloud/anti-malware" }
+      ]
+    },
+    {
+      "id": 102,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Containers — Defender Security Gating (admission control)",
+      "question": "Defender for Containers offers a feature that evaluates incoming Kubernetes deployments against security policies before workloads are admitted to the cluster. Which feature is this, and what is the mechanism?",
+      "options": {
+        "A": "Azure Policy for Kubernetes alone, enforcing constraint templates.",
+        "B": "Defender Security Gating — an admission control layer that evaluates Pod specs (e.g., images with critical vulnerabilities, deployments running as root) against security policies before workloads run. Enabled in the Containers plan settings.",
+        "C": "Microsoft Sentinel automation playbooks triggered on Kubernetes audit events.",
+        "D": "Azure Firewall in front of the AKS API server."
+      },
+      "answer": "B",
+      "rationale": "Defender Security Gating is the admission control component of Defender for Containers — it evaluates incoming Pod specs against policies (such as 'block images with critical CVEs') and can block them at admission. It complements (and is distinct from) Azure Policy for Kubernetes / Gatekeeper.",
+      "optionRationales": {
+        "A": "Azure Policy / Gatekeeper enforces policy but Defender Security Gating is the Defender-specific feature that includes vulnerability and Defender-context-aware policies.",
+        "B": "Correct. Defender Security Gating is the documented Defender for Containers feature.",
+        "C": "Sentinel playbooks operate post-event, not at admission.",
+        "D": "Azure Firewall doesn't perform Kubernetes admission control."
+      },
+      "references": [
+        { "text": "Enable Defender for Containers — Defender Security Gating", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable-plan" }
+      ]
+    },
+    {
+      "id": 103,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "AKS — Workload Identity replaces AAD Pod Identity",
+      "question": "An AKS workload uses AAD Pod Identity (v1) to call Azure resources. Microsoft has announced the deprecation of Pod Identity v1. What is the recommended successor and key architectural change?",
+      "options": {
+        "A": "Stay on Pod Identity v1; deprecation has been canceled.",
+        "B": "Migrate to Microsoft Entra Workload ID — an OIDC-based federation between Kubernetes service accounts and Azure managed identities; no in-cluster controller (NMI) required, and no secret in the cluster.",
+        "C": "Use Kubernetes Secrets to mount service principal credentials.",
+        "D": "Use Azure Key Vault FlexVolume only."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra Workload ID is the supported successor to AAD Pod Identity v1. Instead of the NMI DaemonSet intercepting IMDS requests, Workload ID uses OIDC trust between the Kubernetes service account and a federated identity credential on a user-assigned managed identity / app registration. Tokens are obtained via the standard MSAL flow; no secret is stored in the cluster.",
+      "optionRationales": {
+        "A": "Pod Identity v1 deprecation is real and Microsoft directs customers to Workload ID.",
+        "B": "Correct. Workload ID + federated identity credential is the documented successor.",
+        "C": "Storing service principal secrets reverses the intent.",
+        "D": "Key Vault FlexVolume is a related but separate feature for secret mounting."
+      },
+      "references": [
+        { "text": "Microsoft Entra Workload ID with AKS overview", "url": "https://learn.microsoft.com/azure/aks/workload-identity-overview" },
+        { "text": "Migrate from pod-managed identity to Workload ID", "url": "https://learn.microsoft.com/azure/aks/workload-identity-migrate-from-pod-identity" }
+      ]
+    },
+    {
+      "id": 104,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "ACR — quarantine pattern + vulnerability assessment",
+      "question": "An Azure Container Registry must accept image pushes from many development teams but must prevent images with known critical CVEs from being deployed by downstream AKS clusters. Which combination achieves this?",
+      "options": {
+        "A": "Disable image pushes from all but a small set of trusted accounts.",
+        "B": "Enable ACR image quarantine (only images that pass a configured scan are promoted to the standard repository) and enable Defender for Containers registry vulnerability assessment; AKS clusters pull only from the post-quarantine repository. Combine with Defender Security Gating to block deployment of vulnerable images.",
+        "C": "Use AKS Network Policies to block image pulls.",
+        "D": "Set the ACR SKU to Basic; vulnerability scanning is included."
+      },
+      "answer": "B",
+      "rationale": "ACR image quarantine + Defender for Containers vulnerability assessment is the canonical 'scan-before-deploy' pattern: pushes land in quarantine; only images that pass vulnerability scanning are promoted. Defender Security Gating at the cluster adds a runtime check at admission.",
+      "optionRationales": {
+        "A": "Restricting pushes doesn't address image content.",
+        "B": "Correct. Quarantine + Defender vulnerability assessment + Security Gating is the documented multi-layered approach.",
+        "C": "Network policies don't differentiate by image vulnerability state.",
+        "D": "Vulnerability assessment is provided by Defender for Containers, not the ACR Basic SKU."
+      },
+      "references": [
+        { "text": "Azure Container Registry image quarantine", "url": "https://learn.microsoft.com/azure/container-registry/container-registry-quarantine" },
+        { "text": "Defender for Containers — vulnerability assessment", "url": "https://learn.microsoft.com/azure/defender-for-cloud/agentless-vulnerability-assessment-azure" }
+      ]
+    },
+    {
+      "id": 105,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "App Service — minimum TLS version and TLS 1.0/1.1 retirement",
+      "question": "On May 31, 2027, App Service retires inbound TLS 1.0 and 1.1 for the App Service platform. Which is the correct preparation strategy?",
+      "options": {
+        "A": "Wait for the retirement; Microsoft will automatically upgrade clients.",
+        "B": "Before the date: identify apps where minTlsVersion or scmMinTlsVersion is 1.0/1.1 (via Azure services retirement workbook or audit policy); use the Minimum TLS Version Checker detector on each app to see which clients still use TLS 1.0/1.1; remediate the clients; set minTlsVersion and scmMinTlsVersion to 1.2 (or 1.3) on every app and slot.",
+        "C": "Set the minimum TLS version to 1.0 to maintain compatibility forever.",
+        "D": "Disable SCM site to bypass the requirement."
+      },
+      "answer": "B",
+      "rationale": "Microsoft's documented preparation: discover apps allowing TLS 1.0/1.1 (workbook + Azure Policy audit), use the Minimum TLS Version Checker detector to surface real client traffic, work with client owners to upgrade, then set both minTlsVersion and scmMinTlsVersion to 1.2+ on every app AND every deployment slot.",
+      "optionRationales": {
+        "A": "Microsoft will not upgrade clients on the customer's behalf.",
+        "B": "Correct. Discover → measure → remediate → enforce is the documented sequence.",
+        "C": "TLS 1.0 will be rejected at the App Service front door after the date, regardless of app config.",
+        "D": "Disabling SCM breaks deployments and doesn't bypass the platform-level retirement."
+      },
+      "references": [
+        { "text": "Manage minimum TLS versions for App Service", "url": "https://learn.microsoft.com/azure/app-service/tls-minimum-version" },
+        { "text": "TLS/SSL in Azure App Service", "url": "https://learn.microsoft.com/azure/app-service/overview-tls" }
+      ]
+    },
+    {
+      "id": 106,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "App Service — access restrictions vs Private Endpoint",
+      "question": "An App Service Web App must be reachable only from a specific corporate IP range AND from one VNet's subnet, with no public access from anywhere else. Which combination is most appropriate?",
+      "options": {
+        "A": "App Service access restrictions: configure an Allow rule for the corporate IP range AND a service-endpoint-backed Allow rule for the VNet subnet (or use Private Endpoint for the VNet path); set the default action to Deny. Optionally apply the same to the SCM site.",
+        "B": "Use Azure Firewall in front of App Service.",
+        "C": "Disable public network access only.",
+        "D": "Apply NSGs to the App Service subnet."
+      },
+      "answer": "A",
+      "rationale": "App Service Access Restrictions allow rules by IP CIDR, VNet/subnet (via service endpoints), or service tag, with a default deny action. For VNet traffic, an alternative is a Private Endpoint on the App Service. SCM site has separate access restriction rules. NSGs don't apply to App Service (a PaaS) directly.",
+      "optionRationales": {
+        "A": "Correct. Access Restrictions + service endpoint or Private Endpoint is the documented pattern.",
+        "B": "Azure Firewall sits in front of resources in a VNet; App Service is a PaaS endpoint outside the VNet by default.",
+        "C": "Disabling public access doesn't allow the IP-based allow scenario.",
+        "D": "NSGs don't apply to the App Service plane."
+      },
+      "references": [
+        { "text": "App Service Access Restrictions overview", "url": "https://learn.microsoft.com/azure/app-service/overview-access-restrictions" },
+        { "text": "Use Private Endpoints for App Service", "url": "https://learn.microsoft.com/azure/app-service/networking/private-endpoint" }
+      ]
+    },
+    {
+      "id": 107,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure Functions — authentication",
+      "question": "An HTTP-triggered Azure Function must require Microsoft Entra ID authentication before executing, returning 401 to unauthenticated callers and providing the user/principal claims to the function code. Which configuration meets this with the least code?",
+      "options": {
+        "A": "Implement OAuth token validation manually inside the function code.",
+        "B": "Enable App Service Authentication (Easy Auth) on the Function App with Microsoft Entra as the identity provider; set 'Unauthenticated requests' to 'HTTP 401 Unauthorized'; the Function receives the validated principal in headers/ClaimsPrincipal.",
+        "C": "Use API Management JWT validation; Functions does not support authentication.",
+        "D": "Use a function-level key only."
+      },
+      "answer": "B",
+      "rationale": "App Service Authentication ('Easy Auth') is built-in pre-execution authentication for Functions and Web Apps. With Microsoft Entra as the IdP and 'HTTP 401 Unauthorized' for unauthenticated requests, tokens are validated by the platform and claims are passed to the function. Function keys provide a separate (and weaker) shared-secret model.",
+      "optionRationales": {
+        "A": "Manual validation works but is exactly what Easy Auth replaces.",
+        "B": "Correct. Easy Auth with Entra is the documented zero-code pattern.",
+        "C": "APIM is a valid in-front-of-functions pattern but the question asks for the Function-level mechanism.",
+        "D": "Function keys are a shared-secret model, not Entra-based authentication."
+      },
+      "references": [
+        { "text": "Authentication and authorization in Azure App Service / Functions", "url": "https://learn.microsoft.com/azure/app-service/overview-authentication-authorization" },
+        { "text": "Configure Microsoft Entra authentication for Function Apps", "url": "https://learn.microsoft.com/azure/app-service/configure-authentication-provider-aad" }
+      ]
+    },
+    {
+      "id": 108,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure API Management — backend protection",
+      "question": "A team uses Azure API Management to front a backend API. They want JWT bearer tokens to be validated (issuer, audience, signature, required scope) at the APIM gateway, with invalid tokens rejected before the request reaches the backend. Which APIM policy is appropriate?",
+      "options": {
+        "A": "ip-filter — restricts callers by source IP.",
+        "B": "validate-jwt — validates the JWT signature against the issuer's JWKS, checks claims (issuer, audience, required-claims, scopes), and returns 401 on failure before invoking the backend.",
+        "C": "rate-limit-by-key — limits requests per key.",
+        "D": "set-backend-service — routes the call to a backend."
+      },
+      "answer": "B",
+      "rationale": "validate-jwt is the dedicated APIM policy for OAuth 2.0 / OpenID Connect token validation at the gateway. It supports JWKS-based signature validation, issuer/audience checks, required-claims (e.g., scp/scope), and configurable failure responses. It runs in the inbound section before backend invocation.",
+      "optionRationales": {
+        "A": "IP filtering is unrelated to token validation.",
+        "B": "Correct. validate-jwt is the documented policy.",
+        "C": "Rate limiting is a quota policy.",
+        "D": "set-backend-service handles routing only."
+      },
+      "references": [
+        { "text": "validate-jwt policy reference", "url": "https://learn.microsoft.com/azure/api-management/validate-jwt-policy" },
+        { "text": "Protect APIs with Microsoft Entra ID", "url": "https://learn.microsoft.com/azure/api-management/api-management-howto-protect-backend-with-aad" }
+      ]
+    },
+    {
+      "id": 109,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure Logic Apps — managed identity to call protected APIs",
+      "question": "A Logic App (Standard) must call a Microsoft Graph API endpoint that requires Microsoft Entra authentication, without storing any client secret. Which configuration is appropriate?",
+      "options": {
+        "A": "Hard-code a service principal client secret in a Logic App parameter.",
+        "B": "Enable a system-assigned (or user-assigned) managed identity on the Logic App; grant it the required Microsoft Graph application permission; in the HTTP action's Authentication, choose 'Managed identity' and select Microsoft Graph as the audience.",
+        "C": "Use a basic authentication connector with a service account.",
+        "D": "Use OAuth with PKCE flow in the Logic App."
+      },
+      "answer": "B",
+      "rationale": "Logic Apps support managed identities for outbound HTTP calls. Configure system- or user-assigned MI, grant the required permissions in the target service (e.g., Microsoft Graph application permission), and select 'Managed identity' as the Authentication type. No secret is needed.",
+      "optionRationales": {
+        "A": "Hard-coded secrets violate the no-secrets requirement.",
+        "B": "Correct. Managed identity + 'Managed identity' authentication is the documented pattern.",
+        "C": "Basic auth doesn't apply to Microsoft Graph.",
+        "D": "PKCE is for interactive clients, not Logic App workflows."
+      },
+      "references": [
+        { "text": "Authenticate access to Azure resources using managed identities in Azure Logic Apps", "url": "https://learn.microsoft.com/azure/logic-apps/authenticate-with-managed-identity" }
+      ]
+    },
+    {
+      "id": 110,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Azure Container Apps — network isolation and identity",
+      "question": "A team deploys an Azure Container App that must (1) be reachable only from another Container App in the same environment (no Internet), and (2) call Azure Key Vault using its own identity. Which configuration is appropriate?",
+      "options": {
+        "A": "Set the environment to 'Internal only' (Internal ingress) and enable a system-assigned managed identity on the Container App; grant the MI the Key Vault Secrets User role.",
+        "B": "Set ingress to 'External' and rely on Key Vault firewall to filter.",
+        "C": "Use a sidecar container running NGINX as a reverse proxy with basic auth.",
+        "D": "Use shared environment variables for the Key Vault key."
+      },
+      "answer": "A",
+      "rationale": "Container Apps environments can be 'Internal only' (no public endpoint; the environment gets an internal load balancer in a VNet). Ingress = External vs Internal controls public exposure. Managed identity on the Container App + Key Vault RBAC role is the documented pattern for Key Vault access.",
+      "optionRationales": {
+        "A": "Correct. Internal environment + managed identity + Key Vault RBAC.",
+        "B": "External ingress + firewall filtering still exposes a public endpoint.",
+        "C": "Reverse proxy with basic auth is an anti-pattern.",
+        "D": "Environment variables for keys reintroduce secrets."
+      },
+      "references": [
+        { "text": "Azure Container Apps — networking overview", "url": "https://learn.microsoft.com/azure/container-apps/networking" },
+        { "text": "Managed identities in Azure Container Apps", "url": "https://learn.microsoft.com/azure/container-apps/managed-identity" }
+      ]
+    },
+    {
+      "id": 111,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Purview DSPM for AI — identify SharePoint over-exposure",
+      "question": "Before rolling out Microsoft 365 Copilot, a compliance team needs to identify SharePoint sites and files that are over-shared (e.g., 'Anyone' links, broad org-wide shares) — because Copilot will reason over any document a signed-in user can access. Which Microsoft Purview capability is designed for this discovery + remediation workflow?",
+      "options": {
+        "A": "Manually audit each SharePoint site permission.",
+        "B": "Microsoft Purview Data Security Posture Management (DSPM) for AI — runs data risk assessments that identify SharePoint over-exposure (anyone links, broad shares) and recommends one-click policies (sensitivity labels, DLP for AI prompts) to remediate before Copilot rollout.",
+        "C": "Defender for Cloud Apps app-discovery report.",
+        "D": "Microsoft Entra Permissions Management for SharePoint."
+      },
+      "answer": "B",
+      "rationale": "Purview DSPM for AI is the dedicated solution for understanding and controlling data that Copilot and other AI apps can reach. It runs data risk assessments highlighting SharePoint over-sharing, surfaces sensitive content categories Copilot might expose, and provides one-click remediation policies (sensitivity labels, DLP for AI). Microsoft positions DSPM for AI as the 'front door' for AI rollout readiness.",
+      "optionRationales": {
+        "A": "Manual auditing doesn't scale to tenant-wide SharePoint exposure.",
+        "B": "Correct. DSPM for AI is the documented mechanism.",
+        "C": "Defender for Cloud Apps surfaces shadow IT and SaaS app usage, not SharePoint share-level permissions.",
+        "D": "Entra Permissions Management covers cloud infrastructure entitlements (Azure/AWS/GCP), not SharePoint sharing."
+      },
+      "references": [
+        { "text": "Learn about Data Security Posture Management for AI", "url": "https://learn.microsoft.com/purview/dspm-for-ai" },
+        { "text": "Microsoft Purview to manage data security for Microsoft 365 Copilot", "url": "https://learn.microsoft.com/purview/ai-m365-copilot" }
+      ]
+    },
+    {
+      "id": 112,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Purview DSPM for AI — one-click policies for Copilot Studio agents",
+      "question": "A team deploys a Copilot Studio agent that answers customer questions using internal data. The CISO requires (1) capture of all prompts/responses for compliance audit, (2) detection of risky interactions (jailbreak attempts, harmful content), and (3) detection of sensitive information leakage in responses. Which Purview combination is the fastest path?",
+      "options": {
+        "A": "Enable Microsoft Sentinel data connectors and write custom analytics rules.",
+        "B": "From Microsoft Purview DSPM for AI, enable the one-click policies: 'Capture interactions for Copilot experiences', 'Detect risky AI usage', and 'Extend insights into sensitive data in AI app interactions'. Auditing must be on tenant-wide.",
+        "C": "Apply Microsoft Defender for Cloud Apps file policies to Copilot Studio.",
+        "D": "Enable Microsoft Defender for Endpoint on every device using Copilot."
+      },
+      "answer": "B",
+      "rationale": "DSPM for AI's one-click policies turn on the recommended Purview controls for AI apps: prompt/response capture (Audit + DLP), risky AI usage detection (Insider Risk Management), and sensitive-data-in-prompts detection. This is the documented fastest path for Copilot Studio agent compliance.",
+      "optionRationales": {
+        "A": "Sentinel custom rules are heavyweight and not the documented Copilot Studio compliance path.",
+        "B": "Correct. DSPM for AI one-click policies cover the three requirements.",
+        "C": "Defender for Cloud Apps file policies target SaaS file events, not Copilot Studio interactions.",
+        "D": "MDE is endpoint protection, unrelated to AI app interactions."
+      },
+      "references": [
+        { "text": "Purview for Microsoft Copilot Studio", "url": "https://learn.microsoft.com/purview/ai-copilot-studio" },
+        { "text": "DSPM for AI one-click policies", "url": "https://learn.microsoft.com/purview/dspm-for-ai-considerations" }
+      ]
+    },
+    {
+      "id": 113,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Microsoft Entra Agent ID — what it is",
+      "question": "Which statement most accurately describes Microsoft Entra Agent ID?",
+      "options": {
+        "A": "It's a new license SKU for Microsoft 365 Copilot.",
+        "B": "It's an extension of Microsoft Entra that gives AI agents first-class directory identities, enabling Conditional Access, ID Protection (agent risk), Identity Governance (access packages, owners), and network controls scoped to agents — for autonomous, assistive, and on-behalf-of patterns.",
+        "C": "It's an SDK for building MCP servers.",
+        "D": "It's a replacement for managed identities for Azure resources."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra Agent ID gives AI agents (Copilot Studio agents, Foundry agents, custom agents) Entra-recognized identities so they can be governed like users — Conditional Access (including AI Agents policy templates), ID Protection (agent risk detections), Identity Governance (access packages, owners, lifecycle), and network controls. It is a security-and-governance platform extension, not a license/SDK/replacement.",
+      "optionRationales": {
+        "A": "Agent ID isn't a license SKU.",
+        "B": "Correct. Agent ID is the identity platform extension for AI agents.",
+        "C": "Agent ID is not an SDK.",
+        "D": "Managed identities are for Azure resources; Agent ID is for AI agents."
+      },
+      "references": [
+        { "text": "What is Microsoft Entra Agent ID?", "url": "https://learn.microsoft.com/entra/agent-id/identity-professional/microsoft-entra-agent-identities-for-ai-agents" },
+        { "text": "Microsoft Entra security for AI overview", "url": "https://learn.microsoft.com/entra/agent-id/security-for-ai-overview" }
+      ]
+    },
+    {
+      "id": 114,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Entra Agent ID — Conditional Access for autonomous agents",
+      "question": "An autonomous agent runs on a schedule and authenticates to Microsoft Graph using its own agent identity (client credentials, no user context). The security team must (1) block agents flagged as high risk by Entra ID Protection, (2) allow only agents reviewed and approved by the security team to access tenant resources. Which Conditional Access configuration meets both?",
+      "options": {
+        "A": "Apply a single Conditional Access policy targeting All users with grant = Block on high risk.",
+        "B": "Create two Conditional Access policies targeting Agents (Preview) under Assignments: (1) 'Block high-risk agent identities' Microsoft-managed policy keyed on Agent risk = High; (2) a custom policy that targets all agent identities and excludes approved agents — either by using custom security attributes (recommended) or the enhanced object picker — with grant = Block.",
+        "C": "Use Azure Firewall to filter traffic from agent IPs.",
+        "D": "Manually review every agent sign-in in the sign-in logs."
+      },
+      "answer": "B",
+      "rationale": "Conditional Access now supports the 'Agents (Preview)' assignment target. The Microsoft-managed 'Block high-risk agent identities' template uses Agent risk condition. For the allow-list pattern, target all agent identities and exclude approved ones (by custom security attribute like AgentApprovalStatus = HR_Approved, or via the enhanced object picker). Policies are evaluated against the agent identity, not a user.",
+      "optionRationales": {
+        "A": "Policies for users don't apply to agent identities operating in client-credentials flow.",
+        "B": "Correct. Two policies + agent-targeted Conditional Access is the documented pattern.",
+        "C": "Azure Firewall doesn't differentiate agents from other principals.",
+        "D": "Manual log review isn't a preventive control."
+      },
+      "references": [
+        { "text": "Conditional Access for autonomous agents", "url": "https://learn.microsoft.com/entra/identity/conditional-access/policy-autonomous-agents" },
+        { "text": "Block high-risk agent identities policy", "url": "https://learn.microsoft.com/entra/identity/conditional-access/policy-agent-block-high-risk" }
+      ]
+    },
+    {
+      "id": 115,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Entra Agent ID — Identity Governance (access packages)",
+      "question": "An organization wants to govern agent identity lifecycle the same way they govern human identities: each agent must have an assigned owner/sponsor, time-bound access to resources, an entitlement-management-driven access request flow, and automatic expiration. Which Microsoft Entra capability supports this for agents?",
+      "options": {
+        "A": "Entra ID P1 license and a security group per agent.",
+        "B": "Microsoft Entra ID Governance — entitlement management access packages now support agent identities, allowing sponsor/owner assignment, time-bound assignments, access reviews, and auditability across the agent lifecycle (deployment → expiration).",
+        "C": "Azure Logic Apps that delete agents after 90 days.",
+        "D": "Custom RBAC roles on the agent's app registration."
+      },
+      "answer": "B",
+      "rationale": "Microsoft Entra ID Governance extends entitlement management access packages to agent identities. This brings agent-aware sponsor/owner assignment, time-bound resource access, access reviews, and lifecycle controls — preventing orphaned agent IDs and enforcing intent-based access. This is the documented model under 'Identity Governance for agents'.",
+      "optionRationales": {
+        "A": "Security groups alone don't provide lifecycle governance.",
+        "B": "Correct. ID Governance access packages for agents is the documented mechanism.",
+        "C": "Custom Logic Apps are unsupported and brittle.",
+        "D": "RBAC alone doesn't address lifecycle, sponsorship, or access reviews."
+      },
+      "references": [
+        { "text": "Identity Governance for agents", "url": "https://learn.microsoft.com/entra/id-governance/agent-id-governance-overview" }
+      ]
+    },
+    {
+      "id": 116,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Cloud — AI security posture management (discovery)",
+      "question": "After enabling Defender CSPM on a subscription that hosts Azure OpenAI and Microsoft Foundry workloads, the team wants visibility into discovered AI services + Foundry agents, IaC misconfigurations that affect AI endpoints, and attack-path analysis for AI workloads. Which Defender for Cloud capability provides this?",
+      "options": {
+        "A": "Defender for Storage with sensitive data threat detection.",
+        "B": "AI Security Posture Management (AI SPM) in Defender CSPM — discovers AI workloads across Azure OpenAI, Microsoft Foundry, Azure ML, Amazon Bedrock, and Google Vertex AI; surfaces IaC misconfigurations (e.g., missing private endpoint on AI service); provides attack-path analysis specifically for AI workloads; AI agent discovery (preview) for Foundry agents.",
+        "C": "Microsoft Sentinel UEBA.",
+        "D": "Microsoft Purview Insider Risk Management."
+      },
+      "answer": "B",
+      "rationale": "AI Security Posture Management is a Defender CSPM feature that builds an AI Bill of Materials (AI BOM) across major AI services and dependencies, evaluates IaC misconfigurations specific to AI (private endpoints, managed identity, identity-based auth, restricted endpoints), and runs attack-path analysis tailored to AI workloads. It includes AI agent discovery (preview) for Foundry.",
+      "optionRationales": {
+        "A": "Defender for Storage protects storage accounts, not AI service workloads.",
+        "B": "Correct. AI SPM in Defender CSPM is the documented capability.",
+        "C": "Sentinel UEBA is for user behavior analytics.",
+        "D": "Insider Risk is a Purview signal, not Defender CSPM."
+      },
+      "references": [
+        { "text": "AI security posture management in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/ai-security-posture" },
+        { "text": "Defender for Cloud overview — AI security", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction" }
+      ]
+    },
+    {
+      "id": 117,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender for Cloud — threat protection for AI services",
+      "question": "An organization runs a customer-facing chatbot powered by Microsoft Foundry. They want runtime detection of malicious prompts (jailbreak, prompt injection), abnormal model execution, and abuse patterns — with alerts surfaced in the Defender portal. Which Defender for Cloud plan is required and what does it monitor?",
+      "options": {
+        "A": "Defender for Servers Plan 2 — monitors the VM hosting the chatbot.",
+        "B": "Defender for AI Services (threat protection for AI workloads) — Defender for Cloud plan that monitors Microsoft Foundry workloads for malicious activity at runtime (suspicious prompts, abnormal execution behavior, jailbreak attempts), integrates with Responsible AI and Microsoft Threat Intelligence, and surfaces alerts in the Defender portal.",
+        "C": "Defender CSPM alone is sufficient.",
+        "D": "Defender for Cloud Apps with file policies."
+      },
+      "answer": "B",
+      "rationale": "Defender for AI Services (also called threat protection for AI workloads) is the runtime detection plan for Foundry/Azure OpenAI workloads. It detects suspicious prompts, jailbreak attempts, and abnormal model execution; alerts surface in the Defender portal with contextual signals (e.g., user, app, IP).",
+      "optionRationales": {
+        "A": "Defender for Servers is server-focused; Foundry is a managed service.",
+        "B": "Correct. Defender for AI Services is the dedicated runtime protection plan.",
+        "C": "Defender CSPM provides posture only, not runtime threat protection.",
+        "D": "Defender for Cloud Apps targets SaaS data movement."
+      },
+      "references": [
+        { "text": "Enable threat protection for AI services", "url": "https://learn.microsoft.com/azure/defender-for-cloud/ai-onboarding" },
+        { "text": "Alerts for AI services", "url": "https://learn.microsoft.com/azure/defender-for-cloud/alerts-ai-workloads" }
+      ]
+    },
+    {
+      "id": 118,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Defender XDR — blast radius for AI/Agent compromises",
+      "question": "An Entra Agent ID is flagged as high risk. The SOC needs to understand which Microsoft Graph resources, files, applications, and downstream services the agent could have accessed in the past 7 days to scope the incident. Which Defender capability provides this 'blast radius' analysis?",
+      "options": {
+        "A": "Defender for Cloud Regulatory Compliance dashboard.",
+        "B": "Microsoft Defender XDR incident correlation + Advanced Hunting (KQL) over IdentityEvents / CloudAppEvents / EntraSignInLogs — correlates the agent identity to its access tokens, resources called, and the affected blast radius; Defender for Cloud's AI workload alerts feed into Defender XDR for unified investigation.",
+        "C": "Azure Monitor metrics export to Storage.",
+        "D": "Microsoft Sentinel scheduled queries only."
+      },
+      "answer": "B",
+      "rationale": "Defender XDR's incident correlation engine consolidates signals across endpoint, identity, cloud, and Defender for Cloud. Advanced Hunting (KQL) over the unified schemas lets the SOC pivot on an Entra Agent ID to its sign-ins, accessed resources, and downstream actions — i.e., the blast radius. Defender for Cloud alerts (including AI service alerts) are integrated into Defender XDR.",
+      "optionRationales": {
+        "A": "Regulatory Compliance is a posture view, not an investigation tool.",
+        "B": "Correct. Defender XDR + Advanced Hunting is the documented investigation platform.",
+        "C": "Metrics export doesn't provide cross-signal correlation.",
+        "D": "Sentinel can be used but the XDR-native incident + advanced hunting experience is the documented fastest path."
+      },
+      "references": [
+        { "text": "Protect AI assets using Microsoft Defender", "url": "https://learn.microsoft.com/defender-xdr/security-for-ai/defender-security-for-ai" },
+        { "text": "Defender for Cloud integration with Defender XDR", "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-integration-365" }
+      ]
+    },
+    {
+      "id": 119,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "AI Gateway in APIM — token rate limiting per consumer",
+      "question": "Multiple internal apps share a single Azure OpenAI deployment with a 30k TPM quota. Without controls, one team's runaway loop has been monopolizing all tokens, blocking other apps. The team wants a per-subscription-key TPM limit of 500 with pre-calculation of prompt tokens (so the call is rejected before reaching the backend if the limit would be exceeded). Which capability achieves this?",
+      "options": {
+        "A": "Application Insights with sampling rules.",
+        "B": "Use Azure API Management as an AI gateway in front of the model deployment, and apply the llm-token-limit policy keyed on Subscription.Id, with tokens-per-minute=500 and estimate-prompt-tokens=true — prevents excess calls from ever reaching the backend.",
+        "C": "Resize the Azure OpenAI quota to be per-app.",
+        "D": "Use Azure Front Door with rate-limiting WAF custom rules counting requests."
+      },
+      "answer": "B",
+      "rationale": "AI Gateway (APIM's policy set for LLM APIs) provides llm-token-limit specifically for per-counter-key token rate limiting on LLM APIs. With estimate-prompt-tokens=true, APIM pre-computes the prompt's token count and rejects the request locally if it would exceed the limit — saving the backend call. Counter key can be subscription, IP, or any policy expression.",
+      "optionRationales": {
+        "A": "App Insights is observability, not throttling.",
+        "B": "Correct. llm-token-limit policy is the documented AI Gateway capability.",
+        "C": "Azure OpenAI quota cannot be split per app on a single deployment.",
+        "D": "WAF rate limiting counts requests, not tokens, and can't pre-compute prompt tokens."
+      },
+      "references": [
+        { "text": "AI gateway in Azure API Management", "url": "https://learn.microsoft.com/azure/api-management/genai-gateway-capabilities" },
+        { "text": "llm-token-limit policy", "url": "https://learn.microsoft.com/azure/api-management/llm-token-limit-policy" }
+      ]
+    },
+    {
+      "id": 120,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "AI Gateway in APIM — content safety enforcement on LLM requests",
+      "question": "When importing a Microsoft Foundry API into APIM, the team wants to apply Azure AI Content Safety to block prompts containing unsafe content (e.g., self-harm, sexual, violence) before they reach the LLM. Which APIM policy supports this?",
+      "options": {
+        "A": "validate-jwt — checks user identity before forwarding to backend.",
+        "B": "llm-content-safety policy — enforces content safety checks on LLM requests using Azure AI Content Safety; configurable severity thresholds, and request is blocked if content exceeds thresholds before reaching the backend.",
+        "C": "rate-limit-by-key — limits requests per key.",
+        "D": "ip-filter — restricts IP addresses."
+      },
+      "answer": "B",
+      "rationale": "The llm-content-safety policy in APIM integrates with Azure AI Content Safety to inspect LLM request bodies against configured severity thresholds per category (hate, sexual, self-harm, violence) and blocks unsafe requests before invoking the backend. It can be configured during the Microsoft Foundry API import flow under the AI Content Safety tab.",
+      "optionRationales": {
+        "A": "JWT validation is identity, not content safety.",
+        "B": "Correct. llm-content-safety policy is the documented mechanism.",
+        "C": "Rate limit doesn't inspect content.",
+        "D": "IP filter doesn't inspect content."
+      },
+      "references": [
+        { "text": "llm-content-safety policy", "url": "https://learn.microsoft.com/azure/api-management/llm-content-safety-policy" },
+        { "text": "Import a Microsoft Foundry API into APIM", "url": "https://learn.microsoft.com/azure/api-management/azure-ai-foundry-api" }
+      ]
+    },
+    {
+      "id": 121,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "AI Gateway — token quotas per Foundry project",
+      "question": "Microsoft Foundry Control Plane integrates with AI Gateway to enforce per-project token limits. Which two enforcement dimensions does this provide, and what HTTP response codes are returned when each is exceeded?",
+      "options": {
+        "A": "Only TPM rate limit; returns 503.",
+        "B": "TPM rate limit (returns 429 Too Many Requests) and total token quota over a window (hourly/daily/weekly/monthly/yearly, returns 403 Forbidden) — both apply at the project scope.",
+        "C": "Token count per request only; returns 400 Bad Request.",
+        "D": "Bytes per second only; returns 429."
+      },
+      "answer": "B",
+      "rationale": "Foundry Control Plane with AI Gateway enforces both a TPM rate limit (per-minute, returns 429) and a total token quota over a configurable period (hourly/daily/weekly/monthly/yearly, returns 403). Both apply at the project scope. Concurrent requests in flight can briefly exceed the configured limit until responses are processed.",
+      "optionRationales": {
+        "A": "Both dimensions exist; 503 is incorrect.",
+        "B": "Correct. TPM (429) + quota window (403) is the documented enforcement model.",
+        "C": "Per-request token limits aren't the same as TPM/quota.",
+        "D": "AI Gateway enforces tokens, not bytes."
+      },
+      "references": [
+        { "text": "Enforce token limits for models", "url": "https://learn.microsoft.com/azure/foundry/control-plane/how-to-enforce-limits-models" },
+        { "text": "AI Gateway in Foundry — quota windows", "url": "https://learn.microsoft.com/azure/foundry/configuration/enable-ai-api-management-gateway-portal" }
+      ]
+    },
+    {
+      "id": 122,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Foundry Guardrails — intervention points",
+      "question": "Microsoft Foundry guardrails consist of controls applied at specific intervention points. Which set of intervention points is supported for AGENTS (vs models)?",
+      "options": {
+        "A": "Only User input and Output.",
+        "B": "User input, Tool call (preview, agents only), Tool response (preview, agents only), and Output — agents extend the model's two intervention points with two additional agent-specific ones for tool interactions.",
+        "C": "User input and Tool call only.",
+        "D": "Output only."
+      },
+      "answer": "B",
+      "rationale": "Foundry guardrails apply at four intervention points for agents: User input, Tool call, Tool response, and Output. Models only support User input and Output. Tool call and Tool response are agent-only and are in preview. Risks detected in an agent use the agent's assigned guardrail, which overrides the model's guardrail.",
+      "optionRationales": {
+        "A": "Agents support additional tool-related intervention points.",
+        "B": "Correct. Four intervention points for agents.",
+        "C": "Tool response is also supported.",
+        "D": "Output only is incorrect."
+      },
+      "references": [
+        { "text": "Foundry guardrails and controls overview", "url": "https://learn.microsoft.com/azure/foundry/guardrails/guardrails-overview" },
+        { "text": "Intervention points and controls", "url": "https://learn.microsoft.com/azure/foundry/guardrails/intervention-points" }
+      ]
+    },
+    {
+      "id": 123,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Foundry Guardrails — severity levels",
+      "question": "When configuring a Foundry guardrail control for content risks (Hate, Sexual, Self-harm, Violence), which severity level is the MOST RESTRICTIVE (flags the broadest range of content)?",
+      "options": {
+        "A": "High — flags only the most severe content.",
+        "B": "Low — flags content at low severity and above, making it the most restrictive setting.",
+        "C": "Medium — flags content at medium severity and above.",
+        "D": "Off — flags nothing."
+      },
+      "answer": "B",
+      "rationale": "Severity levels are 'at and above': Low flags content at low severity or worse (most restrictive), Medium flags medium-and-above, High flags only the most severe content (least restrictive). Off disables detection for that risk (and is only available for approved customers).",
+      "optionRationales": {
+        "A": "High is the LEAST restrictive — it only flags the most severe content.",
+        "B": "Correct. Low is the most restrictive.",
+        "C": "Medium is between Low and High.",
+        "D": "Off disables the control entirely."
+      },
+      "references": [
+        { "text": "Foundry guardrails — severity levels", "url": "https://learn.microsoft.com/azure/foundry/guardrails/guardrails-overview" }
+      ]
+    },
+    {
+      "id": 124,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Microsoft 365 admin center — agent management",
+      "question": "A tenant administrator wants to inventory all Copilot Studio and Microsoft 365 agents in use, manage who can create agents, and assign roles for agent management without granting global admin. Where is this surfaced?",
+      "options": {
+        "A": "Azure portal — Microsoft Entra agents.",
+        "B": "Microsoft 365 admin center — Copilot/Agents management pane (with the dedicated 'Copilot Studio agent management' / agents inventory) where admins govern agent creation, access, and lifecycle alongside the Power Platform admin center for environment-level controls.",
+        "C": "Defender XDR — Settings.",
+        "D": "Purview portal — Insider Risk."
+      },
+      "answer": "B",
+      "rationale": "Microsoft 365 admin center is the documented surface for managing Microsoft 365 and Copilot Studio agents at the tenant level — inventory, who can create/deploy, roles, and access. Power Platform admin center provides environment-level controls (DLP, environment-scoped governance). Entra is for identity governance of agent identities.",
+      "optionRationales": {
+        "A": "Azure portal hosts the agent identity governance but not the Copilot Studio agent management surface.",
+        "B": "Correct. M365 admin center is the agent-management surface for Copilot/M365 agents.",
+        "C": "Defender XDR surfaces alerts/incidents, not agent inventory and roles.",
+        "D": "Purview is for data security/compliance, not agent management."
+      },
+      "references": [
+        { "text": "Manage Copilot agents in the Microsoft 365 admin center", "url": "https://learn.microsoft.com/microsoft-365-copilot/extensibility/manage" },
+        { "text": "Microsoft 365 Copilot security and governance", "url": "https://learn.microsoft.com/microsoft-365-copilot/microsoft-365-copilot-overview" }
+      ]
+    },
+    {
+      "id": 125,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "topic": "Data and AI security dashboard in Defender for Cloud",
+      "question": "A security architect needs a single Defender for Cloud surface that summarizes (1) sensitive data exposure across storage and databases, (2) AI workload posture and threats, and (3) overall data/AI risks in one prioritized view across multicloud. Which Defender for Cloud feature provides this?",
+      "options": {
+        "A": "Defender for Cloud's Workload Protections page.",
+        "B": "The Data and AI security dashboard in Defender for Cloud — a centralized monitoring dashboard that correlates sensitive data discovery, Defender for Storage / Databases / AI threats, and AI security posture insights into a unified risk view.",
+        "C": "Defender for Cloud Apps overview.",
+        "D": "Microsoft Sentinel AI workbook."
+      },
+      "answer": "B",
+      "rationale": "Defender for Cloud's Data and AI security dashboard is the documented unified surface for sensitive data exposure across multicloud storage/databases, AI workload posture, and AI threat protection alerts. It correlates SDD signals with Defender for Storage/Databases/AI Services so SOC teams can prioritize the highest-risk areas.",
+      "optionRationales": {
+        "A": "Workload Protections lists plan status, not a unified data/AI risk view.",
+        "B": "Correct. The Data and AI security dashboard is the dedicated unified view.",
+        "C": "Defender for Cloud Apps overview shows shadow IT and SaaS posture, not Azure data/AI workloads.",
+        "D": "Sentinel workbooks can be authored but the dashboard is the documented Defender for Cloud surface."
+      },
+      "references": [
+        { "text": "Defender for Cloud overview — Data and AI security dashboard", "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction" },
+        { "text": "Data security dashboard in Defender for Cloud", "url": "https://learn.microsoft.com/azure/defender-for-cloud/data-security-dashboard" }
+      ]
     }
   ]
 }
