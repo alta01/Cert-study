@@ -1,0 +1,63 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate exam JSON
+        run: |
+          for f in data/exams/*.json; do
+            node scripts/validate-exam.js "$f" || exit 1
+          done
+
+      - name: Stage site for Pages
+        run: |
+          mkdir -p _site
+          # Copy only the files needed by the static app — leave .git, scripts,
+          # docker, k8s, etc. out of the published site.
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='scripts' \
+            --exclude='k8s' \
+            --exclude='node_modules' \
+            --exclude='_site' \
+            --exclude='Dockerfile' \
+            --exclude='docker-compose.yml' \
+            --exclude='docker-entrypoint.sh' \
+            --exclude='nginx.conf' \
+            --exclude='.dockerignore' \
+            --exclude='.env*' \
+            --exclude='*.md' \
+            --exclude='agents.md' \
+            ./ _site/
+          # Keep the README outside the site.
+          ls _site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - id: deployment
+        uses: actions/deploy-pages@v4

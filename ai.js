@@ -2,6 +2,16 @@
 
 const OLLAMA_BASE = 'http://localhost:11434';
 
+// Hosted/remote builds (e.g. GitHub Pages, anything other than localhost or
+// file://) can't talk to a localhost Ollama on the user's device. Detect that
+// and render a clear explanation instead of letting the connection silently
+// fail. The rest of the app (study + exams) is unaffected.
+const IS_HOSTED_BUILD = (() => {
+  if (location.protocol === 'file:') return false;
+  const h = location.hostname;
+  return !!h && !['localhost', '127.0.0.1', '0.0.0.0'].includes(h);
+})();
+
 const SYSTEM_PROMPT =
   'You are a study assistant for the Cert Study app. ' +
   'Help users understand exam topics, explain concepts, and discuss practice questions. ' +
@@ -20,6 +30,16 @@ const AI = (() => {
   // ── Connection ─────────────────────────────────────────────
 
   async function checkConnection() {
+    // Don't try to reach localhost from a hosted build — it will always fail
+    // and the CSP would block it anyway.
+    if (IS_HOSTED_BUILD) {
+      _ready = false;
+      _models = [];
+      setStatus('hosted');
+      renderHostedBuildMessage();
+      disableInputs();
+      return;
+    }
     setStatus('checking');
     try {
       const res = await fetch(`${OLLAMA_BASE}/api/tags`, { signal: AbortSignal.timeout(3000) });
@@ -43,8 +63,25 @@ const AI = (() => {
     if (!dot) return;
     dot.className = `status-dot ${state}`;
     dot.title = state === 'online'   ? `Ollama connected (${_models.length} models)`
+              : state === 'hosted'   ? 'AI tutor unavailable on hosted builds — run the app locally to use it'
               : state === 'offline'  ? 'Ollama not found — start Ollama to enable AI features'
               : 'Checking Ollama…';
+  }
+
+  function renderHostedBuildMessage() {
+    const box = document.getElementById('ai-messages');
+    if (!box) return;
+    box.innerHTML = `
+      <div class="ai-msg assistant">
+        <p><strong>AI Assistant runs locally.</strong></p>
+        <p>This study app is fully usable on its own — every practice exam, study note, and progress tracker works without the AI tutor.</p>
+        <p>The AI features (chat + Generate Exam) talk to <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> running on your computer. They're not available on this hosted build because your phone or this server can't reach <code>localhost:11434</code> on your desktop.</p>
+        <p class="msg-hint">To use the AI tutor, run this app locally: <code>git clone</code> &rarr; <code>npm run serve</code> &rarr; install Ollama &rarr; pull a model (e.g. <code>ollama pull llama3.2</code>).</p>
+      </div>`;
+    const genHint = document.querySelector('#ai-tab-generate .gen-hint');
+    if (genHint) {
+      genHint.innerHTML = 'Generate Exam needs a local Ollama instance to write questions. Run the app locally to use it. On hosted builds, browse the existing exams instead.';
+    }
   }
 
   function populateModelSelect() {
@@ -347,8 +384,11 @@ function initAIPanel() {
 
   // Initial connection check
   AI.checkConnection();
-  // Re-check every 30 s
-  setInterval(AI.checkConnection, 30000);
+  // Re-check every 30 s — but only when there's hope of Ollama appearing.
+  // Hosted builds can't reach localhost, so polling is pointless there.
+  if (!IS_HOSTED_BUILD) {
+    setInterval(AI.checkConnection, 30000);
+  }
 }
 
 // ── Chat helpers ───────────────────────────────────────────────

@@ -456,6 +456,7 @@ h2 {
 }
 .status-dot.online   { background: var(--green); }
 .status-dot.offline  { background: #94A3B8; }
+.status-dot.hosted   { background: #60A5FA; }
 .status-dot.checking { background: #F59E0B; animation: blink .8s ease infinite; }
 @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 

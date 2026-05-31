@@ -606,5 +606,8 @@ function esc(str) {
 }
 
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js'); });
+  window.addEventListener('load', () => {
+    // Relative URL so the SW registers at the correct scope under any base path.
+    navigator.serviceWorker.register('sw.js').catch(() => { /* ignore — works without SW */ });
+  });
 }
