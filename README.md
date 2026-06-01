@@ -33,7 +33,7 @@ The app icon appears on your home screen. All exams and static assets are cached
 
 Pick one based on how you want to reach the app from your phone:
 
-1. **GitHub Pages (recommended).** Push to `main` — the `.github/workflows/deploy-pages.yml` workflow publishes the site to `https://<your-gh-user>.github.io/<repo>/`. Open that URL in Safari and Add to Home Screen. The AI tutor is automatically hidden behind a "Run locally to use this" message on hosted builds (it can't reach localhost from your phone).
+1. **GitHub Pages (recommended).** Push to `main` — the `.github/workflows/deploy-pages.yml` workflow publishes the site to `https://<your-gh-user>.github.io/<repo>/`. Open that URL in Safari and Add to Home Screen. The AI tutor is automatically hidden behind a "Run locally to use this" message on hosted builds (it can't reach localhost from your phone).<br>**Heads up — the path is case-sensitive.** If your repo is `Cert-study`, the URL is `https://<your-gh-user>.github.io/Cert-study/` (capital C); `/cert-study/` will 404. Rename the repo to lowercase if you prefer a tidier URL.
 2. **Self-host on your LAN.** Run `docker compose up` on your laptop and visit `http://<your-laptop-ip>:8080` in Safari on your iPhone while on the same Wi-Fi. The AI tutor works because both devices share the LAN. Set `OLLAMA_BASE` if Ollama runs on a different host.
 3. **Self-host on a VPS.** Deploy the Docker image to any VPS, point a domain at it, add TLS. AI tutor needs a reachable Ollama instance (run it on the same VPS or expose it via WireGuard).
 
