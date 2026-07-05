@@ -602,6 +602,82 @@ h2 {
   background: var(--primary-lt);
 }
 
+/* ── Header actions + account control ──────────────────────── */
+.header-actions { display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+
+.btn-header {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .5rem 1rem; border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; font-size: .88rem; font-weight: 600; font-family: inherit;
+  color: var(--text-muted); box-shadow: var(--shadow); white-space: nowrap;
+  transition: border-color var(--trans), color var(--trans), background var(--trans);
+}
+.btn-header:hover { border-color: var(--primary); color: var(--primary); }
+
+.account-control { position: relative; }
+.btn-signin svg { display: block; }
+
+.btn-account {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .35rem .7rem .35rem .4rem; border-radius: 999px;
+  border: 1.5px solid var(--border); background: var(--surface);
+  cursor: pointer; font-family: inherit; font-size: .85rem; font-weight: 600;
+  color: var(--text); box-shadow: var(--shadow); max-width: 12rem;
+  transition: border-color var(--trans);
+}
+.btn-account:hover { border-color: var(--primary); }
+.account-avatar {
+  width: 26px; height: 26px; border-radius: 50%; object-fit: cover;
+  background: var(--primary-lt); flex-shrink: 0;
+}
+.account-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.account-menu {
+  position: absolute; right: 0; top: calc(100% + .4rem); z-index: 50;
+  min-width: 12rem; padding: .75rem;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
+}
+.account-menu-email {
+  font-size: .78rem; color: var(--text-muted);
+  margin-bottom: .5rem; word-break: break-all;
+}
+
+/* ── Progress dashboard ────────────────────────────────────── */
+.progress-toolbar { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; }
+.progress-toolbar label { font-size: .85rem; font-weight: 600; color: var(--text-muted); }
+.progress-sync-note { margin-left: auto; font-size: .78rem; color: var(--text-muted); }
+.progress-hint { font-size: .82rem; color: var(--text-muted); margin: -.25rem 0 .75rem; }
+
+.progress-summary {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+  gap: .6rem; margin: .25rem 0 1rem;
+}
+.stat-chip {
+  display: flex; flex-direction: column; align-items: center; gap: .15rem;
+  padding: .65rem .4rem; border-radius: var(--radius-sm);
+  background: var(--primary-lt); border: 1px solid var(--border-lt);
+}
+.stat-chip-val { font-size: 1.2rem; font-weight: 800; color: var(--primary-dk); }
+.stat-chip-label { font-size: .72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .03em; }
+
+.progress-trend { width: 100%; }
+.trend-svg { width: 100%; height: auto; display: block; overflow: visible; }
+.trend-line { fill: none; stroke: var(--primary); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.trend-target { stroke: var(--border); stroke-width: 1; stroke-dasharray: 4 4; }
+.trend-dot { stroke: var(--surface); stroke-width: 1.5; }
+.trend-dot.pass { fill: var(--green); }
+.trend-dot.fail { fill: var(--red); }
+
+.focus-item {
+  display: flex; align-items: center; justify-content: space-between; gap: .75rem;
+  padding: .55rem .75rem; margin-bottom: .5rem;
+  background: var(--red-bg); border: 1px solid var(--red-brd); border-radius: var(--radius-sm);
+}
+.focus-dom { font-size: .85rem; font-weight: 600; color: var(--text); }
+.focus-pct { font-size: .85rem; font-weight: 700; color: var(--red); }
+
 /* ── Toast ─────────────────────────────────────────────────── */
 .toast {
   position: fixed; bottom: 1.5rem; left: 50%;

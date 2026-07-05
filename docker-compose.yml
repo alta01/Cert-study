@@ -5,6 +5,10 @@ services:
       - "8080:80"
     environment:
       - OLLAMA_BASE=http://ollama:11434
+      # Optional: enable Google sign-in + cross-device sync. Set these in a .env
+      # file or your shell. Leave blank to run in anonymous (localStorage) mode.
+      - SUPABASE_URL=${SUPABASE_URL:-}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY:-}
     depends_on:
       - ollama
     restart: unless-stopped

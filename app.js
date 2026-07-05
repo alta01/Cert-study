@@ -44,9 +44,15 @@ const Timer = {
 };
 
 // ── Session persistence ────────────────────────────────────────
+// localStorage is always the source of truth (anonymous mode). When signed in,
+// Auth mirrors these to Supabase so sessions/history follow the user across
+// devices. All Auth calls are guarded no-ops when signed out / unconfigured.
 const SESSION_PREFIX = 'cs_sess_';
+const HISTORY_PREFIX = 'cs_hist_';
+const HISTORY_CAP    = 200;   // keep the most recent N attempts per exam locally
 
 function sessionKey(code) { return SESSION_PREFIX + (code || 'unknown'); }
+function historyKey(code) { return HISTORY_PREFIX + (code || 'unknown'); }
 
 function saveSession() {
   if (!App.settings?.saveProgress || !App.current?.exam?.code) return;
@@ -61,6 +67,7 @@ function saveSession() {
   };
   try { localStorage.setItem(sessionKey(App.current.exam.code), JSON.stringify(data)); }
   catch { /* storage full */ }
+  if (typeof Auth !== 'undefined') Auth.pushSession(data);   // fire-and-forget
 }
 
 function loadSession(code) {
@@ -70,7 +77,56 @@ function loadSession(code) {
   } catch { return null; }
 }
 
-function clearSession(code) { localStorage.removeItem(sessionKey(code)); }
+function clearSession(code) {
+  localStorage.removeItem(sessionKey(code));
+  if (typeof Auth !== 'undefined') Auth.deleteSession(code);
+}
+
+// ── Attempt history (completed quizzes) ────────────────────────
+function loadHistory(code) {
+  try {
+    const raw = localStorage.getItem(historyKey(code));
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+
+function writeHistory(code, records) {
+  const trimmed = records.slice(-HISTORY_CAP);
+  try { localStorage.setItem(historyKey(code), JSON.stringify(trimmed)); }
+  catch { /* storage full */ }
+}
+
+function recordAttempt(record) {
+  const list = loadHistory(record.examCode);
+  list.push(record);
+  writeHistory(record.examCode, list);
+  if (typeof Auth !== 'undefined') Auth.saveAttempts([record]);   // fire-and-forget
+}
+
+// Read every locally-stored session / history bucket (used by sign-in merge).
+function readAllLocalSessions() {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(SESSION_PREFIX)) continue;
+    try { out.push(JSON.parse(localStorage.getItem(k))); } catch { /* skip */ }
+  }
+  return out.filter(s => s && s.examCode);
+}
+
+function readAllLocalHistory() {
+  const out = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (!k || !k.startsWith(HISTORY_PREFIX)) continue;
+    try {
+      const arr = JSON.parse(localStorage.getItem(k));
+      if (Array.isArray(arr)) out.push(...arr);
+    } catch { /* skip */ }
+  }
+  return out.filter(r => r && r.id && r.examCode);
+}
 
 // ── Toast ──────────────────────────────────────────────────────
 function showToast(message, type, duration) {
@@ -101,10 +157,67 @@ const App = {
 window.addEventListener('DOMContentLoaded', async () => {
   wireStaticButtons();
   initAIPanel();
+  if (typeof Auth !== 'undefined') {
+    await Auth.init();
+    Auth.onChange(onAuthChange);
+    onAuthChange(Auth.getUser());   // reflect any already-restored session
+  }
   await loadFromManifest();
   renderHome();
   showScreen('home');
 });
+
+// Called on initial load and whenever the signed-in user changes.
+let _mergedThisSession = false;
+async function onAuthChange(user) {
+  renderAccount(user);
+  if (user && !_mergedThisSession) {
+    _mergedThisSession = true;
+    await syncMergeOnSignIn();
+    renderHome();                                   // refresh resume badges
+    if (isScreenActive('progress')) openProgress(); // refresh open dashboard
+    showToast('Signed in — progress synced', 'success');
+  } else if (!user) {
+    _mergedThisSession = false;
+  }
+}
+
+// Merge local (anonymous) data up on sign-in and pull the user's remote data
+// down, so localStorage and Supabase converge. Idempotent (dedupe by id).
+async function syncMergeOnSignIn() {
+  if (typeof Auth === 'undefined' || !Auth.isSignedIn()) return;
+
+  // Attempts: push local-only up, then union everything back into localStorage.
+  const localAttempts = readAllLocalHistory();
+  const remoteAttempts = await Auth.fetchAttempts();
+  const remoteIds = new Set(remoteAttempts.map(a => a.id));
+  const localOnly = localAttempts.filter(a => !remoteIds.has(a.id));
+  if (localOnly.length) await Auth.saveAttempts(localOnly);
+
+  const byExam = {};
+  for (const a of [...localAttempts, ...remoteAttempts]) {
+    (byExam[a.examCode] ||= new Map()).set(a.id, a);
+  }
+  for (const [code, m] of Object.entries(byExam)) {
+    const arr = [...m.values()].sort((x, y) => new Date(x.completedAt) - new Date(y.completedAt));
+    writeHistory(code, arr);
+  }
+
+  // Sessions: reconcile by savedAt — newer wins in both directions.
+  const remoteSessions = await Auth.pullSessions();
+  const remoteByCode = new Map(remoteSessions.map(s => [s.examCode, s]));
+  const localByCode  = new Map(readAllLocalSessions().map(s => [s.examCode, s]));
+  const codes = new Set([...remoteByCode.keys(), ...localByCode.keys()]);
+  for (const code of codes) {
+    const rs = remoteByCode.get(code);
+    const ls = localByCode.get(code);
+    if (rs && (!ls || rs.savedAt > ls.savedAt)) {
+      try { localStorage.setItem(sessionKey(code), JSON.stringify(rs)); } catch { /* full */ }
+    } else if (ls && (!rs || ls.savedAt > rs.savedAt)) {
+      await Auth.pushSession(ls);
+    }
+  }
+}
 
 async function loadFromManifest() {
   // Load from registered manifests (manifest.json + optional data/exams/index.json)
@@ -469,6 +582,19 @@ function showResults() {
     if (App.answers[q.id] && App.answers[q.id].correct) stats[q.domain].c++;
   });
 
+  // Persist this completed attempt to history (local always, Supabase if signed in).
+  recordAttempt({
+    id:          (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('a-' + Date.now() + '-' + Math.random().toString(16).slice(2)),
+    examCode:    App.current.exam.code,
+    examName:    App.current.exam.name,
+    total:       total,
+    correct:     correct,
+    pct:         pct,
+    domains:     Object.entries(stats).map(([num, d]) => ({ number: +num, name: d.name, correct: d.c, total: d.t })),
+    settings:    { domains: App.settings.domains, countMode: App.settings.countMode, timedMode: App.settings.timedMode },
+    completedAt: new Date().toISOString(),
+  });
+
   document.getElementById('domain-breakdown').innerHTML = Object.entries(stats)
     .sort(([a], [b]) => +a - +b)
     .map(([num, d]) => {
@@ -511,6 +637,133 @@ function retryWrong() {
   var ids    = JSON.parse(document.getElementById('btn-retry-wrong').dataset.wrongIds || '[]');
   var wrongQ = App.current.questions.filter(q => ids.includes(q.id));
   if (wrongQ.length) startQuiz(wrongQ);
+}
+
+// ── Progress dashboard ─────────────────────────────────────────
+function openProgress() {
+  var sel = document.getElementById('progress-exam-select');
+  var withHistory = App.exams.filter(e => loadHistory(e.exam.code).length > 0);
+  var list = withHistory.length ? withHistory : App.exams;
+
+  sel.innerHTML = list.map(e =>
+    `<option value="${esc(e.exam.code)}">${esc(e.exam.code)} — ${esc(e.exam.name)}</option>`
+  ).join('');
+
+  var codes   = list.map(e => e.exam.code);
+  var initial = (App.current && codes.includes(App.current.exam.code)) ? App.current.exam.code : codes[0];
+  if (initial) sel.value = initial;
+
+  showScreen('progress');
+  renderProgress(initial);
+}
+
+async function renderProgress(code) {
+  var body  = document.getElementById('progress-body');
+  var empty = document.getElementById('progress-empty');
+  var note  = document.getElementById('progress-sync-note');
+
+  var signedIn = typeof Auth !== 'undefined' && Auth.isSignedIn();
+  var enabled  = typeof Auth !== 'undefined' && Auth.isEnabled();
+  note.textContent = signedIn ? 'Synced to your account'
+                   : enabled  ? 'Local only — sign in to sync across devices'
+                   : 'Stored locally on this device';
+
+  var attempts = code ? loadHistory(code) : [];
+  if (code && signedIn) {
+    var remote = await Auth.fetchAttempts(code);
+    var m = new Map();
+    attempts.concat(remote).forEach(a => m.set(a.id, a));
+    attempts = Array.from(m.values());
+  }
+  attempts.sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
+  if (code && signedIn) writeHistory(code, attempts);   // keep local cache warm
+
+  if (!attempts.length) {
+    body.classList.add('hidden');
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+  body.classList.remove('hidden');
+
+  renderProgressSummary(attempts);
+  renderProgressTrend(attempts);
+  renderProgressDomains(attempts);
+}
+
+function renderProgressSummary(attempts) {
+  var latest = attempts[attempts.length - 1];
+  var first  = attempts[0];
+  var best    = Math.max.apply(null, attempts.map(a => a.pct));
+  var avg     = Math.round(attempts.reduce((s, a) => s + a.pct, 0) / attempts.length);
+  var delta   = latest.pct - first.pct;
+  var trendStr = attempts.length > 1 ? (delta >= 0 ? '+' : '') + delta + '%' : '—';
+
+  var chips = [
+    ['Attempts', attempts.length],
+    ['Latest',   latest.pct + '%'],
+    ['Best',     best + '%'],
+    ['Average',  avg + '%'],
+    ['Trend',    trendStr],
+  ];
+  document.getElementById('progress-summary').innerHTML = chips.map(([label, val]) =>
+    `<div class="stat-chip"><span class="stat-chip-val">${esc(String(val))}</span><span class="stat-chip-label">${esc(label)}</span></div>`
+  ).join('');
+}
+
+function renderProgressTrend(attempts) {
+  var W = 320, H = 120, pad = 24, n = attempts.length;
+  var xs = i => n <= 1 ? W / 2 : pad + (i * (W - 2 * pad) / (n - 1));
+  var ys = p => (H - pad) - (p / 100) * (H - 2 * pad);
+  var pts = attempts.map((a, i) => [xs(i), ys(a.pct)]);
+  var poly = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  var y70 = ys(70).toFixed(1);
+
+  var dots = pts.map((p, i) => {
+    var a   = attempts[i];
+    var when = new Date(a.completedAt).toLocaleDateString();
+    return `<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.5" class="trend-dot ${a.pct >= 70 ? 'pass' : 'fail'}"><title>${esc(when)}: ${a.pct}%</title></circle>`;
+  }).join('');
+
+  document.getElementById('progress-trend').innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" class="trend-svg" role="img" aria-label="Score trend across attempts">
+      <line x1="${pad}" y1="${y70}" x2="${W - pad}" y2="${y70}" class="trend-target"/>
+      ${n > 1 ? `<polyline points="${poly}" class="trend-line"/>` : ''}
+      ${dots}
+    </svg>`;
+}
+
+function renderProgressDomains(attempts) {
+  var agg = {};
+  attempts.forEach(a => (a.domains || []).forEach(d => {
+    if (!agg[d.number]) agg[d.number] = { name: d.name || ('Domain ' + d.number), c: 0, t: 0 };
+    agg[d.number].c += d.correct || 0;
+    agg[d.number].t += d.total   || 0;
+  }));
+
+  var rows = Object.entries(agg).map(([num, d]) => ({
+    num: +num, name: d.name, c: d.c, t: d.t, pct: d.t ? Math.round(d.c / d.t * 100) : 0,
+  })).sort((a, b) => a.num - b.num);
+
+  document.getElementById('progress-domains').innerHTML = rows.map(d =>
+    `<div class="domain-stat">
+      <div class="domain-stat-label">Domain ${d.num}: ${esc(d.name)}</div>
+      <div class="mini-bar"><div class="mini-bar-fill ${d.pct >= 70 ? 'pass' : 'fail'}" style="width:${d.pct}%"></div></div>
+      <div class="domain-stat-score">${d.c}/${d.t} (${d.pct}%)</div>
+    </div>`
+  ).join('');
+
+  var weak = rows.filter(d => d.pct < 70).sort((a, b) => a.pct - b.pct);
+  document.getElementById('progress-focus').innerHTML = weak.length
+    ? weak.map(d =>
+        `<div class="focus-item"><span class="focus-dom">Domain ${d.num}: ${esc(d.name)}</span><span class="focus-pct">${d.pct}%</span></div>`
+      ).join('')
+    : '<p class="progress-hint">All domains above 70% — great work! Keep it up.</p>';
+}
+
+function isScreenActive(name) {
+  var s = document.getElementById('screen-' + name);
+  return !!(s && s.classList.contains('active'));
 }
 
 // ── Static button wiring ───────────────────────────────────────
@@ -572,6 +825,55 @@ function wireStaticButtons() {
   document.getElementById('btn-retry-conn').addEventListener('click', () => {
     if (typeof AI !== 'undefined') AI.checkConnection();
   });
+
+  // ── Account control ──────────────────────────────────────────
+  document.getElementById('btn-signin')?.addEventListener('click', () => {
+    if (typeof Auth !== 'undefined') Auth.signInWithGoogle();
+  });
+  document.getElementById('btn-account')?.addEventListener('click', () => {
+    document.getElementById('account-menu')?.classList.toggle('hidden');
+  });
+  document.getElementById('btn-signout')?.addEventListener('click', () => {
+    document.getElementById('account-menu')?.classList.add('hidden');
+    if (typeof Auth !== 'undefined') Auth.signOut();
+    showToast('Signed out — local progress kept on this device', 'info');
+  });
+  // Dismiss the account menu when clicking elsewhere.
+  document.addEventListener('click', e => {
+    var ctrl = document.getElementById('account-control');
+    if (ctrl && !ctrl.contains(e.target)) document.getElementById('account-menu')?.classList.add('hidden');
+  });
+
+  // ── Progress ─────────────────────────────────────────────────
+  document.getElementById('btn-progress').addEventListener('click', openProgress);
+  document.getElementById('btn-back-progress').addEventListener('click', () => { renderHome(); showScreen('home'); });
+  document.getElementById('progress-exam-select').addEventListener('change', e => renderProgress(e.target.value));
+}
+
+// ── Account rendering ──────────────────────────────────────────
+function renderAccount(user) {
+  var control = document.getElementById('account-control');
+  if (!control) return;
+  if (typeof Auth === 'undefined' || !Auth.isEnabled()) { control.classList.add('hidden'); return; }
+  control.classList.remove('hidden');
+
+  var signin  = document.getElementById('btn-signin');
+  var account = document.getElementById('btn-account');
+  var menu    = document.getElementById('account-menu');
+
+  if (user) {
+    signin.classList.add('hidden');
+    account.classList.remove('hidden');
+    document.getElementById('account-name').textContent  = user.name;
+    document.getElementById('account-email').textContent = user.email;
+    var av = document.getElementById('account-avatar');
+    if (user.avatar) { av.src = user.avatar; av.classList.remove('hidden'); }
+    else av.classList.add('hidden');
+  } else {
+    signin.classList.remove('hidden');
+    account.classList.add('hidden');
+    menu.classList.add('hidden');
+  }
 }
 
 // ── Screen transitions ─────────────────────────────────────────
