@@ -55,6 +55,8 @@ To point at an Ollama instance running elsewhere, set `OLLAMA_BASE`:
 OLLAMA_BASE=http://192.168.1.50:11434 docker compose up --build
 ```
 
+To enable optional Google sign-in + cross-device sync, set `SUPABASE_URL` and `SUPABASE_ANON_KEY` (e.g. in a `.env` file — see `.env.example`). Leave them unset to run in anonymous mode. See [Accounts & Cross-Device Sync](#accounts--cross-device-sync-supabase--optional) below.
+
 ---
 
 ## Kubernetes
@@ -87,6 +89,8 @@ To use a different Ollama URL, edit the `OLLAMA_BASE` env var in `k8s/cert-study
 
 For GPU support, uncomment the `nvidia.com/gpu` resource limit in `k8s/ollama-deployment.yaml`.
 
+For optional Google sign-in + cross-device sync, create the `cert-study-supabase` secret (commented example in `k8s/cert-study-deployment.yaml`) with your Supabase URL and anon key. Omit the secret to run in anonymous mode. See [Accounts & Cross-Device Sync](#accounts--cross-device-sync-supabase--optional) below.
+
 ---
 
 ## Features
@@ -99,6 +103,9 @@ For GPU support, uncomment the `nvidia.com/gpu` resource limit in `k8s/ollama-de
 - **Score ring + domain breakdown** — animated results screen with per-domain pass/fail bars
 - **Local AI assistant** — conversational chat and exam generation via [Ollama](https://ollama.com) (fully offline, no API key)
 - **AI exam generator** — paste any study material; the AI outputs a ready-to-load exam JSON
+- **Google sign-in + cross-device sync** — optional, via [Supabase](https://supabase.com); resumes in-progress sessions and syncs attempt history across devices
+- **Progress dashboard** — score trend, per-domain mastery, and weakest-domain "Focus areas" aggregated across all your attempts
+- **Anonymous by default** — with no Supabase configured, everything above still works fully offline via localStorage; accounts are opt-in
 
 ---
 
@@ -109,6 +116,8 @@ Cert-study/
 ├── index.html              # App entry point — open directly in a browser
 ├── app.js                  # Quiz engine (state, rendering, navigation)
 ├── ai.js                   # Ollama AI panel (chat + exam generation)
+├── auth.js                 # Supabase wrapper — Google sign-in, session/attempt sync
+├── config.example.js       # Template for config.js (Supabase + Ollama runtime config)
 ├── style.css               # App styles
 ├── manifest.json           # Auto-loaded exam registry
 │
@@ -127,13 +136,18 @@ Cert-study/
 │   ├── import-content.js       # CLI: import Markdown study notes
 │   └── validate-exam.js        # CLI: validate an exam JSON file
 │
+├── supabase/
+│   └── schema.sql          # DB schema (quiz_sessions, quiz_attempts) + Row-Level Security
+│
 ├── public/
-│   └── assets/
-│       ├── images/             # Exam logos and static images
-│       └── diagrams/           # Architecture diagrams
+│   ├── assets/
+│   │   ├── images/             # Exam logos and static images
+│   │   └── diagrams/           # Architecture diagrams
+│   └── vendor/
+│       └── supabase.js         # Vendored supabase-js v2 UMD build (no CDN dependency)
 │
 ├── agents.md               # AI agent specifications
-└── .env.example            # Environment variables for CLI scripts
+└── .env.example            # Environment variables for CLI scripts + Supabase
 ```
 
 ---
@@ -211,6 +225,33 @@ Open `index.html`, click **AI Assistant** in the header. The status dot turns gr
 
 - **Chat tab** — ask anything about your exam material
 - **Generate Exam tab** — paste study notes → AI outputs a complete exam JSON → load it directly into the app or download it
+
+---
+
+## Accounts & Cross-Device Sync (Supabase — optional)
+
+By default the app runs entirely **anonymously**, storing sessions and history in `localStorage` on that one device — no setup, no account, nothing to configure. If you want to sign in with Google and sync progress across devices, wire up a free [Supabase](https://supabase.com) project:
+
+1. **Create a free Supabase project** at [supabase.com](https://supabase.com).
+2. **Run the schema** — open the Supabase SQL Editor and run the contents of [`supabase/schema.sql`](./supabase/schema.sql). This creates the `quiz_sessions` and `quiz_attempts` tables with Row-Level Security so each user can only ever read/write their own rows.
+3. **Enable the Google provider** — in Supabase, go to Authentication → Providers → Google. Create a Google Cloud OAuth 2.0 Client ID + secret, paste them into Supabase, and add Supabase's callback URL to the Google console's authorized redirect URIs. Also add your app's URL under Supabase → Authentication → URL Configuration (Site URL / Redirect URLs).
+4. **Configure the app**, depending on how you run it:
+   - **Local dev (no Docker):**
+     ```bash
+     cp config.example.js config.js
+     # Edit config.js: set SUPABASE_URL and SUPABASE_ANON_KEY
+     ```
+     Both values come from Supabase → Project Settings → API. `config.js` is gitignored.
+   - **Docker / Kubernetes:** set the `SUPABASE_URL` and `SUPABASE_ANON_KEY` environment variables — `docker-entrypoint.sh` generates `config.js` automatically at container start. For `docker compose`, put them in a `.env` file (see `.env.example`). For k8s, create the `cert-study-supabase` secret (see the commented example in `k8s/cert-study-deployment.yaml`).
+
+The Supabase anon key is safe to ship to the browser — Row-Level Security, not the key, is the security boundary. Leaving `SUPABASE_URL` / `SUPABASE_ANON_KEY` blank (the default) silently disables sync and the app behaves exactly as before.
+
+**What you get once configured:**
+
+- A **Sign in with Google** control in the header
+- In-progress sessions (resume where you left off) and completed-attempt history synced across every device you sign into
+- A **Progress** screen (header button) showing score trend across attempts, per-domain mastery aggregated over all attempts, and a "Focus areas" list of your weakest domains (below 70%)
+- Your local anonymous history merges up into your account automatically the first time you sign in
 
 ---
 

@@ -140,6 +140,14 @@ Accepts pasted study material and produces a complete exam JSON file in the app'
 - Learner session history (localStorage or backend)
 - Target exam and domain
 
+  > **Data foundation now in place:** the "backend" half of this input is no
+  > longer hypothetical. The `quiz_attempts` Supabase table (see
+  > [Accounts & Progress Sync](#accounts--progress-sync-supabase) below) stores
+  > per-attempt score plus a per-domain `{number, name, correct, total}`
+  > breakdown, keyed by `exam_code`, for every signed-in user. This agent
+  > remains unimplemented, but it now has a concrete, queryable source of
+  > cross-session history to consume instead of scraping localStorage.
+
 **Outputs:**
 - Weighted question pool configuration (questions per difficulty tier)
 
@@ -149,6 +157,43 @@ Accepts pasted study material and produces a complete exam JSON file in the app'
 - Recommends content sections to review based on wrong answers
 
 **Trigger:** Automatically at session start when adaptive mode is enabled
+
+---
+
+## Accounts & Progress Sync (Supabase)
+
+**Files:** `auth.js` (Supabase client, auth state, sync primitives), `config.js` / `config.example.js` (runtime config), `supabase/schema.sql` (table + RLS definitions)
+
+Cert Study added Google sign-in and cross-device progress sync using **Supabase** (managed Postgres + Google OAuth + Row-Level Security). There is no custom backend server — the browser talks to Supabase directly via `supabase-js`, vendored at `public/vendor/supabase.js`. Anonymous localStorage-only mode is fully preserved and remains the default.
+
+### Storage layers
+
+- **localStorage is always the source of truth for the active browser**, whether or not the user is signed in:
+  - `cs_sess_<code>` — the in-progress session for exam `<code>` (pool, index, answers, timer, settings).
+  - `cs_hist_<code>` — the history of completed attempts for exam `<code>`.
+- **Supabase mirrors this per signed-in user.** When signed out or unconfigured, nothing is sent or read remotely.
+
+### Supabase tables (`supabase/schema.sql`)
+
+- **`quiz_sessions`** — one resumable session per user+exam, primary key `(user_id, exam_code)`. Columns: `pool_ids`, `answers`, `settings` (all `jsonb`), `idx`, `timer_remaining`, `saved_at` (client `Date.now()` epoch ms), `updated_at`. Written via upsert (`onConflict: 'user_id,exam_code'`), mirroring the localStorage session shape used by `app.js`'s `saveSession`/`loadSession`.
+- **`quiz_attempts`** — insert-only history of completed quizzes. `id` is a client-generated `uuid` (so re-syncing local history is idempotent/dedupe-safe), plus `user_id`, `exam_code`, `exam_name`, `total`, `correct`, `pct`, `domains` (jsonb array of `{number, name, correct, total}`), `settings` (jsonb), `completed_at`.
+- Both tables are protected by **Row-Level Security**: policy `auth.uid() = user_id` for all operations. This is the actual security boundary — see Auth note below.
+
+### Auth
+
+Google OAuth is handled entirely by `auth.js` via `supabase-js`: `signInWithOAuth({ provider: 'google' })`, with `detectSessionInUrl: true` to complete the redirect handshake. `auth.js` owns the Supabase client and auth state only; all localStorage handling and merge orchestration live in `app.js`. The anon key shipped in `config.js` is public-safe by design — RLS, not key secrecy, is what restricts each user to their own rows.
+
+### Sync behavior
+
+On sign-in, `app.js` runs a one-time merge per session:
+- **Attempts:** local-only attempts (not yet known remotely) are pushed up via `Auth.saveAttempts`; the full remote attempt list is pulled down via `Auth.fetchAttempts`. Reconciliation is dedupe-by-`id`, so re-running the merge is safe.
+- **Sessions:** local and remote sessions are reconciled by `saved_at` — whichever side has the newer timestamp wins and is pushed/pulled accordingly.
+
+Every sync method in `auth.js` (`pushSession`, `deleteSession`, `pullSessions`, `saveAttempts`, `fetchAttempts`) is a guarded no-op that never throws when signed out or when Supabase isn't configured — failures are logged and swallowed so anonymous mode is never affected by sync errors.
+
+### Config
+
+`config.js` (gitignored; copied from `config.example.js`) defines `window.__CS_CONFIG__` with `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `OLLAMA_BASE`. Leaving the Supabase values blank ships an anonymous, localStorage-only build. In Docker/Kubernetes, `docker-entrypoint.sh` generates `config.js` at container startup from the `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `OLLAMA_BASE` environment variables — no manual editing needed there.
 
 ---
 
@@ -181,5 +226,7 @@ Agents read from and write to `data/exams/`.
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Claude API key for CLI scripts | *(required for scripts)* |
 | `LLM_MODEL` | Model ID for question generation | `claude-sonnet-4-6` |
+| `SUPABASE_URL` | Supabase project URL, injected into the browser app's `config.js` at runtime for account sync (Google sign-in + cross-device progress). Optional — omit to run in anonymous localStorage-only mode. | *(unset — anonymous mode)* |
+| `SUPABASE_ANON_KEY` | Supabase anon (public) API key, injected alongside `SUPABASE_URL`. Safe to expose to the browser; Row-Level Security is the real security boundary. Optional — omit to run in anonymous localStorage-only mode. | *(unset — anonymous mode)* |
 
 The Ollama-based local AI in the vanilla app requires no environment variables — it auto-detects Ollama at `http://localhost:11434`.

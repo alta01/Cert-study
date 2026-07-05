@@ -1,10 +1,13 @@
-const CACHE = 'cert-study-v1';
+const CACHE = 'cert-study-v2';
 const PRECACHE = [
   '/',
   '/index.html',
   '/style.css',
   '/app.js',
   '/ai.js',
+  '/auth.js',
+  '/config.js',
+  '/public/vendor/supabase.js',
   '/manifest.json',
   '/data/exams/sc-300.json',
   '/data/exams/aws-saa-c03.json',

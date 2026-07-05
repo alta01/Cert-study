@@ -3,6 +3,9 @@ dist/
 .env
 .env.local
 .env.*.local
+
+# Runtime config (generated from config.example.js / env vars). Never commit keys.
+config.js
 *.log
 .DS_Store
 Thumbs.db
