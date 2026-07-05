@@ -1,5 +1,5 @@
 // sw.js — bumped to v2: works at any base path (root or /cert-study/ etc.)
-const CACHE = 'cert-study-v2';
+const CACHE = 'cert-study-v3';
 
 // Resolve everything relative to the SW's own scope so this works under
 // any deploy path (root '/', '/cert-study/', or any future subpath).
