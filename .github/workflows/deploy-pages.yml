@@ -29,6 +29,26 @@ jobs:
             node scripts/validate-exam.js "$f" || exit 1
           done
 
+      - name: Generate config.js
+        # config.js is gitignored (kept out of the repo since it's environment-
+        # specific), so it has to be generated here too — same values as
+        # docker-entrypoint.sh injects for the Docker/K8s deploys. The anon key
+        # is safe to expose in a static site; Supabase RLS is the security
+        # boundary. Leave the repo secrets unset to ship in anonymous mode.
+        # Secrets are passed via env: (not interpolated into the script) so
+        # special characters in a secret value can't break the heredoc.
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          cat > config.js <<EOF
+          window.__CS_CONFIG__ = {
+            SUPABASE_URL: '${SUPABASE_URL}',
+            SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}',
+            OLLAMA_BASE: '',
+          };
+          EOF
+
       - name: Stage site for Pages
         run: |
           mkdir -p _site
