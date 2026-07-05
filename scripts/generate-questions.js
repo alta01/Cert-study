@@ -13,7 +13,14 @@
  *     --domain 1 \
  *     --domain-name "Design Secure Architectures" \
  *     --domain-weight "30%" \
- *     --count 10
+ *     --count 20 \
+ *     --focus "VPC design, S3 bucket policies, KMS key rotation" \
+ *     --reference-host docs.aws.amazon.com
+ *
+ * Constraints:
+ *   --count is capped at 20 per invocation (larger batches hit transient API errors)
+ *   --focus is optional; comma-separated sub-skills to bias the batch
+ *   --reference-host is optional; restricts references to a specific docs host
  *
  * Requires: ANTHROPIC_API_KEY environment variable
  */
@@ -41,6 +48,13 @@ const domainNum   = parseInt(getArg('domain') ?? '1', 10);
 const domainName  = getArg('domain-name')  ?? 'Design Secure Architectures';
 const domainWeight = getArg('domain-weight') ?? '';
 const count       = parseInt(getArg('count') ?? '5', 10);
+const focus       = getArg('focus')         ?? '';
+const referenceHost = getArg('reference-host') ?? '';
+
+if (count > 20) {
+  console.error('Error: --count must be 20 or fewer (provider rate-limits larger batches).');
+  process.exit(1);
+}
 
 const API_KEY = process.env.ANTHROPIC_API_KEY;
 const MODEL   = process.env.LLM_MODEL ?? 'claude-sonnet-4-6';
@@ -57,28 +71,42 @@ const SCHEMA_EXAMPLE = `{
   "domain": 1,
   "domainName": "Domain Name",
   "topic": "specific sub-topic",
-  "question": "Question text?",
+  "question": "Scenario-based question text that requires synthesis across services?",
   "options": { "A": "First option", "B": "Second option", "C": "Third option", "D": "Fourth option" },
   "answer": "B",
   "rationale": "B is correct because…",
   "optionRationales": {
-    "A": "Why A is wrong.",
+    "A": "Why A is wrong (specific, not generic).",
     "B": "Why B is correct.",
     "C": "Why C is wrong.",
     "D": "Why D is wrong."
-  }
+  },
+  "references": [
+    { "text": "Page title from the official docs", "url": "https://learn.microsoft.com/..." },
+    { "text": "Another supporting doc page", "url": "https://learn.microsoft.com/..." }
+  ]
 }`;
 
 function buildPrompt() {
-  return `You are an expert certification exam question writer. Generate exactly ${count} high-quality multiple-choice questions for the "${examName}" exam, covering domain ${domainNum}: "${domainName}"${domainWeight ? ` (${domainWeight} of exam)` : ''}.
+  const focusBlock = focus
+    ? `\n\nFor this batch, prioritize these sub-skills (pick a different one for each question; do not let any one sub-skill dominate):\n- ${focus.split(',').map((s) => s.trim()).filter(Boolean).join('\n- ')}`
+    : '';
+
+  const refHostBlock = referenceHost
+    ? `\n- Every reference URL MUST start with "https://${referenceHost}/". Do not invent URLs — only use real, currently-published documentation pages you are confident exist.`
+    : '\n- Every reference URL MUST be an https:// link to the vendor\'s official documentation. Do not invent URLs.';
+
+  return `You are an expert certification exam question writer. Generate exactly ${count} high-quality multiple-choice questions for the "${examName}" exam, covering domain ${domainNum}: "${domainName}"${domainWeight ? ` (${domainWeight} of exam)` : ''}.${focusBlock}
 
 Rules:
 - Each question must have exactly 4 options (A, B, C, D)
 - Only one option is correct
-- Questions should test understanding, not just memorization
-- Distractors should be plausible but clearly wrong when you know the material
-- Cover different sub-topics within the domain
-- For optionRationales: one concise sentence per option explaining why it is correct or incorrect
+- Questions must be SCENARIO-BASED: present a realistic situation (company, constraints, existing infrastructure) and require the test-taker to synthesize knowledge across multiple services or features
+- No pure memorization or trivia questions; the correct answer must follow from understanding, not recall of a single fact
+- Distractors must reflect REAL misconceptions a partially-informed candidate would hold (e.g., a feature that almost fits but has a subtle disqualifying constraint). Do not use obviously wrong throwaway options.
+- Cover different sub-topics within the domain — no two questions in this batch should test the same specific sub-skill
+- For optionRationales: one concise sentence per option explaining why it is correct or incorrect, citing the specific feature or constraint that decides it
+- Each question MUST include a "references" array with 2-3 entries pointing to the specific documentation pages that ground the correct answer (not generic landing pages).${refHostBlock}
 
 Return ONLY a valid JSON array (no markdown fences, no commentary). Each object must match this schema:
 ${SCHEMA_EXAMPLE}
@@ -88,7 +116,7 @@ Use sequential integers for "id" starting from __START_ID__.`;
 
 // ── Anthropic API ─────────────────────────────────────────────────────────────
 
-function callAnthropic(prompt, startId) {
+function callAnthropicOnce(prompt, startId) {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({
       model: MODEL,
@@ -113,17 +141,39 @@ function callAnthropic(prompt, startId) {
       res.on('data', (chunk) => { data += chunk; });
       res.on('end', () => {
         if (res.statusCode !== 200) {
-          reject(new Error(`API error ${res.statusCode}: ${data}`));
+          const err = new Error(`API error ${res.statusCode}: ${data}`);
+          err.status = res.statusCode;
+          reject(err);
         } else {
           resolve(JSON.parse(data));
         }
       });
     });
 
-    req.on('error', reject);
+    req.on('error', (err) => { err.transient = true; reject(err); });
     req.write(body);
     req.end();
   });
+}
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function callAnthropic(prompt, startId) {
+  const delays = [2000, 4000, 8000, 16000, 32000];
+  let lastErr;
+  for (let attempt = 0; attempt <= delays.length; attempt++) {
+    try {
+      return await callAnthropicOnce(prompt, startId);
+    } catch (err) {
+      lastErr = err;
+      const retryable = err.transient || err.status === 429 || (err.status >= 500 && err.status < 600);
+      if (!retryable || attempt === delays.length) throw err;
+      const wait = delays[attempt];
+      console.warn(`API call failed (${err.status ?? 'network'}); retrying in ${wait / 1000}s...`);
+      await sleep(wait);
+    }
+  }
+  throw lastErr;
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
