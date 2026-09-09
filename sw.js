@@ -1,5 +1,9 @@
-// sw.js — bumped to v2: works at any base path (root or /cert-study/ etc.)
-const CACHE = 'cert-study-v3';
+// sw.js — works at any base path (root or /cert-study/ etc.)
+// Bump CACHE on every release that changes a cache-first asset. Root
+// manifest.json is one of them (only data/exams/*.json is network-first), so a
+// new deck is invisible to returning visitors until the cache name changes and
+// activate() purges the old one.
+const CACHE = 'cert-study-v4';
 
 // Resolve everything relative to the SW's own scope so this works under
 // any deploy path (root '/', '/cert-study/', or any future subpath).
@@ -20,6 +24,7 @@ const PRECACHE = [
   rel('data/exams/sc-300.json'),
   rel('data/exams/sc-500.json'),
   rel('data/exams/aws-saa-c03.json'),
+  rel('data/exams/ai-security.json'),
 ];
 
 self.addEventListener('install', event => {
