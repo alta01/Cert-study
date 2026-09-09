@@ -2,6 +2,12 @@
   "version": "1",
   "exams": [
     {
+      "id": "aisec",
+      "file": "data/exams/ai-security.json",
+      "title": "AISEC: AI Security Essentials (framework-based study deck)",
+      "category": "AI & Security"
+    },
+    {
       "id": "dva-c02",
       "file": "data/exams/aws-certified-developer.json",
       "title": "DVA-C02: AWS Certified Developer - Associate",
