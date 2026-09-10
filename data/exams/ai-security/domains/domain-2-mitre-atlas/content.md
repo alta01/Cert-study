@@ -29,17 +29,34 @@ NIST's adversarial-ML taxonomy groups attacks into four categories — a safe, h
 - **.002 Triggered** — the injected content stays dormant and only activates when a specific condition/event is later met, as opposed to acting immediately once ingested. This distinguishes a "sleeper" payload from an indirect injection that fires as soon as it's retrieved.
 - Engineering takeaway: any content your system ingests from outside the trusted user turn — retrieved documents, web pages, emails, tool outputs — must be treated as untrusted input, because it can carry .001/.002-style payloads.
 
-## AML.T0057 — LLM Jailbreak
+## AML.T0054 — LLM Jailbreak
 
-- Reference: https://atlas.mitre.org/techniques/AML.T0057
+- Reference: https://atlas.mitre.org/techniques/AML.T0054
 - Core idea: bypassing the model's *own* safety filters/guardrails so it produces output it was aligned/trained to refuse (e.g., role-play framings like "pretend you have no restrictions" repeated until the model complies).
 - Conceptual difference from AML.T0051: prompt injection is about getting *unauthorized instructions* to execute via an input channel (direct or via ingested content); jailbreak is about defeating the model's *alignment/guardrails* directly, typically through the legitimate conversation channel, with no external content involved.
 - Both are engaged directly with the model's language interface, which is why they're grouped together operationally even though ATLAS tracks them as separate techniques.
 
+## Neighbouring LLM technique IDs — don't confuse these
+
+The IDs immediately around T0054 all describe *outcomes at the language interface*, and they are easy
+to mix up. Cite them precisely:
+
+| ID | Name | What it actually covers |
+|---|---|---|
+| AML.T0051 | LLM Prompt Injection | Unauthorized instructions execute via an input channel (sub-techniques .000 Direct / .001 Indirect / .002 Triggered) |
+| AML.T0054 | LLM Jailbreak | Defeating the model's own guardrails so it produces output it was aligned to refuse |
+| AML.T0056 | LLM Meta Prompt Extraction | Inducing the model to reveal its *system/meta prompt* — maps to OWASP **LLM07 System Prompt Leakage** |
+| AML.T0057 | LLM Data Leakage | Crafted queries that make the model surface data it shouldn't — the *exfiltration* angle |
+
+- Jailbreak (T0054) is a **means**; data leakage (T0057) and meta-prompt extraction (T0056) are
+  **outcomes**. A single incident often chains them: jailbreak the guardrails, then extract the
+  system prompt.
+- References: https://atlas.mitre.org/techniques/AML.T0056 · https://atlas.mitre.org/techniques/AML.T0057
+
 ## How ATLAS maps to the OWASP LLM Top 10
 
 - **LLM01 Prompt Injection ↔ AML.T0051 LLM Prompt Injection** — the same underlying phenomenon described from two angles: OWASP frames it as an *application risk* to assess and remediate; ATLAS frames it as an *adversary technique* with named sub-techniques (Direct/Indirect/Triggered) and case studies of it being used in the wild.
-- **Jailbreak ↔ AML.T0057** — OWASP's 2025 list has no separate numbered "jailbreak" entry; jailbreak attempts are prompt-level manipulation most closely associated with LLM01 in OWASP's framing, while ATLAS tracks jailbreak as its own distinct technique from prompt injection.
+- **Jailbreak ↔ AML.T0054** — OWASP's 2025 list has no separate numbered "jailbreak" entry; jailbreak attempts are prompt-level manipulation most closely associated with LLM01 in OWASP's framing, while ATLAS tracks jailbreak as its own distinct technique from prompt injection.
 - **Indirect injection ↔ retrieval/embedding weaknesses** — retrieved chunks in a RAG pipeline are untrusted input. A poisoned document in the retrieval corpus has two angles on the same problem: the hidden-instruction angle is AML.T0051.001 (Indirect Prompt Injection), and the "how did untrusted content get into the retrieval/embedding pipeline in the first place" angle is OWASP's broader vector/embedding risk category. Logging input, retrieval, and output is a baseline control for catching either angle.
 - Practical use: when writing a threat model or pen-test report for an LLM system, cite the OWASP entry for the *application risk* being assessed and the ATLAS technique for the *adversary behavior* observed — they're complementary, not redundant.
 
@@ -48,6 +65,8 @@ NIST's adversarial-ML taxonomy groups attacks into four categories — a safe, h
 - https://atlas.mitre.org/
 - https://atlas.mitre.org/matrices/ATLAS
 - https://atlas.mitre.org/techniques/AML.T0051
+- https://atlas.mitre.org/techniques/AML.T0054
+- https://atlas.mitre.org/techniques/AML.T0056
 - https://atlas.mitre.org/techniques/AML.T0057
 - https://genai.owasp.org/
 - https://genai.owasp.org/llm-top-10/

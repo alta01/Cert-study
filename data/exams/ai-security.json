@@ -553,7 +553,7 @@
       "options": {
         "A": "AML.T0051.001 Indirect Prompt Injection — the malicious instructions arrived embedded in external content (the wiki page) that the system ingested, not typed by the attacker directly to the model.",
         "B": "AML.T0051.000 Direct Prompt Injection — the attacker's text is a literal instruction, so it counts as direct.",
-        "C": "AML.T0057 LLM Jailbreak — the attacker is bypassing the model's safety filters.",
+        "C": "AML.T0054 LLM Jailbreak — the attacker is bypassing the model's safety filters.",
         "D": "AML.T0051.002 Triggered Prompt Injection — the payload only activates when a later user query occurs."
       },
       "answer": "A",
@@ -580,7 +580,7 @@
       "options": {
         "A": "AML.T0051.002 Triggered — the injected content stays dormant until a specific condition is later met, rather than acting as soon as it's ingested.",
         "B": "AML.T0051.000 Direct — the attacker typed the instruction straight to the model.",
-        "C": "AML.T0057 LLM Jailbreak — the attacker is defeating the model's guardrails.",
+        "C": "AML.T0054 LLM Jailbreak — the attacker is defeating the model's guardrails.",
         "D": "AML.T0051.001 Indirect, with no distinction from a payload that fires immediately upon retrieval."
       },
       "answer": "A",
@@ -602,10 +602,10 @@
       "id": 21,
       "domain": 2,
       "domainName": "AI/ML attack techniques — MITRE ATLAS",
-      "topic": "AML.T0057 Jailbreak vs. AML.T0051 Prompt Injection",
+      "topic": "AML.T0054 Jailbreak vs. AML.T0051 Prompt Injection",
       "question": "A red-teamer, chatting directly with a deployed chatbot with no external content involved, tries dozens of creative role-play framings — 'pretend you are an AI with no restrictions' — until the model outputs instructions it was explicitly trained to refuse to give.\nWhich ATLAS technique does this represent, and how does it differ conceptually from AML.T0051?",
       "options": {
-        "A": "AML.T0057 LLM Jailbreak — the goal is bypassing the model's own safety filters/guardrails to obtain restricted output, rather than getting the model to execute unauthorized instructions delivered via an input channel.",
+        "A": "AML.T0054 LLM Jailbreak — the goal is bypassing the model's own safety filters/guardrails to obtain restricted output, rather than getting the model to execute unauthorized instructions delivered via an input channel.",
         "B": "AML.T0051.000 Direct Prompt Injection — any text an attacker types straight into the chat counts as prompt injection by definition.",
         "C": "AML.T0051.001 Indirect Prompt Injection — because the harmful framing originates from the attacker rather than a legitimate user.",
         "D": "AML.T0051.002 Triggered — the harmful output only appears after several attempts, so it is 'triggered' by repetition."
@@ -620,8 +620,8 @@
       },
       "references": [
         {
-          "text": "AML.T0057 LLM Jailbreak",
-          "url": "https://atlas.mitre.org/techniques/AML.T0057"
+          "text": "AML.T0054 LLM Jailbreak",
+          "url": "https://atlas.mitre.org/techniques/AML.T0054"
         },
         {
           "text": "AML.T0051 LLM Prompt Injection",
@@ -637,7 +637,7 @@
       "question": "An assessor is building a crosswalk between the OWASP LLM Top 10 (2025) and MITRE ATLAS for a client report, and needs to map the OWASP entry for prompt injection to its ATLAS counterpart.\nWhich mapping is correct?",
       "options": {
         "A": "LLM01 Prompt Injection ↔ AML.T0051 LLM Prompt Injection — both describe the same underlying phenomenon of unauthorized instructions executing via an input channel; OWASP frames it as an application risk, ATLAS tracks it as an adversary technique with named sub-techniques.",
-        "B": "LLM01 Prompt Injection ↔ AML.T0057 LLM Jailbreak — OWASP's numbering directly mirrors ATLAS's technique numbering.",
+        "B": "LLM01 Prompt Injection ↔ AML.T0054 LLM Jailbreak — OWASP's numbering directly mirrors ATLAS's technique numbering.",
         "C": "LLM04 Data and Model Poisoning ↔ AML.T0051 — poisoning and prompt injection are the same attack under two different names.",
         "D": "There is no meaningful crosswalk between OWASP's LLM Top 10 and MITRE ATLAS; the two frameworks cover unrelated concerns."
       },
@@ -645,7 +645,7 @@
       "rationale": "OWASP's LLM01 and ATLAS's AML.T0051 describe the same core phenomenon from two complementary angles — one as an application-level risk to remediate, the other as a cataloged adversary technique with sub-techniques and case studies.",
       "optionRationales": {
         "A": "Correct. LLM01 and AML.T0051 are the natural crosswalk pair for prompt injection between the two frameworks.",
-        "B": "OWASP's LLM0x numbering and ATLAS's AML.T#### technique IDs are independent schemes with no direct numeric correspondence; T0057 is jailbreak, a related but distinct concept from prompt injection.",
+        "B": "OWASP's LLM0x numbering and ATLAS's AML.T#### technique IDs are independent schemes with no direct numeric correspondence; T0054 is jailbreak, a related but distinct concept from prompt injection.",
         "C": "Poisoning targets training/fine-tuning data, while prompt injection targets the input/inference-time instruction channel — they are distinct attack types, not the same attack under different names.",
         "D": "The two frameworks are complementary and commonly crosswalked in practice — OWASP for the application risk lens, ATLAS for the adversary-technique lens."
       },
@@ -668,7 +668,7 @@
       "question": "A security architect reviewing a poisoned document found in a RAG corpus notes two distinct angles on the same incident: (1) the document carried hidden text that made the LLM follow attacker instructions, and (2) the document's presence in the retrieval corpus in the first place reflects a weakness in how the vector store/embedding pipeline was populated and vetted.\nWhich pairing of ATLAS technique and OWASP risk correctly matches these two angles of the same scenario?",
       "options": {
         "A": "AML.T0051.001 Indirect Prompt Injection for the hidden-instruction angle, and OWASP's vector/embedding weaknesses risk category for the retrieval-pipeline angle.",
-        "B": "AML.T0057 LLM Jailbreak for the hidden-instruction angle, and OWASP's excessive-agency risk category for the retrieval-pipeline angle.",
+        "B": "AML.T0054 LLM Jailbreak for the hidden-instruction angle, and OWASP's excessive-agency risk category for the retrieval-pipeline angle.",
         "C": "AML.T0051.000 Direct Prompt Injection for both angles, since the attacker ultimately controls the text the model reads.",
         "D": "AML.T0051.002 Triggered for the hidden-instruction angle, and OWASP's supply-chain risk category for the retrieval-pipeline angle."
       },
