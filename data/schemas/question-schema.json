@@ -7,9 +7,7 @@
     "id",
     "domain",
     "domainName",
-    "question",
-    "options",
-    "answer"
+    "question"
   ],
   "properties": {
     "id": {
@@ -130,7 +128,94 @@
       "items": {
         "type": "string"
       }
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "choice",
+        "hotspot"
+      ],
+      "default": "choice",
+      "description": "Absent means multiple choice."
+    },
+    "image": {
+      "type": "string",
+      "pattern": "^images/[A-Za-z0-9_-]+\\.png$",
+      "description": "Relative to this exam JSON file."
+    },
+    "hotspots": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "x",
+          "y",
+          "w",
+          "h",
+          "label"
+        ],
+        "properties": {
+          "x": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "y": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "w": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "h": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tolerance": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 5,
+      "default": 1
     }
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "hotspot"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "required": [
+          "image",
+          "hotspots"
+        ]
+      },
+      "else": {
+        "required": [
+          "options",
+          "answer"
+        ]
+      }
+    }
+  ]
 }
