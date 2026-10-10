@@ -460,6 +460,10 @@ function renderQuestion() {
   document.getElementById('q-text').innerHTML         = esc(q.question).replace(/\n/g, '<br>');
 
   var optWrap = document.getElementById('q-options');
+  if (q.type === 'hotspot') {
+    renderHotspot(q, optWrap);
+    return;
+  }
   optWrap.innerHTML = Object.entries(q.options).map(([k, v]) =>
     `<label class="opt-label" data-key="${esc(k)}">
       <input type="radio" name="q-ans" value="${esc(k)}" />
@@ -483,6 +487,64 @@ function renderQuestion() {
   next.classList.add('hidden');
   document.getElementById('explanation').classList.add('hidden');
   submit.onclick = submitAnswer;
+}
+
+// Hotspot image coordinates are measured on the actual image, not its letterboxed container.
+function renderHotspot(q, wrap) {
+  wrap.replaceChildren();
+  var box = document.createElement('div');
+  box.className = 'hotspot-box';
+  var img = document.createElement('img');
+  img.src = 'data/exams/' + q.image;
+  img.alt = 'Portal interface for question ' + q.id;
+  img.className = 'hotspot-image';
+  img.draggable = false;
+  var overlay = document.createElement('div');
+  overlay.className = 'hotspot-overlay';
+  box.append(img, overlay);
+  wrap.append(box);
+  var chosen = null;
+  var submit = document.getElementById('btn-submit');
+  var next = document.getElementById('btn-next');
+  submit.disabled = true;
+  submit.classList.remove('hidden');
+  next.classList.add('hidden');
+  document.getElementById('explanation').classList.add('hidden');
+  img.addEventListener('click', e => {
+    if (chosen && chosen.locked) return;
+    var rect = img.getBoundingClientRect();
+    chosen = { x: Math.max(0,Math.min(100,(e.clientX-rect.left)*100/rect.width)),
+               y: Math.max(0,Math.min(100,(e.clientY-rect.top)*100/rect.height)) };
+    overlay.replaceChildren();
+    var marker = document.createElement('span');
+    marker.className = 'hotspot-marker';
+    marker.style.left = chosen.x + '%';
+    marker.style.top = chosen.y + '%';
+    overlay.append(marker);
+    submit.disabled = false;
+  });
+  submit.onclick = () => {
+    if (!chosen) return;
+    chosen.locked = true;
+    var tolerance = Number.isFinite(q.tolerance) ? q.tolerance : 1;
+    var correct = q.hotspots.some(h => chosen.x >= h.x - tolerance && chosen.x <= h.x + h.w + tolerance && chosen.y >= h.y - tolerance && chosen.y <= h.y + h.h + tolerance);
+    App.answers[q.id] = { selected: {x:chosen.x,y:chosen.y}, correct:correct };
+    q.hotspots.forEach(h => {
+      var zone=document.createElement('span');
+      zone.className='hotspot-correct-zone';
+      Object.assign(zone.style,{left:h.x+'%',top:h.y+'%',width:h.w+'%',height:h.h+'%'});
+      overlay.append(zone);
+    });
+    marker.classList.add(correct ? 'hotspot-right' : 'hotspot-wrong');
+    submit.classList.add('hidden');
+    // Always show feedback for hotspot tasks, even when explanation display is off.
+    showExplanation(q, chosen, correct);
+    if (App.settings.saveProgress) saveSession();
+    var last=App.idx===App.pool.length-1;
+    next.textContent=last?'See results →':'Next →';
+    next.classList.remove('hidden');
+    next.onclick=last?showResults:function(){ App.idx++; if(App.settings.saveProgress)saveSession(); renderQuestion(); };
+  };
 }
 
 function submitAnswer() {
@@ -526,11 +588,13 @@ function showExplanation(q, selected, isCorrect) {
   banner.className  = isCorrect ? 'correct' : 'incorrect';
   banner.textContent = isCorrect
     ? '✓ Correct'
-    : '✗ Incorrect — correct answer: ' + esc(q.answer);
+    : q.type === 'hotspot' ? '✗ Incorrect — highlighted region is the correct target' : '✗ Incorrect — correct answer: ' + esc(q.answer);
 
   var html = '';
 
-  if (q.optionRationales) {
+  if (q.type === 'hotspot') {
+    html = '<p class="exp-fallback">' + esc(q.rationale || '') + '</p>';
+  } else if (q.optionRationales) {
     html = Object.entries(q.options).map(([k, text]) => {
       var isAns = k === q.answer;
       var rat   = q.optionRationales[k] || '';
@@ -618,9 +682,9 @@ function showResults() {
       return `<div class="wrong-item">
         <p><strong>Q${q.id}.</strong> ${esc(q.question)}</p>
         ${userAns
-          ? '<p class="wrong-answer">You chose: ' + esc(userAns) + ' — ' + esc(q.options[userAns]) + '</p>'
+          ? q.type === 'hotspot' ? '<p class="wrong-answer">You clicked: ' + esc(userAns.x.toFixed(1)) + '%, ' + esc(userAns.y.toFixed(1)) + '%</p>' : '<p class="wrong-answer">You chose: ' + esc(userAns) + ' — ' + esc(q.options[userAns]) + '</p>'
           : '<p class="wrong-answer">Not answered (time expired)</p>'}
-        <p class="correct-answer">Correct: ${esc(q.answer)} — ${esc(q.options[q.answer])}</p>
+        <p class="correct-answer">${q.type === 'hotspot' ? 'Correct target: ' + esc(q.hotspots.map(h=>h.label).join(', ')) : 'Correct: ' + esc(q.answer) + ' — ' + esc(q.options[q.answer])}</p>
       </div>`;
     }).join('');
     wrongPanel.classList.remove('hidden');
