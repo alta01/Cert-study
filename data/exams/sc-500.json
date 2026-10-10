@@ -8763,7 +8763,7 @@
         "scenario"
       ],
       "question": "Locate the blade where you verify purge protection before enforcing permanent deletion safeguards.",
-      "image": "images/q261-keyvault-properties.png",
+      "image": "sc-500/images/q261-keyvault-properties.png",
       "hotspots": [
         {
           "x": 2,
@@ -8790,7 +8790,7 @@
         "scenario"
       ],
       "question": "On this Conditional Access policy editor, select the control section where you require an authentication strength.",
-      "image": "images/q262-conditional-access-grant.png",
+      "image": "sc-500/images/q262-conditional-access-grant.png",
       "hotspots": [
         {
           "x": 28.5,
@@ -8817,7 +8817,7 @@
         "scenario"
       ],
       "question": "Choose the blade where trusted countries and IP ranges are configured for Conditional Access.",
-      "image": "images/q263-entra-named-locations.png",
+      "image": "sc-500/images/q263-entra-named-locations.png",
       "hotspots": [
         {
           "x": 2,
@@ -8844,7 +8844,7 @@
         "scenario"
       ],
       "question": "Choose the blade for public network access and storage account network firewall restrictions.",
-      "image": "images/q264-storage-networking.png",
+      "image": "sc-500/images/q264-storage-networking.png",
       "hotspots": [
         {
           "x": 2,
@@ -8871,7 +8871,7 @@
         "scenario"
       ],
       "question": "Click where you choose Azure role-based access control rather than vault access policies for data-plane authorization.",
-      "image": "images/q265-keyvault-access-config.png",
+      "image": "sc-500/images/q265-keyvault-access-config.png",
       "hotspots": [
         {
           "x": 2,
@@ -8898,7 +8898,7 @@
         "scenario"
       ],
       "question": "Select the security posture blade for this VM to inspect Defender for Cloud protection and recommendations.",
-      "image": "images/q266-vm-defender.png",
+      "image": "sc-500/images/q266-vm-defender.png",
       "hotspots": [
         {
           "x": 2,
@@ -8925,7 +8925,7 @@
         "scenario"
       ],
       "question": "Click the blade for configuring this VM's system-assigned managed identity.",
-      "image": "images/q267-vm-identity.png",
+      "image": "sc-500/images/q267-vm-identity.png",
       "hotspots": [
         {
           "x": 2,
@@ -8952,7 +8952,7 @@
         "scenario"
       ],
       "question": "Identify where the AKS resource exposes Defender for Cloud findings relevant to container workload protection.",
-      "image": "images/q268-aks-defender.png",
+      "image": "sc-500/images/q268-aks-defender.png",
       "hotspots": [
         {
           "x": 2,
@@ -8979,7 +8979,7 @@
         "scenario"
       ],
       "question": "Click the blade listing prioritized security posture remediation actions across your Azure resources.",
-      "image": "images/q269-defender-recommendations.png",
+      "image": "sc-500/images/q269-defender-recommendations.png",
       "hotspots": [
         {
           "x": 2,
@@ -9006,7 +9006,7 @@
         "scenario"
       ],
       "question": "Choose the blade for inspecting data connector availability and ingestion configuration for this Sentinel workspace.",
-      "image": "images/q270-sentinel-connectors.png",
+      "image": "sc-500/images/q270-sentinel-connectors.png",
       "hotspots": [
         {
           "x": 2,
