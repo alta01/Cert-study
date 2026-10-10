@@ -8793,10 +8793,10 @@
       "image": "images/q262-conditional-access-grant.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 9.65,
-          "w": 21,
-          "h": 4.9,
+          "x": 28.5,
+          "y": 79,
+          "w": 16,
+          "h": 5,
           "label": "Grant"
         }
       ],
