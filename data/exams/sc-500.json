@@ -8766,10 +8766,10 @@
       "image": "sc-500/images/q261-keyvault-properties.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 57.8,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 64.33333333333333,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Properties"
         }
       ],
@@ -8793,10 +8793,10 @@
       "image": "sc-500/images/q262-conditional-access-grant.png",
       "hotspots": [
         {
-          "x": 28.5,
-          "y": 79,
-          "w": 16,
-          "h": 5,
+          "x": 40.9,
+          "y": 93.4,
+          "w": 8,
+          "h": 3,
           "label": "Grant"
         }
       ],
@@ -8820,10 +8820,10 @@
       "image": "sc-500/images/q263-entra-named-locations.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 25.7,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 31.666666666666668,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Named locations"
         }
       ],
@@ -8847,10 +8847,10 @@
       "image": "sc-500/images/q264-storage-networking.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 41.75,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 48,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Networking"
         }
       ],
@@ -8874,10 +8874,10 @@
       "image": "sc-500/images/q265-keyvault-access-config.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 47.099999999999994,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 53.44444444444444,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Access configuration"
         }
       ],
@@ -8901,10 +8901,10 @@
       "image": "sc-500/images/q266-vm-defender.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 52.449999999999996,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 58.888888888888886,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Microsoft Defender for Cloud"
         }
       ],
@@ -8928,10 +8928,10 @@
       "image": "sc-500/images/q267-vm-identity.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 63.15,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 69.77777777777777,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Identity"
         }
       ],
@@ -8955,10 +8955,10 @@
       "image": "sc-500/images/q268-aks-defender.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 57.8,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 64.33333333333333,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Microsoft Defender for Cloud"
         }
       ],
@@ -8982,10 +8982,10 @@
       "image": "sc-500/images/q269-defender-recommendations.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 20.35,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 26.22222222222222,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Recommendations"
         }
       ],
@@ -9009,10 +9009,10 @@
       "image": "sc-500/images/q270-sentinel-connectors.png",
       "hotspots": [
         {
-          "x": 2,
-          "y": 52.449999999999996,
-          "w": 21,
-          "h": 4.9,
+          "x": 2.8,
+          "y": 58.888888888888886,
+          "w": 20.1,
+          "h": 3.3,
           "label": "Data connectors"
         }
       ],
