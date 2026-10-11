@@ -1,23 +1,10 @@
-/* config.example.js — runtime configuration for Cert Study
- *
- * Copy this file to `config.js` and fill in your values:
- *     cp config.example.js config.js
- *
- * `config.js` is gitignored. In Docker/K8s it is generated automatically from
- * the SUPABASE_URL / SUPABASE_ANON_KEY / OLLAMA_BASE environment variables by
- * docker-entrypoint.sh — no manual editing needed there.
- *
- * All values are safe to expose to the browser:
- *   - The Supabase anon key is public by design; Row-Level Security (see
- *     supabase/schema.sql) is the real security boundary.
- *   - If SUPABASE_URL / SUPABASE_ANON_KEY are left blank, account sync is
- *     silently disabled and the app runs in anonymous (localStorage) mode.
- */
+/* Copy to config.js for local use. Firebase web config is public;
+ * Firestore Security Rules enforce user ownership. Never put service-account keys here.
+ * Leave FIREBASE null for fully local study. */
 window.__CS_CONFIG__ = {
-  // From Supabase → Project Settings → API
-  SUPABASE_URL: '',
-  SUPABASE_ANON_KEY: '',
-
-  // Local Ollama endpoint for the AI assistant (see ai.js)
+  FIREBASE: null,
+  // Replace null with the web app config from Firebase Project settings:
+  // { apiKey: '...', authDomain: 'your-project.firebaseapp.com',
+  //   projectId: 'your-project', appId: '...', messagingSenderId: '...' },
   OLLAMA_BASE: 'http://localhost:11434',
 };

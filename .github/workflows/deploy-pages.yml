@@ -22,32 +22,26 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
       - name: Validate exam JSON
         run: |
           for f in data/exams/*.json; do
+            case "$f" in *-validation-report.json) continue ;; esac
             node scripts/validate-exam.js "$f" || exit 1
           done
 
+      - name: Test learning rules
+        run: node --test tests/*.test.mjs
+
       - name: Generate config.js
-        # config.js is gitignored (kept out of the repo since it's environment-
-        # specific), so it has to be generated here too — same values as
-        # docker-entrypoint.sh injects for the Docker/K8s deploys. The anon key
-        # is safe to expose in a static site; Supabase RLS is the security
-        # boundary. Leave the repo secrets unset to ship in anonymous mode.
-        # Secrets are passed via env: (not interpolated into the script) so
-        # special characters in a secret value can't break the heredoc.
+        # Public Firebase web app configuration; Security Rules protect user data.
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        run: |
-          cat > config.js <<EOF
-          window.__CS_CONFIG__ = {
-            SUPABASE_URL: '${SUPABASE_URL}',
-            SUPABASE_ANON_KEY: '${SUPABASE_ANON_KEY}',
-            OLLAMA_BASE: '',
-          };
-          EOF
+          FIREBASE_CONFIG: ${{ vars.FIREBASE_CONFIG }}
+          OLLAMA_BASE: ''
+        run: sh scripts/write-config.sh config.js
 
       - name: Stage site for Pages
         run: |
@@ -60,6 +54,12 @@ jobs:
             --exclude='scripts' \
             --exclude='k8s' \
             --exclude='node_modules' \
+            --exclude='tests' \
+            --exclude='docs' \
+            --exclude='firebase' \
+            --exclude='firebase.json' \
+            --exclude='supabase' \
+            --exclude='public/vendor/supabase.js' \
             --exclude='_site' \
             --exclude='Dockerfile' \
             --exclude='docker-compose.yml' \
@@ -81,3 +81,4 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+

@@ -1,0 +1,54 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function examCode(d) { return d.examCode is string && d.examCode.size() > 0 && d.examCode.size() <= 100; }
+    function validAnswer(d, id) {
+      return d.keys().hasOnly(['id','examCode','questionId','revision','domain','selected','correct','confidence','answeredAt','sessionId','mode'])
+        && d.keys().hasAll(['id','examCode','questionId','revision','domain','selected','correct','confidence','answeredAt','sessionId','mode'])
+        && d.id == id && examCode(d)
+        && d.questionId is int && d.questionId > 0 && d.domain is int && d.domain > 0
+        && d.revision is string && d.revision.matches('^[a-f0-9]{1,16}$')
+        && d.correct is bool && d.confidence in ['guess','unsure','confident']
+        && d.answeredAt is int && d.answeredAt > 0
+        && d.sessionId is string && d.sessionId.size() <= 100
+        && d.mode in ['regular','focus','retry']
+        && (d.selected is string && d.selected.size() <= 100
+          || d.selected is map && d.selected.keys().hasOnly(['x','y'])
+            && d.selected.x is number && d.selected.y is number
+            && d.selected.x >= 0 && d.selected.x <= 100 && d.selected.y >= 0 && d.selected.y <= 100);
+    }
+    match /users/{uid}/answers/{id} {
+      allow read: if owner(uid);
+      allow create: if owner(uid) && validAnswer(request.resource.data, id);
+      // Duplicate synchronization is allowed, alteration of past answers is not.
+      allow update: if owner(uid) && request.resource.data == resource.data;
+      allow delete: if owner(uid);
+    }
+    match /users/{uid}/attempts/{id} {
+      allow read: if owner(uid);
+      allow create: if owner(uid) && request.resource.data.id == id && examCode(request.resource.data)
+        && request.resource.data.total is int && request.resource.data.total > 0
+        && request.resource.data.correct is int && request.resource.data.correct >= 0
+        && request.resource.data.correct <= request.resource.data.total
+        && request.resource.data.pct is int && request.resource.data.pct >= 0 && request.resource.data.pct <= 100
+        && request.resource.data.domains is list && request.resource.data.completedAt is string;
+      allow update: if owner(uid) && request.resource.data == resource.data;
+      allow delete: if owner(uid);
+    }
+    match /users/{uid}/sessions/{id} {
+      function validSession(d) {
+        return examCode(d) && d.mode in ['regular','focus','retry']
+          && d.savedAt is int && d.savedAt > 0 && d.cleared is bool
+          && (d.cleared == true || d.poolIds is list && d.poolIds.size() <= 10000
+            && d.idx is int && d.idx >= 0 && d.answers is map && d.settings is map && d.sessionId is string);
+      }
+      allow read: if owner(uid);
+      allow create: if owner(uid) && validSession(request.resource.data);
+      allow update: if owner(uid) && validSession(request.resource.data) && request.resource.data.savedAt >= resource.data.savedAt;
+      allow delete: if owner(uid);
+    }
+    // Everything else is denied, including one user accessing another's progress.
+    match /{document=**} { allow read, write: if false; }
+  }
+}

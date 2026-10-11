@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+import crypto from 'node:crypto';
+await import('../learning-core.js');
+test('legacy migration preserves originals, stays guest-scoped, and runs once', () => {
+  const oldSession = { examCode: 'TEST', poolIds: [1], idx: 0, answers: {}, settings: { domains: [1] }, savedAt: 123 };
+  const disk = new Map([['cs_sess_TEST', JSON.stringify(oldSession)], ['cs_hist_TEST', JSON.stringify([{ id: 'old', examCode: 'TEST' }])]]);
+  const storage = { get length() { return disk.size; }, key: i => [...disk.keys()][i], getItem: k => disk.get(k) || null, setItem: (k,v) => disk.set(k,v) };
+  const context = vm.createContext({ localStorage: storage, crypto, showToast() {} });
+  const app = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
+  vm.runInContext(app.slice(app.indexOf('let storageOwner'), app.indexOf('// ── Toast')), context);
+  vm.runInContext('migrateLegacyProgress()', context);
+  assert.equal(disk.get('cs_sess_TEST'), JSON.stringify(oldSession));
+  assert.equal(JSON.parse(disk.get('cs2:guest:sess:TEST:regular')).mode, 'regular');
+  assert.equal(JSON.parse(disk.get('cs2:guest:hist:TEST'))[0].id, 'old');
+  assert.equal([...disk.keys()].some(k => k.startsWith('cs2:alice:')), false);
+  const migrated = disk.get('cs2:guest:sess:TEST:regular');
+  vm.runInContext('migrateLegacyProgress()', context);
+  assert.equal(disk.get('cs2:guest:sess:TEST:regular'), migrated);
+});
+test('backup validation rejects corrupt events and sessions before import', () => {
+  const context = vm.createContext({ LearningCore: globalThis.LearningCore });
+  vm.runInContext(fs.readFileSync(new URL('../progress-backup.js', import.meta.url), 'utf8'), context);
+  const backup = { format: 'cert-study-progress', version: 1, events: [], attempts: [], sessions: [] };
+  assert.doesNotThrow(() => context.validateBackup(backup));
+  assert.throws(() => context.validateBackup({ ...backup, version: 2 }));
+  assert.throws(() => context.validateBackup({ ...backup, events: [{ confidence: 'maybe' }] }));
+  assert.throws(() => context.validateBackup({ ...backup, sessions: [{ examCode: 'TEST', mode: 'focus', savedAt: 1, cleared: 'yes' }] }));
+  assert.equal(context.validSession({ examCode: 'TEST', mode: 'focus', savedAt: 1, cleared: true }), true);
+});

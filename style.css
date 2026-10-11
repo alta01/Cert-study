@@ -713,3 +713,35 @@ h2 {
     transition-duration: .01ms !important;
   }
 }
+
+
+
+/* Hotspot questions: image and overlay share the exact rendered image bounds. */
+.hotspot-box{position:relative;width:100%;max-width:1100px;line-height:0;overflow:hidden;border:1px solid #d0d7e2;border-radius:8px}
+.hotspot-image{display:block;width:100%;height:auto;cursor:crosshair;user-select:none}
+.hotspot-overlay{position:absolute;inset:0;pointer-events:none}
+.hotspot-marker{position:absolute;width:16px;height:16px;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #1565c0;background:#fff;box-shadow:0 1px 5px #3338}
+.hotspot-marker.hotspot-right{border-color:#15803d;background:#bbf7d0}
+.hotspot-marker.hotspot-wrong{border-color:#b91c1c;background:#fecaca}
+.hotspot-correct-zone{position:absolute;border:3px solid #15803d;background:#16a34a24;box-sizing:border-box}
+
+/* Learning and confidence controls */
+.confidence-fieldset{margin:24px 0 8px;border:0;padding:0}
+.confidence-fieldset legend{font-weight:700;font-size:.95rem;margin-bottom:10px}
+.confidence-controls{display:flex;gap:10px;flex-wrap:wrap}
+.confidence-option{cursor:pointer;display:flex;align-items:center;gap:8px;padding:12px 16px;border:1px solid var(--border,#d0d7e2);border-radius:10px;min-height:44px}
+.confidence-option:has(input:checked){border-color:#3b82f6;background:#3b82f61a}
+.confidence-option:focus-within{outline:2px solid #3b82f6;outline-offset:2px}
+.confidence-option input{accent-color:#3b82f6}
+.study-summary{font-size:.86rem;line-height:1.5;margin:12px 0;color:var(--text-secondary,#526079)}
+.exam-card-actions{flex-wrap:wrap}
+.learning-focus{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid var(--border,#d0d7e2)}
+.learning-focus p{font-size:.8rem;line-height:1.5;margin:5px 0;color:var(--text-secondary,#526079)}
+.learning-status{display:block;font-size:.8rem;font-weight:600;margin-top:4px;color:#2563eb}
+.learning-focus.needs-review .learning-status{color:#b45309}
+.learning-focus button{flex-shrink:0}
+.backup-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+#home-sync-note{margin:0 0 18px}
+@media(max-width:600px){.learning-focus{align-items:flex-start;flex-direction:column}.learning-focus button{width:100%}.confidence-option{flex:1;justify-content:center;padding:12px 8px}.progress-toolbar{flex-wrap:wrap}}
+
+.untested-areas{margin-top:18px}.untested-areas summary{cursor:pointer;font-weight:600;padding:12px 0;min-height:44px}

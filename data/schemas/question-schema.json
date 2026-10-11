@@ -33,7 +33,7 @@
       "minLength": 10
     },
     "options": {
-      "description": "Answer choices keyed A–D.",
+      "description": "Answer choices keyed A\u2013D.",
       "type": "object",
       "required": [
         "A",
@@ -189,6 +189,16 @@
       "minimum": 0,
       "maximum": 5,
       "default": 1
+    },
+    "conceptId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Stable learning concept identifier. Distinct from question format and objectiveId."
+    },
+    "conceptName": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Readable learning concept label."
     }
   },
   "additionalProperties": false,
@@ -217,5 +227,13 @@
         ]
       }
     }
-  ]
+  ],
+  "dependencies": {
+    "conceptId": [
+      "conceptName"
+    ],
+    "conceptName": [
+      "conceptId"
+    ]
+  }
 }

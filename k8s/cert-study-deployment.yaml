@@ -22,22 +22,14 @@ spec:
           env:
             - name: OLLAMA_BASE
               value: "http://ollama:11434"
-            # Optional: Google sign-in + cross-device sync. Create the secret with:
-            #   kubectl create secret generic cert-study-supabase \
-            #     --from-literal=url=https://<ref>.supabase.co \
-            #     --from-literal=anon_key=<anon-key>
-            # Omit the secret to run in anonymous (localStorage) mode.
-            - name: SUPABASE_URL
+            # Optional: kubectl create secret generic cert-study-firebase \
+            #   --from-file=config=./firebase-web-config.json
+            # Use the PUBLIC Firebase web app config, never a service account key.
+            - name: FIREBASE_CONFIG
               valueFrom:
                 secretKeyRef:
-                  name: cert-study-supabase
-                  key: url
-                  optional: true
-            - name: SUPABASE_ANON_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: cert-study-supabase
-                  key: anon_key
+                  name: cert-study-firebase
+                  key: config
                   optional: true
           resources:
             requests:
@@ -58,3 +50,4 @@ spec:
               port: 80
             initialDelaySeconds: 10
             periodSeconds: 30
+

@@ -1,12 +1,17 @@
 FROM nginx:alpine
 
+RUN apk add --no-cache jq
+
 WORKDIR /usr/share/nginx/html
 
 # Copy app files
 COPY . .
 
+COPY scripts/write-config.sh /generate-config.sh
+RUN chmod +x /generate-config.sh
+
 # Remove files that have no business being served
-RUN rm -rf .git .env* scripts/ node_modules/ \
+RUN rm -rf .git .env* scripts/ node_modules/ tests/ docs/ firebase/ supabase/ public/vendor/supabase.js firebase.json \
     data/exams/aws-saa-c03/domains \
     data/schemas
 
@@ -24,3 +29,4 @@ EXPOSE 80
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
+
