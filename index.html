@@ -17,6 +17,16 @@
   <link rel="manifest" href="app.webmanifest" />
   <!-- Theme color for browser chrome -->
   <meta name="theme-color" content="#3b82f6" />
+<style>
+/* Hotspot questions: image and overlay share the exact rendered image bounds. */
+.hotspot-box{position:relative;width:100%;max-width:1100px;line-height:0;overflow:hidden;border:1px solid #d0d7e2;border-radius:8px}
+.hotspot-image{display:block;width:100%;height:auto;cursor:crosshair;user-select:none}
+.hotspot-overlay{position:absolute;inset:0;pointer-events:none}
+.hotspot-marker{position:absolute;width:16px;height:16px;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #1565c0;background:#fff;box-shadow:0 1px 5px #3338}
+.hotspot-marker.hotspot-right{border-color:#15803d;background:#bbf7d0}
+.hotspot-marker.hotspot-wrong{border-color:#b91c1c;background:#fecaca}
+.hotspot-correct-zone{position:absolute;border:3px solid #15803d;background:#16a34a24;box-sizing:border-box}
+</style>
 </head>
 <body>
 

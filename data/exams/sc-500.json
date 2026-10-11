@@ -8748,6 +8748,276 @@
         "governance"
       ],
       "topic": "Security Copilot — Grounded agent evaluation"
+    },
+    {
+      "id": 261,
+      "domain": 1,
+      "domainName": "Manage identity, access, and governance",
+      "type": "hotspot",
+      "topic": "Key Vault - purge protection",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "advanced",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "You open a Key Vault in the Azure portal, as shown in the screenshot. You need to inspect the vault's soft-delete and purge-protection settings before making a governance change. Click the Properties tab in the overview page.",
+      "image": "sc-500/images/q261-keyvault-properties.png",
+      "hotspots": [
+        {
+          "x": 36.5,
+          "y": 43.3,
+          "w": 3.5,
+          "h": 2,
+          "label": "Properties"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "The Properties tab in the Key Vault overview's main-pane tab row is the intended navigation target for this question. The Essentials summary shows soft-delete and purge-protection status, while the Properties tab provides further vault properties. Do not click the left navigation: the screenshot's Properties target is a tab, not a left-menu item."
+    },
+    {
+      "id": 262,
+      "domain": 1,
+      "domainName": "Manage identity, access, and governance",
+      "type": "hotspot",
+      "topic": "Conditional Access - authentication strengths",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "intermediate",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "On this Conditional Access policy editor, select the control section where you require an authentication strength.",
+      "image": "sc-500/images/q262-conditional-access-grant.png",
+      "hotspots": [
+        {
+          "x": 40.9,
+          "y": 93.4,
+          "w": 8,
+          "h": 3,
+          "label": "Grant"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Conditions define who and when the policy applies. Grant controls determine what the sign-in must satisfy, including an authentication strength. Correct target: Grant."
+    },
+    {
+      "id": 263,
+      "domain": 1,
+      "domainName": "Manage identity, access, and governance",
+      "type": "hotspot",
+      "topic": "Entra ID - named locations",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "intermediate",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Choose the blade where trusted countries and IP ranges are configured for Conditional Access.",
+      "image": "sc-500/images/q263-entra-named-locations.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 31.666666666666668,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Named locations"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Policies consume location conditions; Named locations is where reusable geographic or IP location definitions are managed. Correct target: Named locations."
+    },
+    {
+      "id": 264,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "type": "hotspot",
+      "topic": "Storage account - firewall",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "advanced",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Choose the blade for public network access and storage account network firewall restrictions.",
+      "image": "sc-500/images/q264-storage-networking.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 48,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Networking"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Encryption protects stored data. Private endpoint connections manages private links, but Networking owns the account network access settings. Correct target: Networking."
+    },
+    {
+      "id": 265,
+      "domain": 2,
+      "domainName": "Secure storage, databases, and networking",
+      "type": "hotspot",
+      "topic": "Key Vault - authorization model",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "intermediate",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "You open a Key Vault in the Azure portal, as shown in the screenshot. You need to choose the vault's data-plane authorization model, using Azure role-based access control instead of vault access policies. Click the control that opens Access configuration.",
+      "image": "sc-500/images/q265-keyvault-access-config.png",
+      "hotspots": [
+        {
+          "x": 39.7,
+          "y": 79,
+          "w": 8.7,
+          "h": 2.6,
+          "label": "Access configuration"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "The blue Access configuration button is inside the 'Control access to key vault' card on the Overview page. This opens the configuration for the vault's permission model (Azure RBAC versus access policies). 'Access control (IAM)' manages Azure role assignments; the 'Access policies' link is not the button requested in this scenario."
+    },
+    {
+      "id": 266,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "type": "hotspot",
+      "topic": "Virtual machine - Defender",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "intermediate",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Select the security posture blade for this VM to inspect Defender for Cloud protection and recommendations.",
+      "image": "sc-500/images/q266-vm-defender.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 58.888888888888886,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Microsoft Defender for Cloud"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Extensions manages installed VM add-ons; Identity manages managed identities. The Defender for Cloud entry surfaces security information for the VM. Correct target: Microsoft Defender for Cloud."
+    },
+    {
+      "id": 267,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "type": "hotspot",
+      "topic": "Virtual machine - identity",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "advanced",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Click the blade for configuring this VM's system-assigned managed identity.",
+      "image": "sc-500/images/q267-vm-identity.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 69.77777777777777,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Identity"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Access control assigns permissions on the VM resource; Identity configures the VM's managed identity itself. Correct target: Identity."
+    },
+    {
+      "id": 268,
+      "domain": 3,
+      "domainName": "Secure compute",
+      "type": "hotspot",
+      "topic": "Azure Kubernetes Service - Defender",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "intermediate",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Identify where the AKS resource exposes Defender for Cloud findings relevant to container workload protection.",
+      "image": "sc-500/images/q268-aks-defender.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 64.33333333333333,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Microsoft Defender for Cloud"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Workloads shows Kubernetes deployments. Identity manages identities; Defender for Cloud focuses on security posture and threat protection. Correct target: Microsoft Defender for Cloud."
+    },
+    {
+      "id": 269,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "type": "hotspot",
+      "topic": "Defender for Cloud - recommendations",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "intermediate",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Click the blade listing prioritized security posture remediation actions across your Azure resources.",
+      "image": "sc-500/images/q269-defender-recommendations.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 26.22222222222222,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Recommendations"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Security alerts addresses detected threats. Regulatory compliance groups controls by benchmark; Recommendations presents remediation items. Correct target: Recommendations."
+    },
+    {
+      "id": 270,
+      "domain": 4,
+      "domainName": "Manage and monitor security posture",
+      "type": "hotspot",
+      "topic": "Microsoft Sentinel - data connectors",
+      "objectiveId": "Portal navigation and configuration",
+      "difficulty": "advanced",
+      "tags": [
+        "hotspot",
+        "azure-portal",
+        "scenario"
+      ],
+      "question": "Choose the blade for inspecting data connector availability and ingestion configuration for this Sentinel workspace.",
+      "image": "sc-500/images/q270-sentinel-connectors.png",
+      "hotspots": [
+        {
+          "x": 2.8,
+          "y": 58.888888888888886,
+          "w": 20.1,
+          "h": 3.3,
+          "label": "Data connectors"
+        }
+      ],
+      "tolerance": 0.7,
+      "rationale": "Content hub is used to discover and install solutions. Analytics defines detection rules. Data connectors manages ingestion connections. Correct target: Data connectors."
     }
   ]
 }
