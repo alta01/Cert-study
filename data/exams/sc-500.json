@@ -8762,19 +8762,19 @@
         "azure-portal",
         "scenario"
       ],
-      "question": "Locate the blade where you verify purge protection before enforcing permanent deletion safeguards.",
+      "question": "You open a Key Vault in the Azure portal, as shown in the screenshot. You need to inspect the vault's soft-delete and purge-protection settings before making a governance change. Click the Properties tab in the overview page.",
       "image": "sc-500/images/q261-keyvault-properties.png",
       "hotspots": [
         {
-          "x": 2.8,
-          "y": 64.33333333333333,
-          "w": 20.1,
-          "h": 3.3,
+          "x": 36.5,
+          "y": 43.3,
+          "w": 3.5,
+          "h": 2,
           "label": "Properties"
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Networking controls traffic, while Access configuration selects RBAC or access policies. Properties contains the vault's deletion protection settings. Correct target: Properties."
+      "rationale": "The Properties tab in the Key Vault overview's main-pane tab row is the intended navigation target for this question. The Essentials summary shows soft-delete and purge-protection status, while the Properties tab provides further vault properties. Do not click the left navigation: the screenshot's Properties target is a tab, not a left-menu item."
     },
     {
       "id": 262,
@@ -8870,19 +8870,19 @@
         "azure-portal",
         "scenario"
       ],
-      "question": "Click where you choose Azure role-based access control rather than vault access policies for data-plane authorization.",
+      "question": "You open a Key Vault in the Azure portal, as shown in the screenshot. You need to choose the vault's data-plane authorization model, using Azure role-based access control instead of vault access policies. Click the control that opens Access configuration.",
       "image": "sc-500/images/q265-keyvault-access-config.png",
       "hotspots": [
         {
-          "x": 2.8,
-          "y": 53.44444444444444,
-          "w": 20.1,
-          "h": 3.3,
+          "x": 39.7,
+          "y": 79,
+          "w": 8.7,
+          "h": 2.6,
           "label": "Access configuration"
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Access control (IAM) assigns Azure roles; Access configuration selects the vault permission model. Networking is unrelated. Correct target: Access configuration."
+      "rationale": "The blue Access configuration button is inside the 'Control access to key vault' card on the Overview page. This opens the configuration for the vault's permission model (Azure RBAC versus access policies). 'Access control (IAM)' manages Azure role assignments; the 'Access policies' link is not the button requested in this scenario."
     },
     {
       "id": 266,
