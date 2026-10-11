@@ -2,16 +2,21 @@
   "name": "cert-study",
   "version": "0.1.0",
   "private": true,
-  "description": "Open-source study hub — any subject, any exam",
+  "description": "Open-source study hub \u2014 any subject, any exam",
   "type": "module",
   "scripts": {
     "serve": "python3 -m http.server 3000",
     "sync": "node scripts/sync-manifest.js",
     "generate": "node scripts/generate-questions.js",
     "import": "node scripts/import-content.js",
-    "validate": "node scripts/validate-exam.js"
+    "validate": "node scripts/validate-exam.js",
+    "test": "node --test tests/*.test.mjs",
+    "test:browser": "node tests/browser-smoke.mjs"
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
   }
 }

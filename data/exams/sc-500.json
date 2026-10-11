@@ -65,7 +65,9 @@
           "text": "Plan a Privileged Identity Management deployment",
           "url": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-deployment-plan"
         }
-      ]
+      ],
+      "conceptId": "privileged-access",
+      "conceptName": "Privileged access and PIM"
     },
     {
       "id": 2,
@@ -96,7 +98,9 @@
           "text": "Manage emergency access accounts in Microsoft Entra ID",
           "url": "https://learn.microsoft.com/entra/identity/role-based-access-control/security-emergency-access"
         }
-      ]
+      ],
+      "conceptId": "privileged-access",
+      "conceptName": "Privileged access and PIM"
     },
     {
       "id": 3,
@@ -127,7 +131,9 @@
           "text": "Conditional Access grant controls",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/concept-conditional-access-grant"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 4,
@@ -158,7 +164,9 @@
           "text": "Microsoft-managed Conditional Access policies",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/managed-policies"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 5,
@@ -185,7 +193,9 @@
           "text": "Conditional Access report-only mode",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/concept-conditional-access-report-only"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 6,
@@ -216,7 +226,9 @@
           "text": "Conditional Access best practices",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/plan-conditional-access"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 7,
@@ -247,7 +259,9 @@
           "text": "Require password change for high-risk users",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/policy-risk-based-user"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 8,
@@ -278,7 +292,9 @@
           "text": "Block high-risk agent identities (Conditional Access)",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/policy-agent-block-high-risk"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 9,
@@ -309,7 +325,9 @@
           "text": "Enable FIDO2 security key sign-in to Windows",
           "url": "https://learn.microsoft.com/entra/identity/authentication/howto-authentication-passwordless-security-key-windows"
         }
-      ]
+      ],
+      "conceptId": "authentication-methods",
+      "conceptName": "Authentication methods"
     },
     {
       "id": 10,
@@ -340,7 +358,9 @@
           "text": "Plan a phishing-resistant passwordless deployment",
           "url": "https://learn.microsoft.com/entra/identity/authentication/how-to-deploy-phishing-resistant-passwordless-authentication"
         }
-      ]
+      ],
+      "conceptId": "authentication-methods",
+      "conceptName": "Authentication methods"
     },
     {
       "id": 11,
@@ -371,7 +391,9 @@
           "text": "Configure a federated identity credential on an app",
           "url": "https://learn.microsoft.com/entra/workload-id/workload-identity-federation-create-trust"
         }
-      ]
+      ],
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "id": 12,
@@ -402,7 +424,9 @@
           "text": "Grant tenant-wide admin consent to an application",
           "url": "https://learn.microsoft.com/entra/identity/enterprise-apps/grant-admin-consent"
         }
-      ]
+      ],
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "id": 13,
@@ -433,7 +457,9 @@
           "text": "Configure the admin consent workflow",
           "url": "https://learn.microsoft.com/entra/identity/enterprise-apps/configure-admin-consent-workflow"
         }
-      ]
+      ],
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "id": 14,
@@ -464,7 +490,9 @@
           "text": "What is managed identities for Azure resources?",
           "url": "https://learn.microsoft.com/entra/identity/managed-identities-azure-resources/overview"
         }
-      ]
+      ],
+      "conceptId": "managed-identities",
+      "conceptName": "Managed identities"
     },
     {
       "id": 15,
@@ -495,7 +523,9 @@
           "text": "Use Microsoft Entra Workload ID with AKS",
           "url": "https://learn.microsoft.com/azure/aks/workload-identity-overview"
         }
-      ]
+      ],
+      "conceptId": "managed-identities",
+      "conceptName": "Managed identities"
     },
     {
       "id": 16,
@@ -526,7 +556,9 @@
           "text": "Single sign-on options in Microsoft Entra ID",
           "url": "https://learn.microsoft.com/entra/identity/enterprise-apps/sso-options"
         }
-      ]
+      ],
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "id": 17,
@@ -557,7 +589,9 @@
           "text": "Use Microsoft Entra groups to manage role assignments",
           "url": "https://learn.microsoft.com/entra/identity/role-based-access-control/groups-concept"
         }
-      ]
+      ],
+      "conceptId": "privileged-access",
+      "conceptName": "Privileged access and PIM"
     },
     {
       "id": 18,
@@ -588,7 +622,9 @@
           "text": "MSAL for iOS and macOS",
           "url": "https://learn.microsoft.com/entra/identity-platform/quickstart-v2-ios"
         }
-      ]
+      ],
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "id": 19,
@@ -615,7 +651,9 @@
           "text": "Conditional Access for workload identities",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/workload-identity"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 20,
@@ -646,7 +684,9 @@
           "text": "Configure Azure resource role settings in PIM",
           "url": "https://learn.microsoft.com/entra/id-governance/privileged-identity-management/pim-resource-roles-configure-role-settings"
         }
-      ]
+      ],
+      "conceptId": "privileged-access",
+      "conceptName": "Privileged access and PIM"
     },
     {
       "id": 21,
@@ -681,7 +721,9 @@
           "text": "Provide access to Key Vault with Azure RBAC",
           "url": "https://learn.microsoft.com/azure/key-vault/general/rbac-guide"
         }
-      ]
+      ],
+      "conceptId": "keyvault-permissions",
+      "conceptName": "Key Vault permissions"
     },
     {
       "id": 22,
@@ -716,7 +758,9 @@
           "text": "Grant access to trusted Azure services",
           "url": "https://learn.microsoft.com/azure/key-vault/general/overview-vnet-service-endpoints"
         }
-      ]
+      ],
+      "conceptId": "keyvault-protection",
+      "conceptName": "Key Vault protection and networking"
     },
     {
       "id": 23,
@@ -747,7 +791,9 @@
           "text": "Azure Key Vault purge protection",
           "url": "https://learn.microsoft.com/azure/key-vault/general/soft-delete-overview#purge-protection"
         }
-      ]
+      ],
+      "conceptId": "keyvault-protection",
+      "conceptName": "Key Vault protection and networking"
     },
     {
       "id": 24,
@@ -778,7 +824,9 @@
           "text": "Alerts for Azure Key Vault",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/alerts-azure-key-vault"
         }
-      ]
+      ],
+      "conceptId": "keyvault-protection",
+      "conceptName": "Key Vault protection and networking"
     },
     {
       "id": 25,
@@ -809,7 +857,9 @@
           "text": "Protecting secrets in Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/secrets-scanning"
         }
-      ]
+      ],
+      "conceptId": "iac-security",
+      "conceptName": "Infrastructure as code security"
     },
     {
       "id": 26,
@@ -836,7 +886,9 @@
           "text": "Protect cloud deployment secrets",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/secrets-scanning-cloud-deployment"
         }
-      ]
+      ],
+      "conceptId": "iac-security",
+      "conceptName": "Infrastructure as code security"
     },
     {
       "id": 27,
@@ -867,7 +919,9 @@
           "text": "Azure Policy effect basics",
           "url": "https://learn.microsoft.com/azure/governance/policy/concepts/effect-basics"
         }
-      ]
+      ],
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "id": 28,
@@ -894,7 +948,9 @@
           "text": "Safe deployment of Azure Policy assignments",
           "url": "https://learn.microsoft.com/azure/governance/policy/how-to/policy-safe-deployment-practices"
         }
-      ]
+      ],
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "id": 29,
@@ -925,7 +981,9 @@
           "text": "Customize the set of standards",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/update-regulatory-compliance-packages"
         }
-      ]
+      ],
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "id": 30,
@@ -952,7 +1010,9 @@
           "text": "Lock your resources to protect your infrastructure",
           "url": "https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources"
         }
-      ]
+      ],
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "id": 31,
@@ -983,7 +1043,9 @@
           "text": "Azure role definitions",
           "url": "https://learn.microsoft.com/azure/role-based-access-control/role-definitions"
         }
-      ]
+      ],
+      "conceptId": "role-governance",
+      "conceptName": "Roles and identity governance"
     },
     {
       "id": 32,
@@ -1014,7 +1076,9 @@
           "text": "Elevate access to manage all Azure subscriptions",
           "url": "https://learn.microsoft.com/azure/role-based-access-control/elevate-access-global-admin"
         }
-      ]
+      ],
+      "conceptId": "role-governance",
+      "conceptName": "Roles and identity governance"
     },
     {
       "id": 33,
@@ -1045,7 +1109,9 @@
           "text": "Defender for Cloud DevOps Security overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-devops-introduction"
         }
-      ]
+      ],
+      "conceptId": "iac-security",
+      "conceptName": "Infrastructure as code security"
     },
     {
       "id": 34,
@@ -1076,7 +1142,9 @@
           "text": "Overview of security features in Azure Backup",
           "url": "https://learn.microsoft.com/azure/backup/security-overview"
         }
-      ]
+      ],
+      "conceptId": "backup-security",
+      "conceptName": "Backup security"
     },
     {
       "id": 35,
@@ -1107,7 +1175,9 @@
           "text": "Configure MUA using Resource Guard",
           "url": "https://learn.microsoft.com/azure/backup/multi-user-authorization"
         }
-      ]
+      ],
+      "conceptId": "backup-security",
+      "conceptName": "Backup security"
     },
     {
       "id": 36,
@@ -1134,7 +1204,9 @@
           "text": "Immutable vault for Azure Backup",
           "url": "https://learn.microsoft.com/azure/backup/backup-azure-immutable-vault-concept"
         }
-      ]
+      ],
+      "conceptId": "backup-security",
+      "conceptName": "Backup security"
     },
     {
       "id": 37,
@@ -1161,7 +1233,9 @@
           "text": "Azure Policy exemption structure",
           "url": "https://learn.microsoft.com/azure/governance/policy/concepts/exemption-structure"
         }
-      ]
+      ],
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "id": 38,
@@ -1192,7 +1266,9 @@
           "text": "Key Vault tiers and SKUs",
           "url": "https://learn.microsoft.com/azure/key-vault/general/overview"
         }
-      ]
+      ],
+      "conceptId": "keyvault-protection",
+      "conceptName": "Key Vault protection and networking"
     },
     {
       "id": 39,
@@ -1219,7 +1295,9 @@
           "text": "What is Microsoft Entra Permissions Management?",
           "url": "https://learn.microsoft.com/entra/permissions-management/overview"
         }
-      ]
+      ],
+      "conceptId": "role-governance",
+      "conceptName": "Roles and identity governance"
     },
     {
       "id": 40,
@@ -1250,7 +1328,9 @@
           "text": "Microsoft Entra terms of use",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/terms-of-use"
         }
-      ]
+      ],
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 41,
@@ -1281,7 +1361,9 @@
           "text": "Create a user delegation SAS",
           "url": "https://learn.microsoft.com/rest/api/storageservices/create-user-delegation-sas"
         }
-      ]
+      ],
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "id": 42,
@@ -1308,7 +1390,9 @@
           "text": "Prevent Shared Key authorization for an Azure Storage account",
           "url": "https://learn.microsoft.com/azure/storage/common/shared-key-authorization-prevent"
         }
-      ]
+      ],
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "id": 43,
@@ -1339,7 +1423,9 @@
           "text": "Configure Azure Storage firewalls and virtual networks",
           "url": "https://learn.microsoft.com/azure/storage/common/storage-network-security"
         }
-      ]
+      ],
+      "conceptId": "storage-network",
+      "conceptName": "Storage networking"
     },
     {
       "id": 44,
@@ -1370,7 +1456,9 @@
           "text": "Defender for Storage overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-introduction"
         }
-      ]
+      ],
+      "conceptId": "storage-protection",
+      "conceptName": "Storage data protection"
     },
     {
       "id": 45,
@@ -1397,7 +1485,9 @@
           "text": "Sensitive data threat detection in Defender for Storage",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-storage-data-sensitivity"
         }
-      ]
+      ],
+      "conceptId": "storage-protection",
+      "conceptName": "Storage data protection"
     },
     {
       "id": 46,
@@ -1428,7 +1518,9 @@
           "text": "Set and manage immutability policies",
           "url": "https://learn.microsoft.com/azure/storage/blobs/immutable-policy-configure-version-scope"
         }
-      ]
+      ],
+      "conceptId": "storage-protection",
+      "conceptName": "Storage data protection"
     },
     {
       "id": 47,
@@ -1459,7 +1551,9 @@
           "text": "Configure customer-managed keys in the same or a different tenant",
           "url": "https://learn.microsoft.com/azure/storage/common/customer-managed-keys-configure-key-vault"
         }
-      ]
+      ],
+      "conceptId": "storage-protection",
+      "conceptName": "Storage data protection"
     },
     {
       "id": 48,
@@ -1490,7 +1584,9 @@
           "text": "TDE overview for SQL Database and SQL Managed Instance",
           "url": "https://learn.microsoft.com/azure/azure-sql/database/transparent-data-encryption-tde-overview"
         }
-      ]
+      ],
+      "conceptId": "database-encryption",
+      "conceptName": "Database encryption and tamper protection"
     },
     {
       "id": 49,
@@ -1521,7 +1617,9 @@
           "text": "Always Encrypted with secure enclaves",
           "url": "https://learn.microsoft.com/sql/relational-databases/security/encryption/always-encrypted-enclaves"
         }
-      ]
+      ],
+      "conceptId": "database-encryption",
+      "conceptName": "Database encryption and tamper protection"
     },
     {
       "id": 50,
@@ -1552,7 +1650,9 @@
           "text": "Azure Policy for Microsoft Entra-only authentication",
           "url": "https://learn.microsoft.com/azure/azure-sql/database/authentication-azure-ad-only-authentication-policy"
         }
-      ]
+      ],
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "id": 51,
@@ -1583,7 +1683,9 @@
           "text": "Auditing for Azure SQL Database — limitations",
           "url": "https://learn.microsoft.com/azure/azure-sql/database/auditing-overview"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 52,
@@ -1614,7 +1716,9 @@
           "text": "Protect databases with Defender for Databases",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-databases-plan"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 53,
@@ -1641,7 +1745,9 @@
           "text": "Vulnerability assessment for Azure SQL Database",
           "url": "https://learn.microsoft.com/azure/azure-sql/database/sql-vulnerability-assessment"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 54,
@@ -1672,7 +1778,9 @@
           "text": "Enable Defender for SQL Servers on Machines",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-usage"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 55,
@@ -1703,7 +1811,9 @@
           "text": "Defender for Databases overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-overview"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 56,
@@ -1734,7 +1844,9 @@
           "text": "Enable Defender for Azure Cosmos DB",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-databases-enable-cosmos-protections"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 57,
@@ -1761,7 +1873,9 @@
           "text": "Dynamic data masking — Azure SQL",
           "url": "https://learn.microsoft.com/azure/azure-sql/database/dynamic-data-masking-overview"
         }
-      ]
+      ],
+      "conceptId": "database-encryption",
+      "conceptName": "Database encryption and tamper protection"
     },
     {
       "id": 58,
@@ -1792,7 +1906,9 @@
           "text": "Defender for Azure SQL overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-sql-introduction"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 59,
@@ -1819,7 +1935,9 @@
           "text": "Overview of identity-based authentication for Azure Files",
           "url": "https://learn.microsoft.com/azure/storage/files/storage-files-active-directory-overview"
         }
-      ]
+      ],
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "id": 60,
@@ -1846,7 +1964,9 @@
           "text": "Remediate anonymous public read access for blob data",
           "url": "https://learn.microsoft.com/azure/storage/blobs/anonymous-read-access-prevent"
         }
-      ]
+      ],
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "id": 61,
@@ -1877,7 +1997,9 @@
           "text": "Network security groups overview",
           "url": "https://learn.microsoft.com/azure/virtual-network/network-security-groups-overview"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 62,
@@ -1908,7 +2030,9 @@
           "text": "Service tags overview",
           "url": "https://learn.microsoft.com/azure/virtual-network/service-tags-overview"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 63,
@@ -1939,7 +2063,9 @@
           "text": "Migrate NSG flow logs to VNet flow logs",
           "url": "https://learn.microsoft.com/azure/network-watcher/nsg-flow-logs-migrate"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 64,
@@ -1970,7 +2096,9 @@
           "text": "Protect high-risk network ports with Security Admin Rules",
           "url": "https://learn.microsoft.com/azure/virtual-network-manager/how-to-block-high-risk-ports"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 65,
@@ -1997,7 +2125,9 @@
           "text": "Security admin rules — non-application",
           "url": "https://learn.microsoft.com/azure/virtual-network-manager/concept-security-admins"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 66,
@@ -2028,7 +2158,9 @@
           "text": "What is a secured virtual hub?",
           "url": "https://learn.microsoft.com/azure/firewall-manager/secured-virtual-hub"
         }
-      ]
+      ],
+      "conceptId": "network-routing",
+      "conceptName": "Hybrid networking and routing"
     },
     {
       "id": 67,
@@ -2059,7 +2191,9 @@
           "text": "Deploy and configure Azure Firewall Premium",
           "url": "https://learn.microsoft.com/azure/firewall/premium-deploy"
         }
-      ]
+      ],
+      "conceptId": "azure-firewall",
+      "conceptName": "Azure Firewall"
     },
     {
       "id": 68,
@@ -2090,7 +2224,9 @@
           "text": "FQDN filtering in network rules",
           "url": "https://learn.microsoft.com/azure/firewall/fqdn-filtering-network-rules"
         }
-      ]
+      ],
+      "conceptId": "azure-firewall",
+      "conceptName": "Azure Firewall"
     },
     {
       "id": 69,
@@ -2121,7 +2257,9 @@
           "text": "Configure P2S VPN Gateway for Microsoft Entra ID authentication",
           "url": "https://learn.microsoft.com/azure/vpn-gateway/point-to-site-entra-gateway"
         }
-      ]
+      ],
+      "conceptId": "network-routing",
+      "conceptName": "Hybrid networking and routing"
     },
     {
       "id": 70,
@@ -2152,7 +2290,9 @@
           "text": "Apply Conditional Access policies to Private Access apps",
           "url": "https://learn.microsoft.com/entra/global-secure-access/how-to-target-resource-private-access-apps"
         }
-      ]
+      ],
+      "conceptId": "global-secure-access",
+      "conceptName": "Entra Private and Internet Access"
     },
     {
       "id": 71,
@@ -2179,7 +2319,9 @@
           "text": "Global Secure Access source IP restoration",
           "url": "https://learn.microsoft.com/entra/global-secure-access/how-to-source-ip-restoration"
         }
-      ]
+      ],
+      "conceptId": "global-secure-access",
+      "conceptName": "Entra Private and Internet Access"
     },
     {
       "id": 72,
@@ -2210,7 +2352,9 @@
           "text": "What is Azure Private Link Service?",
           "url": "https://learn.microsoft.com/azure/private-link/private-link-service-overview"
         }
-      ]
+      ],
+      "conceptId": "private-link",
+      "conceptName": "Private endpoints, Private Link, and DNS"
     },
     {
       "id": 73,
@@ -2237,7 +2381,9 @@
           "text": "View effective security rules — Network Watcher",
           "url": "https://learn.microsoft.com/azure/network-watcher/diagnose-vm-network-traffic-filtering-problem"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 74,
@@ -2264,7 +2410,9 @@
           "text": "Azure DDoS Protection SKU comparison",
           "url": "https://learn.microsoft.com/azure/ddos-protection/ddos-protection-sku-comparison"
         }
-      ]
+      ],
+      "conceptId": "web-network-protection",
+      "conceptName": "DDoS and web application firewalls"
     },
     {
       "id": 75,
@@ -2295,7 +2443,9 @@
           "text": "Azure WAF on Application Gateway",
           "url": "https://learn.microsoft.com/azure/web-application-firewall/ag/ag-overview"
         }
-      ]
+      ],
+      "conceptId": "web-network-protection",
+      "conceptName": "DDoS and web application firewalls"
     },
     {
       "id": 76,
@@ -2326,7 +2476,9 @@
           "text": "ExpressRoute peering options",
           "url": "https://learn.microsoft.com/azure/expressroute/expressroute-circuit-peerings"
         }
-      ]
+      ],
+      "conceptId": "network-routing",
+      "conceptName": "Hybrid networking and routing"
     },
     {
       "id": 77,
@@ -2357,7 +2509,9 @@
           "text": "Azure Bastion — connect using native client",
           "url": "https://learn.microsoft.com/azure/bastion/connect-native-client-windows"
         }
-      ]
+      ],
+      "conceptId": "bastion-access",
+      "conceptName": "Azure Bastion"
     },
     {
       "id": 78,
@@ -2384,7 +2538,9 @@
           "text": "Connectivity configurations in Azure Virtual Network Manager",
           "url": "https://learn.microsoft.com/azure/virtual-network-manager/concept-connectivity-configuration"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 79,
@@ -2411,7 +2567,9 @@
           "text": "Secure origins with Private Link in Azure Front Door Premium",
           "url": "https://learn.microsoft.com/azure/frontdoor/private-link"
         }
-      ]
+      ],
+      "conceptId": "private-link",
+      "conceptName": "Private endpoints, Private Link, and DNS"
     },
     {
       "id": 80,
@@ -2438,7 +2596,9 @@
           "text": "Azure Firewall forced tunneling",
           "url": "https://learn.microsoft.com/azure/firewall/forced-tunneling"
         }
-      ]
+      ],
+      "conceptId": "azure-firewall",
+      "conceptName": "Azure Firewall"
     },
     {
       "id": 81,
@@ -2465,7 +2625,9 @@
           "text": "Azure Private Endpoint DNS configuration",
           "url": "https://learn.microsoft.com/azure/private-link/private-endpoint-dns"
         }
-      ]
+      ],
+      "conceptId": "private-link",
+      "conceptName": "Private endpoints, Private Link, and DNS"
     },
     {
       "id": 82,
@@ -2496,7 +2658,9 @@
           "text": "Configure IDPS signature rules",
           "url": "https://learn.microsoft.com/azure/firewall/premium-deploy-certificates-enterprise-ca"
         }
-      ]
+      ],
+      "conceptId": "azure-firewall",
+      "conceptName": "Azure Firewall"
     },
     {
       "id": 83,
@@ -2527,7 +2691,9 @@
           "text": "Immutable storage with time-based retention",
           "url": "https://learn.microsoft.com/azure/storage/blobs/immutable-time-based-retention-policy-overview"
         }
-      ]
+      ],
+      "conceptId": "database-defender",
+      "conceptName": "Database threat protection and auditing"
     },
     {
       "id": 84,
@@ -2554,7 +2720,9 @@
           "text": "Networking with private access in Azure Database for PostgreSQL Flexible Server",
           "url": "https://learn.microsoft.com/azure/postgresql/flexible-server/concepts-networking-private"
         }
-      ]
+      ],
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "id": 85,
@@ -2585,7 +2753,9 @@
           "text": "Virtual network service endpoints",
           "url": "https://learn.microsoft.com/azure/virtual-network/virtual-network-service-endpoints-overview"
         }
-      ]
+      ],
+      "conceptId": "storage-network",
+      "conceptName": "Storage networking"
     },
     {
       "id": 86,
@@ -2612,7 +2782,9 @@
           "text": "SQL Managed Instance connectivity architecture",
           "url": "https://learn.microsoft.com/azure/azure-sql/managed-instance/connectivity-architecture-overview"
         }
-      ]
+      ],
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "id": 87,
@@ -2639,7 +2811,9 @@
           "text": "Azure Firewall threat intelligence-based filtering",
           "url": "https://learn.microsoft.com/azure/firewall/threat-intel"
         }
-      ]
+      ],
+      "conceptId": "azure-firewall",
+      "conceptName": "Azure Firewall"
     },
     {
       "id": 88,
@@ -2666,7 +2840,9 @@
           "text": "Use Conditional Access with Azure SQL Database",
           "url": "https://learn.microsoft.com/azure/azure-sql/database/conditional-access-configure"
         }
-      ]
+      ],
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "id": 89,
@@ -2693,7 +2869,9 @@
           "text": "Create an expiration policy for shared access signatures",
           "url": "https://learn.microsoft.com/azure/storage/common/sas-expiration-policy"
         }
-      ]
+      ],
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "id": 90,
@@ -2720,7 +2898,9 @@
           "text": "Network Watcher Connection Troubleshoot overview",
           "url": "https://learn.microsoft.com/azure/network-watcher/connection-troubleshoot-overview"
         }
-      ]
+      ],
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "id": 91,
@@ -2751,7 +2931,9 @@
           "text": "Server-side encryption of Azure Disk Storage",
           "url": "https://learn.microsoft.com/azure/virtual-machines/disk-encryption"
         }
-      ]
+      ],
+      "conceptId": "vm-integrity",
+      "conceptName": "VM encryption, confidential compute, and attestation"
     },
     {
       "id": 92,
@@ -2778,7 +2960,9 @@
           "text": "Confidential VM overview (DCasv5/ECasv5)",
           "url": "https://learn.microsoft.com/azure/confidential-computing/confidential-vm-overview"
         }
-      ]
+      ],
+      "conceptId": "vm-integrity",
+      "conceptName": "VM encryption, confidential compute, and attestation"
     },
     {
       "id": 93,
@@ -2809,7 +2993,9 @@
           "text": "Connect to a VM using Bastion native client",
           "url": "https://learn.microsoft.com/azure/bastion/connect-native-client-windows"
         }
-      ]
+      ],
+      "conceptId": "bastion-access",
+      "conceptName": "Azure Bastion"
     },
     {
       "id": 94,
@@ -2840,7 +3026,9 @@
           "text": "JIT VM access overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/just-in-time-access-overview"
         }
-      ]
+      ],
+      "conceptId": "jit-access",
+      "conceptName": "Just-in-time VM access"
     },
     {
       "id": 95,
@@ -2871,7 +3059,9 @@
           "text": "Defender for Servers overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-servers-overview"
         }
-      ]
+      ],
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "id": 96,
@@ -2902,7 +3092,9 @@
           "text": "Configure vulnerability scanning for machines",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/auto-deploy-vulnerability-assessment"
         }
-      ]
+      ],
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "id": 97,
@@ -2933,7 +3125,9 @@
           "text": "Connect AWS account to Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws"
         }
-      ]
+      ],
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "id": 98,
@@ -2964,7 +3158,9 @@
           "text": "Enable FIM with Defender for Endpoint",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/file-integrity-monitoring-enable-defender-endpoint"
         }
-      ]
+      ],
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "id": 99,
@@ -2995,7 +3191,9 @@
           "text": "Compute security baselines in Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/operating-system-misconfiguration"
         }
-      ]
+      ],
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "id": 100,
@@ -3026,7 +3224,9 @@
           "text": "Defender for Containers overview",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-introduction"
         }
-      ]
+      ],
+      "conceptId": "container-defender",
+      "conceptName": "Container threat protection"
     },
     {
       "id": 101,
@@ -3053,7 +3253,9 @@
           "text": "Container runtime antimalware detection and blocking",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/anti-malware"
         }
-      ]
+      ],
+      "conceptId": "container-defender",
+      "conceptName": "Container threat protection"
     },
     {
       "id": 102,
@@ -3080,7 +3282,9 @@
           "text": "Enable Defender for Containers — Defender Security Gating",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-containers-enable-plan"
         }
-      ]
+      ],
+      "conceptId": "container-defender",
+      "conceptName": "Container threat protection"
     },
     {
       "id": 103,
@@ -3111,7 +3315,9 @@
           "text": "Migrate from pod-managed identity to Workload ID",
           "url": "https://learn.microsoft.com/azure/aks/workload-identity-migrate-from-pod-identity"
         }
-      ]
+      ],
+      "conceptId": "aks-hardening",
+      "conceptName": "AKS identity, authorization, and hardening"
     },
     {
       "id": 104,
@@ -3142,7 +3348,9 @@
           "text": "Defender for Containers — vulnerability assessment",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/agentless-vulnerability-assessment-azure"
         }
-      ]
+      ],
+      "conceptId": "registry-security",
+      "conceptName": "Container registry security"
     },
     {
       "id": 105,
@@ -3173,7 +3381,9 @@
           "text": "TLS/SSL in Azure App Service",
           "url": "https://learn.microsoft.com/azure/app-service/overview-tls"
         }
-      ]
+      ],
+      "conceptId": "appservice-security",
+      "conceptName": "App Service security"
     },
     {
       "id": 106,
@@ -3204,7 +3414,9 @@
           "text": "Use Private Endpoints for App Service",
           "url": "https://learn.microsoft.com/azure/app-service/networking/private-endpoint"
         }
-      ]
+      ],
+      "conceptId": "appservice-security",
+      "conceptName": "App Service security"
     },
     {
       "id": 107,
@@ -3235,7 +3447,9 @@
           "text": "Configure Microsoft Entra authentication for Function Apps",
           "url": "https://learn.microsoft.com/azure/app-service/configure-authentication-provider-aad"
         }
-      ]
+      ],
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "id": 108,
@@ -3266,7 +3480,9 @@
           "text": "Protect APIs with Microsoft Entra ID",
           "url": "https://learn.microsoft.com/azure/api-management/api-management-howto-protect-backend-with-aad"
         }
-      ]
+      ],
+      "conceptId": "api-security",
+      "conceptName": "API Management and AI gateways"
     },
     {
       "id": 109,
@@ -3293,7 +3509,9 @@
           "text": "Authenticate access to Azure resources using managed identities in Azure Logic Apps",
           "url": "https://learn.microsoft.com/azure/logic-apps/authenticate-with-managed-identity"
         }
-      ]
+      ],
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "id": 110,
@@ -3324,7 +3542,9 @@
           "text": "Managed identities in Azure Container Apps",
           "url": "https://learn.microsoft.com/azure/container-apps/managed-identity"
         }
-      ]
+      ],
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "id": 111,
@@ -3355,7 +3575,9 @@
           "text": "Microsoft Purview to manage data security for Microsoft 365 Copilot",
           "url": "https://learn.microsoft.com/purview/ai-m365-copilot"
         }
-      ]
+      ],
+      "conceptId": "ai-data-security",
+      "conceptName": "Purview and AI data security"
     },
     {
       "id": 112,
@@ -3386,7 +3608,9 @@
           "text": "DSPM for AI one-click policies",
           "url": "https://learn.microsoft.com/purview/dspm-for-ai-considerations"
         }
-      ]
+      ],
+      "conceptId": "ai-data-security",
+      "conceptName": "Purview and AI data security"
     },
     {
       "id": 113,
@@ -3417,7 +3641,9 @@
           "text": "Microsoft Entra security for AI overview",
           "url": "https://learn.microsoft.com/entra/agent-id/security-for-ai-overview"
         }
-      ]
+      ],
+      "conceptId": "agent-identity",
+      "conceptName": "Agent identity and permissions"
     },
     {
       "id": 114,
@@ -3448,7 +3674,9 @@
           "text": "Block high-risk agent identities policy",
           "url": "https://learn.microsoft.com/entra/identity/conditional-access/policy-agent-block-high-risk"
         }
-      ]
+      ],
+      "conceptId": "agent-identity",
+      "conceptName": "Agent identity and permissions"
     },
     {
       "id": 115,
@@ -3475,7 +3703,9 @@
           "text": "Identity Governance for agents",
           "url": "https://learn.microsoft.com/entra/id-governance/agent-id-governance-overview"
         }
-      ]
+      ],
+      "conceptId": "agent-identity",
+      "conceptName": "Agent identity and permissions"
     },
     {
       "id": 116,
@@ -3506,7 +3736,9 @@
           "text": "Defender for Cloud overview — AI security",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/defender-for-cloud-introduction"
         }
-      ]
+      ],
+      "conceptId": "ai-threat-protection",
+      "conceptName": "AI posture and threat investigation"
     },
     {
       "id": 117,
@@ -3537,7 +3769,9 @@
           "text": "Alerts for AI services",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/alerts-ai-workloads"
         }
-      ]
+      ],
+      "conceptId": "ai-threat-protection",
+      "conceptName": "AI posture and threat investigation"
     },
     {
       "id": 118,
@@ -3568,7 +3802,9 @@
           "text": "Defender for Cloud integration with Defender XDR",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-integration-365"
         }
-      ]
+      ],
+      "conceptId": "ai-threat-protection",
+      "conceptName": "AI posture and threat investigation"
     },
     {
       "id": 119,
@@ -3599,7 +3835,9 @@
           "text": "llm-token-limit policy",
           "url": "https://learn.microsoft.com/azure/api-management/llm-token-limit-policy"
         }
-      ]
+      ],
+      "conceptId": "api-security",
+      "conceptName": "API Management and AI gateways"
     },
     {
       "id": 120,
@@ -3630,7 +3868,9 @@
           "text": "Import a Microsoft Foundry API into APIM",
           "url": "https://learn.microsoft.com/azure/api-management/azure-ai-foundry-api"
         }
-      ]
+      ],
+      "conceptId": "api-security",
+      "conceptName": "API Management and AI gateways"
     },
     {
       "id": 121,
@@ -3661,7 +3901,9 @@
           "text": "AI Gateway in Foundry — quota windows",
           "url": "https://learn.microsoft.com/azure/foundry/configuration/enable-ai-api-management-gateway-portal"
         }
-      ]
+      ],
+      "conceptId": "api-security",
+      "conceptName": "API Management and AI gateways"
     },
     {
       "id": 122,
@@ -3692,7 +3934,9 @@
           "text": "Intervention points and controls",
           "url": "https://learn.microsoft.com/azure/foundry/guardrails/intervention-points"
         }
-      ]
+      ],
+      "conceptId": "ai-guardrails",
+      "conceptName": "Foundry guardrails and Copilot Studio protection"
     },
     {
       "id": 123,
@@ -3719,7 +3963,9 @@
           "text": "Foundry guardrails — severity levels",
           "url": "https://learn.microsoft.com/azure/foundry/guardrails/guardrails-overview"
         }
-      ]
+      ],
+      "conceptId": "ai-guardrails",
+      "conceptName": "Foundry guardrails and Copilot Studio protection"
     },
     {
       "id": 124,
@@ -3750,7 +3996,9 @@
           "text": "Microsoft 365 Copilot security and governance",
           "url": "https://learn.microsoft.com/microsoft-365-copilot/microsoft-365-copilot-overview"
         }
-      ]
+      ],
+      "conceptId": "agent-identity",
+      "conceptName": "Agent identity and permissions"
     },
     {
       "id": 125,
@@ -3781,7 +4029,9 @@
           "text": "Data security dashboard in Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/data-security-dashboard"
         }
-      ]
+      ],
+      "conceptId": "ai-threat-protection",
+      "conceptName": "AI posture and threat investigation"
     },
     {
       "id": 126,
@@ -3812,7 +4062,9 @@
           "text": "Attack path analysis in Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-attack-path"
         }
-      ]
+      ],
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "id": 127,
@@ -3843,7 +4095,9 @@
           "text": "Manage attack paths",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/how-to-manage-attack-path"
         }
-      ]
+      ],
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "id": 128,
@@ -3874,7 +4128,9 @@
           "text": "Build queries with Cloud Security Explorer",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/how-to-manage-cloud-security-explorer"
         }
-      ]
+      ],
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "id": 129,
@@ -3905,7 +4161,9 @@
           "text": "Authentication architecture for AWS connectors",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-authentication-architecture-aws"
         }
-      ]
+      ],
+      "conceptId": "multicloud-onboarding",
+      "conceptName": "Hybrid and multicloud onboarding"
     },
     {
       "id": 130,
@@ -3932,7 +4190,9 @@
           "text": "Connect AWS accounts — management account & StackSets",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/quickstart-onboard-aws"
         }
-      ]
+      ],
+      "conceptId": "multicloud-onboarding",
+      "conceptName": "Hybrid and multicloud onboarding"
     },
     {
       "id": 131,
@@ -3963,7 +4223,9 @@
           "text": "Microsoft cloud security benchmark in Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-regulatory-compliance"
         }
-      ]
+      ],
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "id": 132,
@@ -3994,7 +4256,9 @@
           "text": "Update regulatory compliance packages",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/update-regulatory-compliance-packages"
         }
-      ]
+      ],
+      "conceptId": "cloud-recommendations",
+      "conceptName": "Cloud recommendations and compliance"
     },
     {
       "id": 133,
@@ -4025,7 +4289,9 @@
           "text": "EASM inventory assets",
           "url": "https://learn.microsoft.com/azure/external-attack-surface-management/understanding-inventory-assets"
         }
-      ]
+      ],
+      "conceptId": "external-attack-surface",
+      "conceptName": "External attack surface management"
     },
     {
       "id": 134,
@@ -4052,7 +4318,9 @@
           "text": "Use and manage discovery in Defender EASM",
           "url": "https://learn.microsoft.com/azure/external-attack-surface-management/using-and-managing-discovery"
         }
-      ]
+      ],
+      "conceptId": "external-attack-surface",
+      "conceptName": "External attack surface management"
     },
     {
       "id": 135,
@@ -4079,7 +4347,9 @@
           "text": "Use and manage discovery — Access your automated attack surface",
           "url": "https://learn.microsoft.com/azure/external-attack-surface-management/using-and-managing-discovery"
         }
-      ]
+      ],
+      "conceptId": "external-attack-surface",
+      "conceptName": "External attack surface management"
     },
     {
       "id": 136,
@@ -4106,7 +4376,9 @@
           "text": "Security baselines assessment — MDVM",
           "url": "https://learn.microsoft.com/defender-vulnerability-management/tvm-security-baselines"
         }
-      ]
+      ],
+      "conceptId": "vulnerability-management",
+      "conceptName": "Vulnerability management"
     },
     {
       "id": 137,
@@ -4133,7 +4405,9 @@
           "text": "Block vulnerable applications with MDVM",
           "url": "https://learn.microsoft.com/defender-vulnerability-management/tvm-block-vuln-apps"
         }
-      ]
+      ],
+      "conceptId": "vulnerability-management",
+      "conceptName": "Vulnerability management"
     },
     {
       "id": 138,
@@ -4160,7 +4434,9 @@
           "text": "Authenticated scan for Windows in MDVM",
           "url": "https://learn.microsoft.com/defender-vulnerability-management/windows-authenticated-scan"
         }
-      ]
+      ],
+      "conceptId": "vulnerability-management",
+      "conceptName": "Vulnerability management"
     },
     {
       "id": 139,
@@ -4187,7 +4463,9 @@
           "text": "Network share analysis in MDVM",
           "url": "https://learn.microsoft.com/defender-vulnerability-management/tvm-network-share-assessment"
         }
-      ]
+      ],
+      "conceptId": "vulnerability-management",
+      "conceptName": "Vulnerability management"
     },
     {
       "id": 140,
@@ -4218,7 +4496,9 @@
           "text": "Microsoft Entra Permissions Management overview",
           "url": "https://learn.microsoft.com/entra/permissions-management/overview"
         }
-      ]
+      ],
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "id": 141,
@@ -4245,7 +4525,9 @@
           "text": "About data security posture management",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/concept-data-security-posture"
         }
-      ]
+      ],
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "id": 142,
@@ -4276,7 +4558,9 @@
           "text": "Enable Defender for Cloud plans",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/enable-enhanced-security"
         }
-      ]
+      ],
+      "conceptId": "cloud-recommendations",
+      "conceptName": "Cloud recommendations and compliance"
     },
     {
       "id": 143,
@@ -4303,7 +4587,9 @@
           "text": "Exempt recommendations and resources in Defender for Cloud",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/exempt-resource"
         }
-      ]
+      ],
+      "conceptId": "cloud-recommendations",
+      "conceptName": "Cloud recommendations and compliance"
     },
     {
       "id": 144,
@@ -4330,7 +4616,9 @@
           "text": "Prevent misconfigurations with Enforce/Deny",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/prevent-misconfigurations"
         }
-      ]
+      ],
+      "conceptId": "cloud-recommendations",
+      "conceptName": "Cloud recommendations and compliance"
     },
     {
       "id": 145,
@@ -4357,7 +4645,9 @@
           "text": "Create custom security standards and recommendations",
           "url": "https://learn.microsoft.com/azure/defender-for-cloud/custom-security-policies"
         }
-      ]
+      ],
+      "conceptId": "cloud-recommendations",
+      "conceptName": "Cloud recommendations and compliance"
     },
     {
       "id": 146,
@@ -4388,7 +4678,9 @@
           "text": "Sentinel overview — Azure portal retirement timeline",
           "url": "https://learn.microsoft.com/azure/sentinel/overview"
         }
-      ]
+      ],
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "id": 147,
@@ -4415,7 +4707,9 @@
           "text": "Roles and permissions in Microsoft Sentinel",
           "url": "https://learn.microsoft.com/azure/sentinel/roles"
         }
-      ]
+      ],
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "id": 148,
@@ -4442,7 +4736,9 @@
           "text": "Discover and manage Sentinel out-of-the-box content (Content Hub)",
           "url": "https://learn.microsoft.com/azure/sentinel/sentinel-solutions-deploy"
         }
-      ]
+      ],
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "id": 149,
@@ -4473,7 +4769,9 @@
           "text": "Ingest syslog and CEF messages with AMA",
           "url": "https://learn.microsoft.com/azure/sentinel/connect-cef-syslog-ama"
         }
-      ]
+      ],
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "id": 150,
@@ -4504,7 +4802,9 @@
           "text": "Filter Windows event collection with XPath",
           "url": "https://learn.microsoft.com/azure/azure-monitor/agents/data-collection-windows-events"
         }
-      ]
+      ],
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "id": 151,
@@ -4531,7 +4831,9 @@
           "text": "Custom logs via AMA in Microsoft Sentinel",
           "url": "https://learn.microsoft.com/azure/sentinel/unified-connector-custom-device"
         }
-      ]
+      ],
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "id": 152,
@@ -4558,7 +4860,9 @@
           "text": "Automate threat response with automation rules in Microsoft Sentinel",
           "url": "https://learn.microsoft.com/azure/sentinel/automate-incident-handling-with-automation-rules"
         }
-      ]
+      ],
+      "conceptId": "sentinel-automation",
+      "conceptName": "Sentinel automation"
     },
     {
       "id": 153,
@@ -4585,7 +4889,9 @@
           "text": "Automate threat response with playbooks — Required permissions",
           "url": "https://learn.microsoft.com/azure/sentinel/automation/automate-responses-with-playbooks"
         }
-      ]
+      ],
+      "conceptId": "sentinel-automation",
+      "conceptName": "Sentinel automation"
     },
     {
       "id": 154,
@@ -4616,7 +4922,9 @@
           "text": "Manage data tiers and retention in Microsoft Sentinel",
           "url": "https://learn.microsoft.com/azure/sentinel/manage-data-overview"
         }
-      ]
+      ],
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "id": 155,
@@ -4647,7 +4955,9 @@
           "text": "Microsoft Purview Audit overview",
           "url": "https://learn.microsoft.com/purview/audit-solutions-overview"
         }
-      ]
+      ],
+      "conceptId": "purview-audit",
+      "conceptName": "Purview Audit investigations"
     },
     {
       "id": 156,
@@ -4674,7 +4984,9 @@
           "text": "Understand authentication in Microsoft Security Copilot",
           "url": "https://learn.microsoft.com/copilot/security/authentication"
         }
-      ]
+      ],
+      "conceptId": "copilot-access",
+      "conceptName": "Security Copilot access and privacy"
     },
     {
       "id": 157,
@@ -4705,7 +5017,9 @@
           "text": "Microsoft Sentinel roles and permissions",
           "url": "https://learn.microsoft.com/azure/sentinel/roles"
         }
-      ]
+      ],
+      "conceptId": "copilot-access",
+      "conceptName": "Security Copilot access and privacy"
     },
     {
       "id": 158,
@@ -4732,7 +5046,9 @@
           "text": "Security Copilot authentication — Recommended roles",
           "url": "https://learn.microsoft.com/copilot/security/authentication"
         }
-      ]
+      ],
+      "conceptId": "copilot-access",
+      "conceptName": "Security Copilot access and privacy"
     },
     {
       "id": 159,
@@ -4763,7 +5079,9 @@
           "text": "Manage plugins in Security Copilot",
           "url": "https://learn.microsoft.com/copilot/security/manage-plugins"
         }
-      ]
+      ],
+      "conceptId": "copilot-extensibility",
+      "conceptName": "Security Copilot plugins and agents"
     },
     {
       "id": 160,
@@ -4794,7 +5112,9 @@
           "text": "Grant MSSPs access to Microsoft Security Copilot",
           "url": "https://learn.microsoft.com/copilot/security/grant-access-external-users"
         }
-      ]
+      ],
+      "conceptId": "copilot-extensibility",
+      "conceptName": "Security Copilot plugins and agents"
     },
     {
       "answer": "B",
@@ -4837,7 +5157,9 @@
         "auto-renewal",
         "lifecycle"
       ],
-      "topic": "Key Vault — certificate auto-renewal"
+      "topic": "Key Vault — certificate auto-renewal",
+      "conceptId": "keyvault-lifecycle",
+      "conceptName": "Key Vault keys, secrets, and certificates"
     },
     {
       "answer": "C",
@@ -4876,7 +5198,9 @@
         "certificate-authority",
         "issuance"
       ],
-      "topic": "Key Vault — certificate issuance with an integrated CA"
+      "topic": "Key Vault — certificate issuance with an integrated CA",
+      "conceptId": "keyvault-lifecycle",
+      "conceptName": "Key Vault keys, secrets, and certificates"
     },
     {
       "answer": "A",
@@ -4915,7 +5239,9 @@
         "cmk",
         "encryption"
       ],
-      "topic": "Key Vault — customer-managed key rotation"
+      "topic": "Key Vault — customer-managed key rotation",
+      "conceptId": "keyvault-lifecycle",
+      "conceptName": "Key Vault keys, secrets, and certificates"
     },
     {
       "answer": "D",
@@ -4959,7 +5285,9 @@
         "azure-functions",
         "zero-downtime"
       ],
-      "topic": "Key Vault — zero-downtime secret rotation"
+      "topic": "Key Vault — zero-downtime secret rotation",
+      "conceptId": "keyvault-lifecycle",
+      "conceptName": "Key Vault keys, secrets, and certificates"
     },
     {
       "answer": "B",
@@ -4999,7 +5327,9 @@
         "attestation",
         "authentication-methods"
       ],
-      "topic": "Entra ID — FIDO2 passkey restrictions"
+      "topic": "Entra ID — FIDO2 passkey restrictions",
+      "conceptId": "authentication-methods",
+      "conceptName": "Authentication methods"
     },
     {
       "answer": "A",
@@ -5039,7 +5369,9 @@
         "authentication-binding",
         "phishing-resistant"
       ],
-      "topic": "Entra ID — certificate-based authentication binding"
+      "topic": "Entra ID — certificate-based authentication binding",
+      "conceptId": "authentication-methods",
+      "conceptName": "Authentication methods"
     },
     {
       "answer": "C",
@@ -5079,7 +5411,9 @@
         "migration",
         "sspr"
       ],
-      "topic": "Entra ID — migration from legacy MFA method policies"
+      "topic": "Entra ID — migration from legacy MFA method policies",
+      "conceptId": "authentication-methods",
+      "conceptName": "Authentication methods"
     },
     {
       "answer": "B",
@@ -5119,7 +5453,9 @@
         "secrets",
         "deployment-history"
       ],
-      "topic": "Bicep — secure deployment parameters and outputs"
+      "topic": "Bicep — secure deployment parameters and outputs",
+      "conceptId": "iac-security",
+      "conceptName": "Infrastructure as code security"
     },
     {
       "answer": "D",
@@ -5158,7 +5494,9 @@
         "deny-assignments",
         "resource-protection"
       ],
-      "topic": "Azure deployment stacks — deny assignments"
+      "topic": "Azure deployment stacks — deny assignments",
+      "conceptId": "iac-security",
+      "conceptName": "Infrastructure as code security"
     },
     {
       "answer": "A",
@@ -5202,7 +5540,9 @@
         "rbac",
         "state-locking"
       ],
-      "topic": "Terraform — secure remote state storage"
+      "topic": "Terraform — secure remote state storage",
+      "conceptId": "iac-security",
+      "conceptName": "Infrastructure as code security"
     },
     {
       "answer": "C",
@@ -5242,7 +5582,9 @@
         "managed-identity",
         "rbac"
       ],
-      "topic": "Azure Policy — management group remediation"
+      "topic": "Azure Policy — management group remediation",
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "answer": "B",
@@ -5282,7 +5624,9 @@
         "remediation",
         "governance"
       ],
-      "topic": "Azure Policy — non-compliance triage"
+      "topic": "Azure Policy — non-compliance triage",
+      "conceptId": "policy-governance",
+      "conceptName": "Azure Policy and resource governance"
     },
     {
       "answer": "D",
@@ -5325,7 +5669,9 @@
         "defender-for-cloud-apps",
         "anomaly-detection"
       ],
-      "topic": "App governance — anomalous OAuth application behavior"
+      "topic": "App governance — anomalous OAuth application behavior",
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "answer": "C",
@@ -5369,7 +5715,9 @@
         "device-binding",
         "session-security"
       ],
-      "topic": "Conditional Access — token protection against replay"
+      "topic": "Conditional Access — token protection against replay",
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "answer": "A",
@@ -5409,7 +5757,9 @@
         "token-revocation",
         "conditional-access"
       ],
-      "topic": "Entra ID — Continuous Access Evaluation"
+      "topic": "Entra ID — Continuous Access Evaluation",
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "answer": "D",
@@ -5453,7 +5803,9 @@
         "least-privilege",
         "zero-trust"
       ],
-      "topic": "Privileged access — administrative workstation isolation"
+      "topic": "Privileged access — administrative workstation isolation",
+      "conceptId": "privileged-access",
+      "conceptName": "Privileged access and PIM"
     },
     {
       "answer": "B",
@@ -5492,7 +5844,9 @@
         "b2b-collaboration",
         "b2b-direct-connect"
       ],
-      "topic": "Cross-tenant access — B2B collaboration versus direct connect"
+      "topic": "Cross-tenant access — B2B collaboration versus direct connect",
+      "conceptId": "role-governance",
+      "conceptName": "Roles and identity governance"
     },
     {
       "answer": "C",
@@ -5532,7 +5886,9 @@
         "conditional-access",
         "b2b"
       ],
-      "topic": "Cross-tenant access — trusting external MFA claims"
+      "topic": "Cross-tenant access — trusting external MFA claims",
+      "conceptId": "role-governance",
+      "conceptName": "Roles and identity governance"
     },
     {
       "answer": "A",
@@ -5576,7 +5932,9 @@
         "app-consent",
         "consent-phishing"
       ],
-      "topic": "App consent — verified publisher requirements"
+      "topic": "App consent — verified publisher requirements",
+      "conceptId": "application-identity",
+      "conceptName": "Application identity and OAuth"
     },
     {
       "answer": "D",
@@ -5620,7 +5978,9 @@
         "versioning",
         "application-integration"
       ],
-      "topic": "Key Vault — certificate rotation without application downtime"
+      "topic": "Key Vault — certificate rotation without application downtime",
+      "conceptId": "keyvault-lifecycle",
+      "conceptName": "Key Vault keys, secrets, and certificates"
     },
     {
       "answer": "B",
@@ -5660,7 +6020,9 @@
         "hybrid-networking",
         "troubleshooting"
       ],
-      "topic": "Private endpoint — hybrid DNS resolution and split-brain troubleshooting"
+      "topic": "Private endpoint — hybrid DNS resolution and split-brain troubleshooting",
+      "conceptId": "private-link",
+      "conceptName": "Private endpoints, Private Link, and DNS"
     },
     {
       "answer": "C",
@@ -5699,7 +6061,9 @@
         "stored-access-policy",
         "revocation"
       ],
-      "topic": "Storage SAS — stored access policy lifecycle and revocation"
+      "topic": "Storage SAS — stored access policy lifecycle and revocation",
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "answer": "D",
@@ -5739,7 +6103,9 @@
         "private-endpoint",
         "disaster-recovery"
       ],
-      "topic": "Azure SQL — failover group security and geo-replication"
+      "topic": "Azure SQL — failover group security and geo-replication",
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "answer": "A",
@@ -5779,7 +6145,9 @@
         "integrity",
         "tamper-evidence"
       ],
-      "topic": "Azure SQL ledger — append-only tamper evidence"
+      "topic": "Azure SQL ledger — append-only tamper evidence",
+      "conceptId": "database-encryption",
+      "conceptName": "Database encryption and tamper protection"
     },
     {
       "answer": "C",
@@ -5819,7 +6187,9 @@
         "protocol-hardening",
         "compatibility"
       ],
-      "topic": "Azure Files — SMB transport hardening and compatibility"
+      "topic": "Azure Files — SMB transport hardening and compatibility",
+      "conceptId": "storage-access",
+      "conceptName": "Storage authorization and SAS"
     },
     {
       "answer": "B",
@@ -5858,7 +6228,9 @@
         "data-retention",
         "data-minimization"
       ],
-      "topic": "Azure Blob Storage — lifecycle retention and security"
+      "topic": "Azure Blob Storage — lifecycle retention and security",
+      "conceptId": "storage-protection",
+      "conceptName": "Storage data protection"
     },
     {
       "answer": "D",
@@ -5897,7 +6269,9 @@
         "on-demand-scan",
         "incident-response"
       ],
-      "topic": "Defender for Storage — on-demand malware scanning of historical content"
+      "topic": "Defender for Storage — on-demand malware scanning of historical content",
+      "conceptId": "storage-protection",
+      "conceptName": "Storage data protection"
     },
     {
       "answer": "A",
@@ -5937,7 +6311,9 @@
         "hybrid-security",
         "encryption"
       ],
-      "topic": "ExpressRoute — private peering encryption and gateway security"
+      "topic": "ExpressRoute — private peering encryption and gateway security",
+      "conceptId": "network-routing",
+      "conceptName": "Hybrid networking and routing"
     },
     {
       "answer": "C",
@@ -5976,7 +6352,9 @@
         "azure-firewall",
         "firewall-manager"
       ],
-      "topic": "Azure Virtual WAN — secured virtual hub deployment"
+      "topic": "Azure Virtual WAN — secured virtual hub deployment",
+      "conceptId": "network-routing",
+      "conceptName": "Hybrid networking and routing"
     },
     {
       "answer": "B",
@@ -6016,7 +6394,9 @@
         "false-positive",
         "exclusions"
       ],
-      "topic": "Application Gateway WAF — targeted managed-rule exclusions"
+      "topic": "Application Gateway WAF — targeted managed-rule exclusions",
+      "conceptId": "web-network-protection",
+      "conceptName": "DDoS and web application firewalls"
     },
     {
       "answer": "D",
@@ -6056,7 +6436,9 @@
         "managed-rules",
         "web-security"
       ],
-      "topic": "Azure Front Door WAF — managed bot protection"
+      "topic": "Azure Front Door WAF — managed bot protection",
+      "conceptId": "web-network-protection",
+      "conceptName": "DDoS and web application firewalls"
     },
     {
       "answer": "A",
@@ -6096,7 +6478,9 @@
         "routing",
         "hybrid-security"
       ],
-      "topic": "Site-to-site VPN — centralized inspection through Azure Firewall"
+      "topic": "Site-to-site VPN — centralized inspection through Azure Firewall",
+      "conceptId": "network-routing",
+      "conceptName": "Hybrid networking and routing"
     },
     {
       "answer": "C",
@@ -6135,7 +6519,9 @@
         "application-segment",
         "zero-trust"
       ],
-      "topic": "Microsoft Entra Private Access — connector groups and application segments"
+      "topic": "Microsoft Entra Private Access — connector groups and application segments",
+      "conceptId": "global-secure-access",
+      "conceptName": "Entra Private and Internet Access"
     },
     {
       "answer": "B",
@@ -6174,7 +6560,9 @@
         "approval-workflow",
         "cross-tenant"
       ],
-      "topic": "Azure Private Link service — visibility and connection approval"
+      "topic": "Azure Private Link service — visibility and connection approval",
+      "conceptId": "private-link",
+      "conceptName": "Private endpoints, Private Link, and DNS"
     },
     {
       "answer": "D",
@@ -6214,7 +6602,9 @@
         "incident-response",
         "vnet-flow-logs"
       ],
-      "topic": "Network Watcher — traffic analytics and targeted packet capture"
+      "topic": "Network Watcher — traffic analytics and targeted packet capture",
+      "conceptId": "network-segmentation",
+      "conceptName": "Network segmentation and diagnostics"
     },
     {
       "answer": "A",
@@ -6254,7 +6644,9 @@
         "monitoring",
         "runbook"
       ],
-      "topic": "Azure DDoS Protection — incident response and escalation runbook"
+      "topic": "Azure DDoS Protection — incident response and escalation runbook",
+      "conceptId": "web-network-protection",
+      "conceptName": "DDoS and web application firewalls"
     },
     {
       "answer": "C",
@@ -6293,7 +6685,9 @@
         "network-isolation",
         "public-access"
       ],
-      "topic": "Azure Cosmos DB — private network access enforcement"
+      "topic": "Azure Cosmos DB — private network access enforcement",
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "answer": "B",
@@ -6332,7 +6726,9 @@
         "private-access",
         "network-security"
       ],
-      "topic": "Azure Database for MySQL — Flexible Server private networking"
+      "topic": "Azure Database for MySQL — Flexible Server private networking",
+      "conceptId": "database-access",
+      "conceptName": "Database authentication and networking"
     },
     {
       "answer": "D",
@@ -6372,7 +6768,9 @@
         "disaster-recovery",
         "security-validation"
       ],
-      "topic": "Azure Storage — account failover and security implications"
+      "topic": "Azure Storage — account failover and security implications",
+      "conceptId": "storage-network",
+      "conceptName": "Storage networking"
     },
     {
       "answer": "B",
@@ -6412,7 +6810,9 @@
         "dns-zone-group",
         "split-brain"
       ],
-      "topic": "Private endpoint — DNS zone design across multiple storage accounts"
+      "topic": "Private endpoint — DNS zone design across multiple storage accounts",
+      "conceptId": "private-link",
+      "conceptName": "Private endpoints, Private Link, and DNS"
     },
     {
       "answer": "B",
@@ -6450,7 +6850,9 @@
         "network-policy",
         "segmentation"
       ],
-      "topic": "AKS — network policies for pod segmentation"
+      "topic": "AKS — network policies for pod segmentation",
+      "conceptId": "aks-hardening",
+      "conceptName": "AKS identity, authorization, and hardening"
     },
     {
       "answer": "C",
@@ -6488,7 +6890,9 @@
         "azure-rbac",
         "authorization"
       ],
-      "topic": "AKS — Azure RBAC for Kubernetes authorization"
+      "topic": "AKS — Azure RBAC for Kubernetes authorization",
+      "conceptId": "aks-hardening",
+      "conceptName": "AKS identity, authorization, and hardening"
     },
     {
       "answer": "A",
@@ -6526,7 +6930,9 @@
         "private-cluster",
         "api-server"
       ],
-      "topic": "AKS — private Kubernetes API server"
+      "topic": "AKS — private Kubernetes API server",
+      "conceptId": "aks-hardening",
+      "conceptName": "AKS identity, authorization, and hardening"
     },
     {
       "answer": "D",
@@ -6564,7 +6970,9 @@
         "easy-auth",
         "entra-id"
       ],
-      "topic": "App Service — Microsoft Entra authentication with Easy Auth"
+      "topic": "App Service — Microsoft Entra authentication with Easy Auth",
+      "conceptId": "appservice-security",
+      "conceptName": "App Service security"
     },
     {
       "answer": "B",
@@ -6602,7 +7010,9 @@
         "secure-boot",
         "vtpm"
       ],
-      "topic": "Trusted Launch — secure boot and virtual TPM"
+      "topic": "Trusted Launch — secure boot and virtual TPM",
+      "conceptId": "vm-integrity",
+      "conceptName": "VM encryption, confidential compute, and attestation"
     },
     {
       "answer": "A",
@@ -6640,7 +7050,9 @@
         "vnet",
         "private-container"
       ],
-      "topic": "Azure Container Instances — private container execution"
+      "topic": "Azure Container Instances — private container execution",
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "answer": "C",
@@ -6678,7 +7090,9 @@
         "vm-patching",
         "maintenance"
       ],
-      "topic": "Azure Update Manager — coordinated VM security patching"
+      "topic": "Azure Update Manager — coordinated VM security patching",
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "answer": "B",
@@ -6717,7 +7131,9 @@
         "oversharing",
         "copilot"
       ],
-      "topic": "Microsoft Purview DSPM — data oversharing assessments"
+      "topic": "Microsoft Purview DSPM — data oversharing assessments",
+      "conceptId": "ai-data-security",
+      "conceptName": "Purview and AI data security"
     },
     {
       "answer": "A",
@@ -6755,7 +7171,9 @@
         "guardrails",
         "agent-security"
       ],
-      "topic": "Foundry guardrails — assignment and validation"
+      "topic": "Foundry guardrails — assignment and validation",
+      "conceptId": "ai-guardrails",
+      "conceptName": "Foundry guardrails and Copilot Studio protection"
     },
     {
       "answer": "B",
@@ -6793,7 +7211,9 @@
         "defender",
         "runtime-protection"
       ],
-      "topic": "Copilot Studio — real-time blocking of malicious tool invocations"
+      "topic": "Copilot Studio — real-time blocking of malicious tool invocations",
+      "conceptId": "ai-guardrails",
+      "conceptName": "Foundry guardrails and Copilot Studio protection"
     },
     {
       "answer": "A",
@@ -6832,7 +7252,9 @@
         "extensibility",
         "governance"
       ],
-      "topic": "Microsoft 365 Copilot extensibility — agent permission boundaries"
+      "topic": "Microsoft 365 Copilot extensibility — agent permission boundaries",
+      "conceptId": "agent-identity",
+      "conceptName": "Agent identity and permissions"
     },
     {
       "answer": "B",
@@ -6871,7 +7293,9 @@
         "patching",
         "node-image"
       ],
-      "topic": "AKS — node image integrity and security updates"
+      "topic": "AKS — node image integrity and security updates",
+      "conceptId": "aks-hardening",
+      "conceptName": "AKS identity, authorization, and hardening"
     },
     {
       "answer": "C",
@@ -6909,7 +7333,9 @@
         "cicd",
         "vulnerability-scanning"
       ],
-      "topic": "Defender for Containers — CI/CD vulnerability scanning"
+      "topic": "Defender for Containers — CI/CD vulnerability scanning",
+      "conceptId": "container-defender",
+      "conceptName": "Container threat protection"
     },
     {
       "answer": "D",
@@ -6947,7 +7373,9 @@
         "image-signing",
         "supply-chain"
       ],
-      "topic": "Azure Container Registry — signed image verification"
+      "topic": "Azure Container Registry — signed image verification",
+      "conceptId": "registry-security",
+      "conceptName": "Container registry security"
     },
     {
       "answer": "B",
@@ -6985,7 +7413,9 @@
         "ingress",
         "authentication"
       ],
-      "topic": "Azure Container Apps — ingress authentication and exposure"
+      "topic": "Azure Container Apps — ingress authentication and exposure",
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "answer": "A",
@@ -7023,7 +7453,9 @@
         "vnet-integration",
         "private-endpoint"
       ],
-      "topic": "App Service — outbound VNet integration versus inbound Private Endpoint"
+      "topic": "App Service — outbound VNet integration versus inbound Private Endpoint",
+      "conceptId": "appservice-security",
+      "conceptName": "App Service security"
     },
     {
       "answer": "C",
@@ -7061,7 +7493,9 @@
         "network-isolation",
         "private-endpoint"
       ],
-      "topic": "Azure Functions — restrict inbound access while preserving private dependencies"
+      "topic": "Azure Functions — restrict inbound access while preserving private dependencies",
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "answer": "D",
@@ -7099,7 +7533,9 @@
         "access-control",
         "http-trigger"
       ],
-      "topic": "Azure Logic Apps — inbound workflow authorization"
+      "topic": "Azure Logic Apps — inbound workflow authorization",
+      "conceptId": "serverless-security",
+      "conceptName": "Functions, Logic Apps, and container hosting"
     },
     {
       "answer": "B",
@@ -7137,7 +7573,9 @@
         "jwt",
         "backend-protection"
       ],
-      "topic": "API Management — validate JWT tokens before backend access"
+      "topic": "API Management — validate JWT tokens before backend access",
+      "conceptId": "api-security",
+      "conceptName": "API Management and AI gateways"
     },
     {
       "answer": "C",
@@ -7175,7 +7613,9 @@
         "app-service",
         "application-gateway"
       ],
-      "topic": "Azure WAF — protecting App Service from application-layer attacks"
+      "topic": "Azure WAF — protecting App Service from application-layer attacks",
+      "conceptId": "web-network-protection",
+      "conceptName": "DDoS and web application firewalls"
     },
     {
       "answer": "A",
@@ -7213,7 +7653,9 @@
         "kubernetes",
         "azure-policy"
       ],
-      "topic": "Azure Arc-enabled Kubernetes — centralized policy governance"
+      "topic": "Azure Arc-enabled Kubernetes — centralized policy governance",
+      "conceptId": "aks-hardening",
+      "conceptName": "AKS identity, authorization, and hardening"
     },
     {
       "answer": "B",
@@ -7251,7 +7693,9 @@
         "entra-authentication",
         "troubleshooting"
       ],
-      "topic": "Azure Bastion — troubleshooting Microsoft Entra RDP authentication"
+      "topic": "Azure Bastion — troubleshooting Microsoft Entra RDP authentication",
+      "conceptId": "bastion-access",
+      "conceptName": "Azure Bastion"
     },
     {
       "answer": "C",
@@ -7289,7 +7733,9 @@
         "alert-triage",
         "prompt-injection"
       ],
-      "topic": "Defender for AI Services — suspicious prompt activity triage"
+      "topic": "Defender for AI Services — suspicious prompt activity triage",
+      "conceptId": "ai-threat-protection",
+      "conceptName": "AI posture and threat investigation"
     },
     {
       "answer": "D",
@@ -7328,7 +7774,9 @@
         "incident-response",
         "advanced-hunting"
       ],
-      "topic": "Defender XDR — compromised autonomous agent investigation"
+      "topic": "Defender XDR — compromised autonomous agent investigation",
+      "conceptId": "ai-threat-protection",
+      "conceptName": "AI posture and threat investigation"
     },
     {
       "answer": "A",
@@ -7367,7 +7815,9 @@
         "indirect-injection",
         "guardrails"
       ],
-      "topic": "Foundry guardrails — indirect prompt injection defense"
+      "topic": "Foundry guardrails — indirect prompt injection defense",
+      "conceptId": "ai-guardrails",
+      "conceptName": "Foundry guardrails and Copilot Studio protection"
     },
     {
       "answer": "C",
@@ -7405,7 +7855,9 @@
         "external-protection",
         "generative-orchestration"
       ],
-      "topic": "Copilot Studio — external threat detection applicability"
+      "topic": "Copilot Studio — external threat detection applicability",
+      "conceptId": "ai-guardrails",
+      "conceptName": "Foundry guardrails and Copilot Studio protection"
     },
     {
       "answer": "B",
@@ -7444,7 +7896,9 @@
         "tee",
         "attestation"
       ],
-      "topic": "Confidential containers — protecting data in use"
+      "topic": "Confidential containers — protecting data in use",
+      "conceptId": "vm-integrity",
+      "conceptName": "VM encryption, confidential compute, and attestation"
     },
     {
       "answer": "D",
@@ -7482,7 +7936,9 @@
         "trusted-launch",
         "integrity-monitoring"
       ],
-      "topic": "VM guest attestation — detecting boot-chain integrity violations"
+      "topic": "VM guest attestation — detecting boot-chain integrity violations",
+      "conceptId": "vm-integrity",
+      "conceptName": "VM encryption, confidential compute, and attestation"
     },
     {
       "answer": "C",
@@ -7521,7 +7977,9 @@
         "entra-rdp",
         "compatibility"
       ],
-      "topic": "Azure Bastion — session recording versus Entra RDP compatibility"
+      "topic": "Azure Bastion — session recording versus Entra RDP compatibility",
+      "conceptId": "bastion-access",
+      "conceptName": "Azure Bastion"
     },
     {
       "answer": "B",
@@ -7560,7 +8018,9 @@
         "privileged-access",
         "nsg"
       ],
-      "topic": "JIT VM access — emergency access without weakening baseline controls"
+      "topic": "JIT VM access — emergency access without weakening baseline controls",
+      "conceptId": "jit-access",
+      "conceptName": "Just-in-time VM access"
     },
     {
       "answer": "B",
@@ -7599,7 +8059,9 @@
         "multicloud",
         "onboarding"
       ],
-      "topic": "Defender for Cloud — GCP connector onboarding"
+      "topic": "Defender for Cloud — GCP connector onboarding",
+      "conceptId": "multicloud-onboarding",
+      "conceptName": "Hybrid and multicloud onboarding"
     },
     {
       "answer": "B",
@@ -7638,7 +8100,9 @@
         "organization-scope",
         "resource-discovery"
       ],
-      "topic": "Defender for Cloud — GCP organization scope"
+      "topic": "Defender for Cloud — GCP organization scope",
+      "conceptId": "multicloud-onboarding",
+      "conceptName": "Hybrid and multicloud onboarding"
     },
     {
       "answer": "C",
@@ -7678,7 +8142,9 @@
         "least-privilege",
         "iam"
       ],
-      "topic": "Defender for Cloud — GCP permission remediation"
+      "topic": "Defender for Cloud — GCP permission remediation",
+      "conceptId": "multicloud-onboarding",
+      "conceptName": "Hybrid and multicloud onboarding"
     },
     {
       "answer": "D",
@@ -7718,7 +8184,9 @@
         "connector-health",
         "troubleshooting"
       ],
-      "topic": "Defender for Cloud — Multicloud connector health"
+      "topic": "Defender for Cloud — Multicloud connector health",
+      "conceptId": "multicloud-onboarding",
+      "conceptName": "Hybrid and multicloud onboarding"
     },
     {
       "answer": "A",
@@ -7757,7 +8225,9 @@
         "scu",
         "cost-management"
       ],
-      "topic": "Security Copilot — Compute capacity planning"
+      "topic": "Security Copilot — Compute capacity planning",
+      "conceptId": "copilot-capacity",
+      "conceptName": "Security Copilot capacity"
     },
     {
       "answer": "C",
@@ -7796,7 +8266,9 @@
         "workspace",
         "privacy"
       ],
-      "topic": "Security Copilot — Data residency configuration"
+      "topic": "Security Copilot — Data residency configuration",
+      "conceptId": "copilot-access",
+      "conceptName": "Security Copilot access and privacy"
     },
     {
       "answer": "B",
@@ -7835,7 +8307,9 @@
         "overage",
         "capacity-planning"
       ],
-      "topic": "Security Copilot — Capacity overage management"
+      "topic": "Security Copilot — Capacity overage management",
+      "conceptId": "copilot-capacity",
+      "conceptName": "Security Copilot capacity"
     },
     {
       "answer": "B",
@@ -7874,7 +8348,9 @@
         "configuration",
         "integrations"
       ],
-      "topic": "Security Copilot — Plugin configuration"
+      "topic": "Security Copilot — Plugin configuration",
+      "conceptId": "copilot-extensibility",
+      "conceptName": "Security Copilot plugins and agents"
     },
     {
       "answer": "D",
@@ -7913,7 +8389,9 @@
         "custom-plugins",
         "tool-discovery"
       ],
-      "topic": "Security Copilot — Custom MCP plugin updates"
+      "topic": "Security Copilot — Custom MCP plugin updates",
+      "conceptId": "copilot-extensibility",
+      "conceptName": "Security Copilot plugins and agents"
     },
     {
       "answer": "A",
@@ -7952,7 +8430,9 @@
         "github",
         "repository-security"
       ],
-      "topic": "Defender for Cloud — GitHub DevOps security"
+      "topic": "Defender for Cloud — GitHub DevOps security",
+      "conceptId": "devops-posture",
+      "conceptName": "DevOps security posture"
     },
     {
       "answer": "C",
@@ -7991,7 +8471,9 @@
         "pipelines",
         "devsecops"
       ],
-      "topic": "Defender for Cloud — Azure DevOps pipeline posture"
+      "topic": "Defender for Cloud — Azure DevOps pipeline posture",
+      "conceptId": "devops-posture",
+      "conceptName": "DevOps security posture"
     },
     {
       "answer": "B",
@@ -8030,7 +8512,9 @@
         "api-management",
         "discovery"
       ],
-      "topic": "Defender CSPM — API security posture discovery"
+      "topic": "Defender CSPM — API security posture discovery",
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "answer": "D",
@@ -8073,7 +8557,9 @@
         "attack-path",
         "risk-prioritization"
       ],
-      "topic": "Defender CSPM — API exposure prioritization"
+      "topic": "Defender CSPM — API exposure prioritization",
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "answer": "C",
@@ -8112,7 +8598,9 @@
         "attack-surface",
         "triage"
       ],
-      "topic": "Defender EASM — External web application triage"
+      "topic": "Defender EASM — External web application triage",
+      "conceptId": "external-attack-surface",
+      "conceptName": "External attack surface management"
     },
     {
       "answer": "A",
@@ -8151,7 +8639,9 @@
         "asset-prioritization",
         "vulnerabilities"
       ],
-      "topic": "Defender EASM — Prioritizing newly exposed assets"
+      "topic": "Defender EASM — Prioritizing newly exposed assets",
+      "conceptId": "external-attack-surface",
+      "conceptName": "External attack surface management"
     },
     {
       "answer": "B",
@@ -8190,7 +8680,9 @@
         "exceptions",
         "compliance"
       ],
-      "topic": "Defender Vulnerability Management — Baseline assessment exceptions"
+      "topic": "Defender Vulnerability Management — Baseline assessment exceptions",
+      "conceptId": "vulnerability-management",
+      "conceptName": "Vulnerability management"
     },
     {
       "answer": "D",
@@ -8229,7 +8721,9 @@
         "advanced-hunting",
         "reporting"
       ],
-      "topic": "Defender Vulnerability Management — Baseline compliance hunting"
+      "topic": "Defender Vulnerability Management — Baseline compliance hunting",
+      "conceptId": "vulnerability-management",
+      "conceptName": "Vulnerability management"
     },
     {
       "answer": "C",
@@ -8268,7 +8762,9 @@
         "remediation",
         "risk-prioritization"
       ],
-      "topic": "Defender CSPM — Attack path remediation sequencing"
+      "topic": "Defender CSPM — Attack path remediation sequencing",
+      "conceptId": "cspm-posture",
+      "conceptName": "Cloud security posture and attack paths"
     },
     {
       "answer": "B",
@@ -8308,7 +8804,9 @@
         "windows-events",
         "troubleshooting"
       ],
-      "topic": "Sentinel — Windows event DCR troubleshooting"
+      "topic": "Sentinel — Windows event DCR troubleshooting",
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     },
     {
       "answer": "D",
@@ -8347,7 +8845,9 @@
         "normalization",
         "kql"
       ],
-      "topic": "Sentinel — ASIM unifying parser"
+      "topic": "Sentinel — ASIM unifying parser",
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "answer": "A",
@@ -8387,7 +8887,9 @@
         "normalization",
         "kql"
       ],
-      "topic": "Sentinel — Custom ASIM parser development"
+      "topic": "Sentinel — Custom ASIM parser development",
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "answer": "C",
@@ -8427,7 +8929,9 @@
         "stix",
         "indicators"
       ],
-      "topic": "Sentinel — Threat intelligence TAXII integration"
+      "topic": "Sentinel — Threat intelligence TAXII integration",
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "answer": "B",
@@ -8466,7 +8970,9 @@
         "upload-api",
         "migration"
       ],
-      "topic": "Sentinel — Threat intelligence platform migration"
+      "topic": "Sentinel — Threat intelligence platform migration",
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "answer": "A",
@@ -8505,7 +9011,9 @@
         "upload-api",
         "migration"
       ],
-      "topic": "Sentinel — UEBA data source configuration"
+      "topic": "Sentinel — UEBA data source configuration",
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "answer": "D",
@@ -8548,7 +9056,9 @@
         "kql-jobs",
         "historical-investigation"
       ],
-      "topic": "Sentinel — Historical data lake investigation"
+      "topic": "Sentinel — Historical data lake investigation",
+      "conceptId": "sentinel-investigation",
+      "conceptName": "Sentinel investigation and data retention"
     },
     {
       "answer": "C",
@@ -8587,7 +9097,9 @@
         "incident-management",
         "execution-order"
       ],
-      "topic": "Sentinel — Ordered incident automation rules"
+      "topic": "Sentinel — Ordered incident automation rules",
+      "conceptId": "sentinel-automation",
+      "conceptName": "Sentinel automation"
     },
     {
       "answer": "B",
@@ -8626,7 +9138,9 @@
         "event-hubs",
         "security-recommendations"
       ],
-      "topic": "Defender for Cloud — Continuous export"
+      "topic": "Defender for Cloud — Continuous export",
+      "conceptId": "continuous-export",
+      "conceptName": "Defender for Cloud continuous export"
     },
     {
       "answer": "A",
@@ -8665,7 +9179,9 @@
         "rest-api",
         "automation"
       ],
-      "topic": "Defender for Cloud — Export automation scope"
+      "topic": "Defender for Cloud — Export automation scope",
+      "conceptId": "continuous-export",
+      "conceptName": "Defender for Cloud continuous export"
     },
     {
       "answer": "D",
@@ -8704,7 +9220,9 @@
         "data-sharing",
         "governance"
       ],
-      "topic": "Security Copilot — Data sharing and privacy controls"
+      "topic": "Security Copilot — Data sharing and privacy controls",
+      "conceptId": "copilot-access",
+      "conceptName": "Security Copilot access and privacy"
     },
     {
       "answer": "C",
@@ -8747,7 +9265,9 @@
         "data-sharing",
         "governance"
       ],
-      "topic": "Security Copilot — Grounded agent evaluation"
+      "topic": "Security Copilot — Grounded agent evaluation",
+      "conceptId": "copilot-extensibility",
+      "conceptName": "Security Copilot plugins and agents"
     },
     {
       "id": 261,
@@ -8774,7 +9294,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "The Properties tab in the Key Vault overview's main-pane tab row is the intended navigation target for this question. The Essentials summary shows soft-delete and purge-protection status, while the Properties tab provides further vault properties. Do not click the left navigation: the screenshot's Properties target is a tab, not a left-menu item."
+      "rationale": "The Properties tab in the Key Vault overview's main-pane tab row is the intended navigation target for this question. The Essentials summary shows soft-delete and purge-protection status, while the Properties tab provides further vault properties. Do not click the left navigation: the screenshot's Properties target is a tab, not a left-menu item.",
+      "conceptId": "keyvault-protection",
+      "conceptName": "Key Vault protection and networking"
     },
     {
       "id": 262,
@@ -8801,7 +9323,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Conditions define who and when the policy applies. Grant controls determine what the sign-in must satisfy, including an authentication strength. Correct target: Grant."
+      "rationale": "Conditions define who and when the policy applies. Grant controls determine what the sign-in must satisfy, including an authentication strength. Correct target: Grant.",
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 263,
@@ -8828,7 +9352,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Policies consume location conditions; Named locations is where reusable geographic or IP location definitions are managed. Correct target: Named locations."
+      "rationale": "Policies consume location conditions; Named locations is where reusable geographic or IP location definitions are managed. Correct target: Named locations.",
+      "conceptId": "conditional-access",
+      "conceptName": "Conditional Access"
     },
     {
       "id": 264,
@@ -8855,7 +9381,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Encryption protects stored data. Private endpoint connections manages private links, but Networking owns the account network access settings. Correct target: Networking."
+      "rationale": "Encryption protects stored data. Private endpoint connections manages private links, but Networking owns the account network access settings. Correct target: Networking.",
+      "conceptId": "storage-network",
+      "conceptName": "Storage networking"
     },
     {
       "id": 265,
@@ -8882,7 +9410,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "The blue Access configuration button is inside the 'Control access to key vault' card on the Overview page. This opens the configuration for the vault's permission model (Azure RBAC versus access policies). 'Access control (IAM)' manages Azure role assignments; the 'Access policies' link is not the button requested in this scenario."
+      "rationale": "The blue Access configuration button is inside the 'Control access to key vault' card on the Overview page. This opens the configuration for the vault's permission model (Azure RBAC versus access policies). 'Access control (IAM)' manages Azure role assignments; the 'Access policies' link is not the button requested in this scenario.",
+      "conceptId": "keyvault-permissions",
+      "conceptName": "Key Vault permissions"
     },
     {
       "id": 266,
@@ -8909,7 +9439,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Extensions manages installed VM add-ons; Identity manages managed identities. The Defender for Cloud entry surfaces security information for the VM. Correct target: Microsoft Defender for Cloud."
+      "rationale": "Extensions manages installed VM add-ons; Identity manages managed identities. The Defender for Cloud entry surfaces security information for the VM. Correct target: Microsoft Defender for Cloud.",
+      "conceptId": "server-protection",
+      "conceptName": "Server security posture and maintenance"
     },
     {
       "id": 267,
@@ -8936,7 +9468,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Access control assigns permissions on the VM resource; Identity configures the VM's managed identity itself. Correct target: Identity."
+      "rationale": "Access control assigns permissions on the VM resource; Identity configures the VM's managed identity itself. Correct target: Identity.",
+      "conceptId": "managed-identities",
+      "conceptName": "Managed identities"
     },
     {
       "id": 268,
@@ -8963,7 +9497,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Workloads shows Kubernetes deployments. Identity manages identities; Defender for Cloud focuses on security posture and threat protection. Correct target: Microsoft Defender for Cloud."
+      "rationale": "Workloads shows Kubernetes deployments. Identity manages identities; Defender for Cloud focuses on security posture and threat protection. Correct target: Microsoft Defender for Cloud.",
+      "conceptId": "container-defender",
+      "conceptName": "Container threat protection"
     },
     {
       "id": 269,
@@ -8990,7 +9526,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Security alerts addresses detected threats. Regulatory compliance groups controls by benchmark; Recommendations presents remediation items. Correct target: Recommendations."
+      "rationale": "Security alerts addresses detected threats. Regulatory compliance groups controls by benchmark; Recommendations presents remediation items. Correct target: Recommendations.",
+      "conceptId": "cloud-recommendations",
+      "conceptName": "Cloud recommendations and compliance"
     },
     {
       "id": 270,
@@ -9017,7 +9555,9 @@
         }
       ],
       "tolerance": 0.7,
-      "rationale": "Content hub is used to discover and install solutions. Analytics defines detection rules. Data connectors manages ingestion connections. Correct target: Data connectors."
+      "rationale": "Content hub is used to discover and install solutions. Analytics defines detection rules. Data connectors manages ingestion connections. Correct target: Data connectors.",
+      "conceptId": "sentinel-ingestion",
+      "conceptName": "Sentinel ingestion and connectors"
     }
   ]
 }

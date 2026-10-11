@@ -3,7 +3,7 @@
 // manifest.json is one of them (only data/exams/*.json is network-first), so a
 // new deck is invisible to returning visitors until the cache name changes and
 // activate() purges the old one.
-const CACHE = 'cert-study-v4';
+const CACHE = 'cert-study-v5-confidence-firebase';
 
 // Resolve everything relative to the SW's own scope so this works under
 // any deploy path (root '/', '/cert-study/', or any future subpath).
@@ -18,7 +18,9 @@ const PRECACHE = [
   rel('ai.js'),
   rel('auth.js'),
   rel('config.js'),
-  rel('public/vendor/supabase.js'),
+  rel('learning-core.js'),
+  rel('learning-store.js'),
+  rel('progress-backup.js'),
   rel('manifest.json'),
   rel('app.webmanifest'),
   rel('data/exams/sc-300.json'),
@@ -51,12 +53,18 @@ self.addEventListener('fetch', event => {
 
   const url = new URL(event.request.url);
 
-  // Never intercept cross-origin (Ollama, Google Fonts, etc.)
+  // Cache only the pinned Firebase SDK modules, never auth or database responses.
+  if (url.origin === 'https://www.gstatic.com' && url.pathname.startsWith('/firebasejs/13.0.0/')) {
+    event.respondWith(caches.match(event.request).then(cached => cached || fetch(event.request).then(res => { if (res.ok) caches.open(CACHE).then(cache => cache.put(event.request, res.clone())); return res; })));
+    return;
+  }
+
+  // Never intercept other cross-origin traffic (Ollama, Firebase APIs, etc.)
   if (url.origin !== location.origin) return;
 
   const isExamData = url.pathname.startsWith(BASE + 'data/exams/') && url.pathname.endsWith('.json');
 
-  if (isExamData) {
+  if (isExamData || url.pathname === BASE + 'config.js') {
     // Network-first for exam data so fresh questions load when online
     event.respondWith(
       fetch(event.request)
@@ -81,3 +89,4 @@ self.addEventListener('fetch', event => {
     );
   }
 });
+

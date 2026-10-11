@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://localhost:11434 http://127.0.0.1:11434 https://*.supabase.co wss://*.supabase.co; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://www.gstatic.com; connect-src 'self' http://localhost:11434 http://127.0.0.1:11434 https://*.googleapis.com https://*.firebaseapp.com https://www.gstatic.com; frame-src https://*.firebaseapp.com https://accounts.google.com; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com">
   <title>Cert Study</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,16 +17,7 @@
   <link rel="manifest" href="app.webmanifest" />
   <!-- Theme color for browser chrome -->
   <meta name="theme-color" content="#3b82f6" />
-<style>
-/* Hotspot questions: image and overlay share the exact rendered image bounds. */
-.hotspot-box{position:relative;width:100%;max-width:1100px;line-height:0;overflow:hidden;border:1px solid #d0d7e2;border-radius:8px}
-.hotspot-image{display:block;width:100%;height:auto;cursor:crosshair;user-select:none}
-.hotspot-overlay{position:absolute;inset:0;pointer-events:none}
-.hotspot-marker{position:absolute;width:16px;height:16px;transform:translate(-50%,-50%);border-radius:50%;border:3px solid #1565c0;background:#fff;box-shadow:0 1px 5px #3338}
-.hotspot-marker.hotspot-right{border-color:#15803d;background:#bbf7d0}
-.hotspot-marker.hotspot-wrong{border-color:#b91c1c;background:#fecaca}
-.hotspot-correct-zone{position:absolute;border:3px solid #15803d;background:#16a34a24;box-sizing:border-box}
-</style>
+
 </head>
 <body>
 
@@ -46,7 +37,7 @@
           <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           AI Assistant
         </button>
-        <!-- Account control — hidden entirely when Supabase isn't configured -->
+        <!-- Account sync is optional. -->
         <div id="account-control" class="account-control hidden">
           <button id="btn-signin" class="btn-header btn-signin" title="Sign in with Google to sync across devices">
             <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
@@ -58,12 +49,14 @@
           </button>
           <div id="account-menu" class="account-menu hidden">
             <div class="account-menu-email" id="account-email"></div>
+            <button id="btn-import-guest" class="btn-link hidden">Import this device’s guest progress</button>
             <button id="btn-signout" class="btn-link">Sign out</button>
           </div>
         </div>
       </div>
     </header>
 
+    <p id="home-sync-note" class="progress-sync-note" role="status"></p>
     <div id="exam-grid" class="exam-grid"></div>
 
     <div class="home-actions">
@@ -170,6 +163,11 @@
       <p id="q-text" class="q-text"></p>
       <div id="q-options" class="q-options"></div>
 
+      <fieldset class="confidence-fieldset">
+        <legend>How confident are you?</legend>
+        <div id="confidence-controls" class="confidence-controls"></div>
+        <p class="progress-hint">Choose before submitting. Correct guesses stay in your review list.</p>
+      </fieldset>
       <div class="quiz-actions">
         <button id="btn-submit" class="btn-primary" disabled>Submit</button>
         <button id="btn-next" class="btn-primary hidden"></button>
@@ -211,6 +209,11 @@
       </div>
     </div>
 
+    <div class="card">
+      <h2>Study next</h2>
+      <p class="progress-hint">Recent answers and confidence guide your next practice session.</p>
+      <div id="results-focus"></div>
+    </div>
     <div id="wrong-panel" class="card hidden">
       <h2>Incorrect answers</h2>
       <div id="wrong-list"></div>
@@ -228,31 +231,37 @@
       <div class="progress-toolbar">
         <label for="progress-exam-select">Exam</label>
         <select id="progress-exam-select" class="model-select"></select>
+        <button id="btn-sync" class="btn-secondary btn-sm">Sync now</button>
         <span id="progress-sync-note" class="progress-sync-note"></span>
       </div>
     </div>
 
+    <div class="card backup-toolbar">
+      <button id="btn-export-progress" class="btn-secondary btn-sm">Export progress</button>
+      <label class="btn-load">Import progress<input id="progress-import" type="file" accept=".json" hidden /></label>
+      <p class="progress-hint">Back up this profile or transfer progress between devices.</p>
+    </div>
     <div id="progress-empty" class="card empty-state hidden">
       <p><strong>No attempts yet.</strong></p>
-      <p>Finish a quiz and your score, domain breakdown, and trend will show up here.</p>
+      <p>Answer a few questions to discover your focus areas. Your answers save even if you leave early.</p>
     </div>
 
     <div id="progress-body" class="hidden">
-      <div class="card">
+      <div class="card" id="score-history-card">
         <h2>Score trend</h2>
         <div id="progress-summary" class="progress-summary"></div>
         <div id="progress-trend" class="progress-trend"></div>
       </div>
 
       <div class="card">
-        <h2>Domain mastery</h2>
+        <h2>Domain score history</h2>
         <p class="progress-hint">Aggregated across all attempts for this exam.</p>
         <div id="progress-domains"></div>
       </div>
 
       <div class="card">
         <h2>Focus areas</h2>
-        <p class="progress-hint">Weakest domains — study these next.</p>
+        <p class="progress-hint">Confident errors come first. Untested areas need assessment. Immediate retries do not erase a weakness.</p>
         <div id="progress-focus"></div>
       </div>
     </div>
@@ -317,10 +326,13 @@
 
   <div id="ai-overlay" class="ai-overlay hidden"></div>
 
-  <script src="public/vendor/supabase.js"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
+  <script src="learning-core.js"></script>
+  <script src="learning-store.js"></script>
+  <script src="progress-backup.js"></script>
   <script src="ai.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
+

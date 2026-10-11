@@ -43,89 +43,52 @@ const Timer = {
   getRemaining() { return this._rem; },
 };
 
-// ── Session persistence ────────────────────────────────────────
-// localStorage is always the source of truth (anonymous mode). When signed in,
-// Auth mirrors these to Supabase so sessions/history follow the user across
-// devices. All Auth calls are guarded no-ops when signed out / unconfigured.
-const SESSION_PREFIX = 'cs_sess_';
-const HISTORY_PREFIX = 'cs_hist_';
-const HISTORY_CAP    = 200;   // keep the most recent N attempts per exam locally
-
-function sessionKey(code) { return SESSION_PREFIX + (code || 'unknown'); }
-function historyKey(code) { return HISTORY_PREFIX + (code || 'unknown'); }
-
+// Local sessions and score history are isolated by guest / Firebase account.
+let storageOwner = 'guest';
+const HISTORY_CAP = 200;
+function storagePrefix(kind, owner = storageOwner) { return 'cs2:' + owner + ':' + kind + ':'; }
+function sessionKey(code, mode = 'regular', owner = storageOwner) { return storagePrefix('sess', owner) + encodeURIComponent(code || 'unknown') + ':' + mode; }
+function historyKey(code, owner = storageOwner) { return storagePrefix('hist', owner) + encodeURIComponent(code || 'unknown'); }
+function storeJSON(key, data) {
+  try { localStorage.setItem(key, JSON.stringify(data)); return true; }
+  catch { showToast('Device storage is full or unavailable. Export progress before leaving.', 'error', 8000); return false; }
+}
+function readJSON(key, fallback = null) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } }
 function saveSession() {
   if (!App.settings?.saveProgress || !App.current?.exam?.code) return;
-  const data = {
-    examCode:       App.current.exam.code,
-    poolIds:        App.pool.map(q => q.id),
-    idx:            App.idx,
-    answers:        App.answers,
-    settings:       App.settings,
-    timerRemaining: App.settings.timedMode ? Timer.getRemaining() : null,
-    savedAt:        Date.now(),
-  };
-  try { localStorage.setItem(sessionKey(App.current.exam.code), JSON.stringify(data)); }
-  catch { /* storage full */ }
-  if (typeof Auth !== 'undefined') Auth.pushSession(data);   // fire-and-forget
+  const data = { examCode: App.current.exam.code, mode: App.settings.mode || 'regular', sessionId: App.sessionId,
+    poolIds: App.pool.map(q => q.id), idx: App.idx, answers: App.answers, settings: App.settings,
+    timerRemaining: App.settings.timedMode ? Timer.getRemaining() : null, savedAt: Date.now(), cleared: false };
+  if (storeJSON(sessionKey(data.examCode, data.mode), data) && Auth.getUser()?.id === storageOwner) Auth.pushSession(data);
 }
-
-function loadSession(code) {
-  try {
-    const raw = localStorage.getItem(sessionKey(code));
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
+function loadSession(code, mode = 'regular') { const s = readJSON(sessionKey(code, mode)); return s?.cleared ? null : s; }
+function clearSession(code, mode = App.settings.mode || 'regular') {
+  const tombstone = { examCode: code, mode, cleared: true, savedAt: Date.now() };
+  if (storeJSON(sessionKey(code, mode), tombstone) && Auth.getUser()?.id === storageOwner) Auth.pushSession(tombstone);
 }
-
-function clearSession(code) {
-  localStorage.removeItem(sessionKey(code));
-  if (typeof Auth !== 'undefined') Auth.deleteSession(code);
-}
-
-// ── Attempt history (completed quizzes) ────────────────────────
-function loadHistory(code) {
-  try {
-    const raw = localStorage.getItem(historyKey(code));
-    const arr = raw ? JSON.parse(raw) : [];
-    return Array.isArray(arr) ? arr : [];
-  } catch { return []; }
-}
-
-function writeHistory(code, records) {
-  const trimmed = records.slice(-HISTORY_CAP);
-  try { localStorage.setItem(historyKey(code), JSON.stringify(trimmed)); }
-  catch { /* storage full */ }
-}
-
+function loadHistory(code) { const rows = readJSON(historyKey(code), []); return Array.isArray(rows) ? rows : []; }
+function writeHistory(code, records) { return storeJSON(historyKey(code), records.slice(-HISTORY_CAP)); }
 function recordAttempt(record) {
   const list = loadHistory(record.examCode);
-  list.push(record);
-  writeHistory(record.examCode, list);
-  if (typeof Auth !== 'undefined') Auth.saveAttempts([record]);   // fire-and-forget
+  if (list.some(r => r.id === record.id)) return;
+  if (writeHistory(record.examCode, [...list, record]) && Auth.getUser()?.id === storageOwner) Auth.saveAttempts([record]);
 }
-
-// Read every locally-stored session / history bucket (used by sign-in merge).
-function readAllLocalSessions() {
-  const out = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k || !k.startsWith(SESSION_PREFIX)) continue;
-    try { out.push(JSON.parse(localStorage.getItem(k))); } catch { /* skip */ }
-  }
-  return out.filter(s => s && s.examCode);
+function localBuckets(kind, owner = storageOwner) {
+  const prefix = storagePrefix(kind, owner), out = [];
+  for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k?.startsWith(prefix)) { const value = readJSON(k); if (value) out.push(value); } }
+  return out;
 }
-
-function readAllLocalHistory() {
-  const out = [];
+function readAllLocalSessions(owner = storageOwner) { return localBuckets('sess', owner).filter(s => s.examCode); }
+function readAllLocalHistory(owner = storageOwner) { return localBuckets('hist', owner).flat().filter(r => r.id && r.examCode); }
+function migrateLegacyProgress() {
+  if (localStorage.getItem('cs2:migrated')) return;
+  let ok = true;
   for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (!k || !k.startsWith(HISTORY_PREFIX)) continue;
-    try {
-      const arr = JSON.parse(localStorage.getItem(k));
-      if (Array.isArray(arr)) out.push(...arr);
-    } catch { /* skip */ }
+    const key = localStorage.key(i), value = readJSON(key);
+    if (key?.startsWith('cs_sess_') && value?.examCode) ok = storeJSON(sessionKey(value.examCode, 'regular', 'guest'), { ...value, mode: 'regular', sessionId: crypto.randomUUID() }) && ok;
+    if (key?.startsWith('cs_hist_') && Array.isArray(value)) ok = storeJSON(historyKey(key.slice(8), 'guest'), value) && ok;
   }
-  return out.filter(r => r && r.id && r.examCode);
+  if (ok) localStorage.setItem('cs2:migrated', '1'); // Original keys remain available for recovery.
 }
 
 // ── Toast ──────────────────────────────────────────────────────
@@ -151,72 +114,79 @@ const App = {
   idx:      0,
   answers:  {},
   settings: {},
+  sessionId: null,
+  confidence: null,
+  selected: null,
+  submitting: false,
+  recorded: false,
 };
 
-// ── Boot ───────────────────────────────────────────────────────
+// ── Boot and optional cloud sync ────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  wireStaticButtons();
-  initAIPanel();
-  if (typeof Auth !== 'undefined') {
-    await Auth.init();
-    Auth.onChange(onAuthChange);
-    onAuthChange(Auth.getUser());   // reflect any already-restored session
-  }
-  await loadFromManifest();
-  renderHome();
-  showScreen('home');
+  wireStaticButtons(); initAIPanel(); migrateLegacyProgress();
+  await LearningStore.init();
+  if (LearningStore.isFallback()) showToast('Using browser storage fallback. Export progress for a backup.', 'info', 6000);
+  await Auth.init();
+  storageOwner = Auth.getUser()?.id || 'guest'; LearningStore.setOwner(storageOwner);
+  Auth.onChange(user => { authTransition = authTransition.then(() => onAuthChange(user)); });
+  renderAccount(Auth.getUser());
+  await loadFromManifest(); renderHome(); showScreen('home');
+  if (Auth.isSignedIn()) syncMergeOnSignIn();
+  window.addEventListener('online', () => syncMergeOnSignIn());
+  window.addEventListener('cs-sync-status', renderSyncStatus);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && isScreenActive('quiz')) saveSession();
+  });
 });
-
-// Called on initial load and whenever the signed-in user changes.
-let _mergedThisSession = false;
+let authTransition = Promise.resolve(), syncing = false;
 async function onAuthChange(user) {
-  renderAccount(user);
-  if (user && !_mergedThisSession) {
-    _mergedThisSession = true;
-    await syncMergeOnSignIn();
-    renderHome();                                   // refresh resume badges
-    if (isScreenActive('progress')) openProgress(); // refresh open dashboard
-    showToast('Signed in — progress synced', 'success');
-  } else if (!user) {
-    _mergedThisSession = false;
+  const nextOwner = user?.id || 'guest';
+  if (nextOwner !== storageOwner) {
+    if (isScreenActive('quiz')) { saveSession(); Timer.clear(); }
+    storageOwner = nextOwner; LearningStore.setOwner(storageOwner);
+    App.answers = {}; App.pool = []; App.current = null;
+    renderHome(); showScreen('home');
   }
+  renderAccount(user); renderSyncStatus();
+  if (user) await syncMergeOnSignIn();
 }
-
-// Merge local (anonymous) data up on sign-in and pull the user's remote data
-// down, so localStorage and Supabase converge. Idempotent (dedupe by id).
+function renderSyncStatus() {
+  const message = Auth.getStatus();
+  document.getElementById('home-sync-note').textContent = message;
+  document.getElementById('progress-sync-note').textContent = message;
+}
 async function syncMergeOnSignIn() {
-  if (typeof Auth === 'undefined' || !Auth.isSignedIn()) return;
-
-  // Attempts: push local-only up, then union everything back into localStorage.
-  const localAttempts = readAllLocalHistory();
-  const remoteAttempts = await Auth.fetchAttempts();
-  const remoteIds = new Set(remoteAttempts.map(a => a.id));
-  const localOnly = localAttempts.filter(a => !remoteIds.has(a.id));
-  if (localOnly.length) await Auth.saveAttempts(localOnly);
-
-  const byExam = {};
-  for (const a of [...localAttempts, ...remoteAttempts]) {
-    (byExam[a.examCode] ||= new Map()).set(a.id, a);
-  }
-  for (const [code, m] of Object.entries(byExam)) {
-    const arr = [...m.values()].sort((x, y) => new Date(x.completedAt) - new Date(y.completedAt));
-    writeHistory(code, arr);
-  }
-
-  // Sessions: reconcile by savedAt — newer wins in both directions.
-  const remoteSessions = await Auth.pullSessions();
-  const remoteByCode = new Map(remoteSessions.map(s => [s.examCode, s]));
-  const localByCode  = new Map(readAllLocalSessions().map(s => [s.examCode, s]));
-  const codes = new Set([...remoteByCode.keys(), ...localByCode.keys()]);
-  for (const code of codes) {
-    const rs = remoteByCode.get(code);
-    const ls = localByCode.get(code);
-    if (rs && (!ls || rs.savedAt > ls.savedAt)) {
-      try { localStorage.setItem(sessionKey(code), JSON.stringify(rs)); } catch { /* full */ }
-    } else if (ls && (!rs || ls.savedAt > rs.savedAt)) {
-      await Auth.pushSession(ls);
+  const owner = storageOwner;
+  if (syncing || !Auth.isSignedIn() || Auth.getUser().id !== owner || !navigator.onLine) return;
+  syncing = true; Auth.report('Syncing progress…');
+  try {
+    const [remoteAttempts, remoteSessions, remoteEvents] = await Promise.all([Auth.fetchAttempts(), Auth.pullSessions(), Auth.fetchEvents()]);
+    if (storageOwner !== owner || Auth.getUser()?.id !== owner) return;
+    if (!remoteAttempts || !remoteSessions || !remoteEvents) return;
+    const localAttempts = readAllLocalHistory(), remoteIds = new Set(remoteAttempts.map(a => a.id));
+    let ok = await Auth.saveAttempts(localAttempts.filter(a => !remoteIds.has(a.id)));
+    if (storageOwner !== owner || Auth.getUser()?.id !== owner) return;
+    const byExam = new Map();
+    [...localAttempts, ...remoteAttempts].forEach(a => { if (!byExam.has(a.examCode)) byExam.set(a.examCode, new Map()); byExam.get(a.examCode).set(a.id, a); });
+    byExam.forEach((m, code) => writeHistory(code, [...m.values()].sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt))));
+    const sessions = new Map(remoteSessions.map(s => [s.examCode + ':' + (s.mode || 'regular'), s]));
+    for (const s of readAllLocalSessions()) {
+      const key = s.examCode + ':' + (s.mode || 'regular'), remote = sessions.get(key);
+      if (!remote || s.savedAt > remote.savedAt) { ok = await Auth.pushSession(s) && ok; sessions.set(key, s); }
+      if (storageOwner !== owner || Auth.getUser()?.id !== owner) return;
     }
-  }
+    sessions.forEach(s => storeJSON(sessionKey(s.examCode, s.mode || 'regular', owner), s));
+    await LearningStore.put(remoteEvents.filter(LearningCore.validEvent), { forOwner: owner, synced: true });
+    const remoteEventIds = new Set(remoteEvents.map(e => e.id));
+    await LearningStore.markSynced(LearningStore.pending(owner).filter(e => remoteEventIds.has(e.id)).map(e => e.id), owner);
+    const pending = LearningStore.pending(owner);
+    if (pending.length) {
+      if (Auth.getUser()?.id !== owner) return;
+      if (await Auth.saveEvents(pending)) await LearningStore.markSynced(pending.map(e => e.id), owner); else ok = false;
+    }
+    if (storageOwner === owner) { Auth.report(ok ? 'Progress synced' : 'Sync pending — saved on this device'); renderHome(); if (isScreenActive('progress')) openProgress(); }
+  } catch (e) { Auth.report('Sync pending — saved on this device', e); }
+  finally { syncing = false; }
 }
 
 async function loadFromManifest() {
@@ -294,39 +264,25 @@ document.getElementById('file-input')?.addEventListener('change', e => {
 
 // ── Home ───────────────────────────────────────────────────────
 function renderHome() {
-  const grid = document.getElementById('exam-grid');
-  if (!grid) return;
-
-  if (App.exams.length === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.innerHTML = '<p><strong>No exams loaded yet.</strong></p><p>Load a JSON exam file below, or use the AI Assistant to generate one.</p>';
-    grid.replaceChildren(empty);
-    return;
-  }
-
+  const grid = document.getElementById('exam-grid'); if (!grid) return;
+  renderSyncStatus();
+  if (!App.exams.length) { grid.innerHTML = '<p>No exams loaded. Load an exam file to begin.</p>'; return; }
   grid.innerHTML = App.exams.map((exam, i) => {
-    const meta     = exam._meta || {};
-    const category = meta.category || exam.exam.category || '';
-    const qCount   = exam.questions.length;
-    const domains  = (exam.exam.domains || []).length;
-    const session  = loadSession(exam.exam.code);
-    const catHtml  = category
-      ? `<div class="exam-card-category">${esc(category)}</div>`
-      : '';
-    const sessHtml = session
-      ? `<div class="exam-card-session"><span class="resume-badge">In progress · Q${session.idx + 1}/${session.poolIds.length}</span></div>`
-      : '';
-    const actHtml  = session
-      ? `<button class="btn-primary btn-sm" data-exam-idx="${i}" data-action="resume">Resume →</button>
-         <button class="btn-secondary btn-sm" data-exam-idx="${i}" data-action="new">New quiz</button>`
-      : `<button class="btn-primary" data-exam-idx="${i}" data-action="study">Study →</button>`;
+    const code = exam.exam.code, regular = loadSession(code), focus = loadSession(code, 'focus'), retry = loadSession(code, 'retry');
+    const groups = LearningCore.summarize(exam.questions, LearningStore.events(code));
+    const weak = groups.filter(g => g.priority > 0).slice(0, 3);
+    const summary = weak.length ? 'Focus next: ' + weak.map(g => g.name).join(' · ') : LearningStore.events(code).length ? 'Keep building evidence with a focused practice session.' : 'Start a short assessment to discover your focus areas.';
     return `<div class="exam-card">
-      ${catHtml}
+      <div class="exam-card-category">${esc(exam._meta?.category || exam.exam.category || '')}</div>
       <div class="exam-card-title">${esc(exam.exam.name)}</div>
-      <div class="exam-card-meta">${qCount} question${qCount !== 1 ? 's' : ''} · ${domains} domain${domains !== 1 ? 's' : ''} · Pass ${exam.exam.passingScore}/${exam.exam.maxScore}</div>
-      ${sessHtml}
-      <div class="exam-card-actions">${actHtml}</div>
+      <div class="exam-card-meta">${exam.questions.length} questions · ${(exam.exam.domains || []).length} domains</div>
+      <p class="study-summary">${esc(summary)}</p>
+      <div class="exam-card-actions">
+        ${regular ? `<button class="btn-secondary btn-sm" data-exam-idx="${i}" data-action="resume" data-mode="regular">Continue quiz · ${Object.keys(regular.answers || {}).length}/${regular.poolIds.length}</button>` : ''}
+        <button class="btn-primary btn-sm" data-exam-idx="${i}" data-action="${focus ? 'resume' : 'focus'}" data-mode="focus">${focus ? 'Continue focused practice' : weak.length ? 'Study weak areas' : 'Focused practice'} →</button>
+        ${retry ? `<button class="btn-secondary btn-sm" data-exam-idx="${i}" data-action="resume" data-mode="retry">Continue retry</button>` : ''}
+        <button class="btn-link" data-exam-idx="${i}" data-action="study">${regular ? 'Start new quiz' : 'Custom quiz'}</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -339,15 +295,18 @@ window.openSetup = function(examIdx) {
 
 // ── Resume saved session ───────────────────────────────────────
 function startQuizFromSession(session) {
-  App.settings = Object.assign({}, session.settings);
+  App.settings = Object.assign({}, session.settings, { mode: session.mode || 'regular' });
+  App.sessionId = session.sessionId || crypto.randomUUID();
+  App.recorded = false;
   App.answers  = Object.assign({}, session.answers);
-  App.idx      = session.idx;
+  App.idx      = 0;
 
   const byId = new Map(App.current.questions.map(q => [q.id, q]));
   App.pool   = session.poolIds.map(id => byId.get(id)).filter(Boolean);
+  App.pool.forEach(q => { if (App.answers[q.id]?.revision && App.answers[q.id].revision !== LearningCore.revision(q)) delete App.answers[q.id]; });
 
   if (App.pool.length === 0) {
-    clearSession(App.current.exam.code);
+    clearSession(App.current.exam.code, App.settings.mode);
     alert('Saved session could not be restored. Starting fresh.');
     openSetup(App.exams.indexOf(App.current));
     return;
@@ -404,13 +363,16 @@ function gatherSettings() {
     showLinks:    document.getElementById('opt-show-links').checked   !== false,
     saveProgress: document.getElementById('opt-save-progress').checked !== false,
     timedMode:    document.getElementById('opt-timed').checked        || false,
+    mode: 'regular',
     timerMinutes: parseInt(document.getElementById('timer-minutes').value) || 90,
   };
 }
 
 // ── Quiz ───────────────────────────────────────────────────────
-function startQuiz(retryPool) {
-  App.settings = gatherSettings();
+function startQuiz(retryPool, override) {
+  App.settings = override || { ...gatherSettings(), mode: retryPool ? 'retry' : 'regular' };
+  App.sessionId = crypto.randomUUID();
+  App.recorded = false;
   App.answers  = {};
   App.idx      = 0;
 
@@ -440,10 +402,48 @@ function startQuiz(retryPool) {
 }
 
 function handleTimerExpiry() {
-  var q = App.pool[App.idx];
-  if (q && !App.answers[q.id]) App.answers[q.id] = { selected: null, correct: false };
-  clearSession(App.current && App.current.exam && App.current.exam.code);
+  // Unanswered questions affect the quiz score, but are not evidence of a concept error.
   showResults();
+}
+function startFocus(exam, conceptKey = null) {
+  App.current = exam;
+  const pool = LearningCore.selectFocus(exam.questions, LearningStore.events(exam.exam.code), { conceptKey, count: 10 });
+  if (!pool.length) { showToast('No questions available for this focus area.', 'info'); return; }
+  const names = [...new Set(pool.map(q => LearningCore.concept(q).name))];
+  startQuiz(pool, { mode: 'focus', domains: [...new Set(pool.map(q => q.domain))], countMode: 'custom', customCount: 10, randomize: false, showExplain: true, showLinks: true, saveProgress: true, timedMode: false });
+  showToast('Today’s focus: ' + names.join(' · '), 'info', 6000);
+}
+function renderConfidence() {
+  App.confidence = null; App.selected = null;
+  document.getElementById('confidence-controls').innerHTML = LearningCore.confidenceValues.map(value => `<label class="confidence-option"><input type="radio" name="confidence" value="${value}" /><span>${value === 'guess' ? 'Guessing' : value === 'unsure' ? 'Unsure' : 'Confident'}</span></label>`).join('');
+  document.querySelectorAll('input[name="confidence"]').forEach(input => input.addEventListener('change', () => { App.confidence = input.value; updateSubmit(); }));
+}
+function updateSubmit() { document.getElementById('btn-submit').disabled = !App.confidence || App.selected === null || App.submitting; }
+async function saveQuestionAnswer(q, selected, correct) {
+  if (App.submitting || App.answers[q.id] || !App.confidence) return false;
+  App.submitting = true; updateSubmit();
+  document.getElementById('btn-back-quiz').disabled = true;
+  const remaining = App.settings.timedMode ? Timer.pause() : null;
+  const owner = storageOwner;
+  const event = { id: App.sessionId + '-q-' + q.id, examCode: App.current.exam.code, questionId: q.id,
+    revision: LearningCore.revision(q), domain: q.domain, selected, correct, confidence: App.confidence,
+    answeredAt: Date.now(), sessionId: App.sessionId, mode: App.settings.mode || 'regular' };
+  try {
+    await LearningStore.put([event], { forOwner: owner });
+    App.answers[q.id] = { selected, correct, confidence: event.confidence, revision: event.revision, eventId: event.id };
+    document.querySelectorAll('input[name="confidence"]').forEach(input => { input.disabled = true; });
+    if (App.settings.saveProgress) saveSession();
+    if (Auth.getUser()?.id === owner) {
+      Auth.report('Sync pending — saved on this device');
+      Auth.saveEvents([event]).then(async ok => { if (ok) { await LearningStore.markSynced([event.id], owner); if (storageOwner === owner) Auth.report(LearningStore.pending(owner).length ? 'Sync pending — saved on this device' : 'Answers synced'); } }).catch(e => Auth.report('Sync pending — saved on this device', e));
+    }
+    return true;
+  } catch (e) { showToast('Could not save this answer. Free device storage and submit again.', 'error', 8000); return false; }
+  finally {
+    App.submitting = false; document.getElementById('btn-back-quiz').disabled = false;
+    if (remaining !== null && remaining > 0) { document.getElementById('timer-display').classList.remove('hidden'); Timer.start(remaining, handleTimerExpiry); }
+    updateSubmit();
+  }
 }
 
 function renderQuestion() {
@@ -459,6 +459,7 @@ function renderQuestion() {
   document.getElementById('q-topic').textContent      = q.topic || '';
   document.getElementById('q-text').innerHTML         = esc(q.question).replace(/\n/g, '<br>');
 
+  renderConfidence();
   var optWrap = document.getElementById('q-options');
   if (q.type === 'hotspot') {
     renderHotspot(q, optWrap);
@@ -474,7 +475,7 @@ function renderQuestion() {
 
   optWrap.querySelectorAll('input').forEach(r =>
     r.addEventListener('change', () => {
-      document.getElementById('btn-submit').disabled = false;
+      App.selected = r.value; updateSubmit();
       optWrap.querySelectorAll('.opt-label').forEach(l => l.classList.remove('opt-selected'));
       r.closest('.opt-label').classList.add('opt-selected');
     })
@@ -503,7 +504,7 @@ function renderHotspot(q, wrap) {
   overlay.className = 'hotspot-overlay';
   box.append(img, overlay);
   wrap.append(box);
-  var chosen = null;
+  var chosen = null, marker = null;
   var submit = document.getElementById('btn-submit');
   var next = document.getElementById('btn-next');
   submit.disabled = true;
@@ -516,19 +517,19 @@ function renderHotspot(q, wrap) {
     chosen = { x: Math.max(0,Math.min(100,(e.clientX-rect.left)*100/rect.width)),
                y: Math.max(0,Math.min(100,(e.clientY-rect.top)*100/rect.height)) };
     overlay.replaceChildren();
-    var marker = document.createElement('span');
+    marker = document.createElement('span');
     marker.className = 'hotspot-marker';
     marker.style.left = chosen.x + '%';
     marker.style.top = chosen.y + '%';
     overlay.append(marker);
-    submit.disabled = false;
+    App.selected = { x: chosen.x, y: chosen.y }; updateSubmit();
   });
-  submit.onclick = () => {
-    if (!chosen) return;
+  submit.onclick = async () => {
+    if (!chosen || chosen.locked || !App.confidence) return;
     chosen.locked = true;
     var tolerance = Number.isFinite(q.tolerance) ? q.tolerance : 1;
     var correct = q.hotspots.some(h => chosen.x >= h.x - tolerance && chosen.x <= h.x + h.w + tolerance && chosen.y >= h.y - tolerance && chosen.y <= h.y + h.h + tolerance);
-    App.answers[q.id] = { selected: {x:chosen.x,y:chosen.y}, correct:correct };
+    if (!await saveQuestionAnswer(q, {x:chosen.x,y:chosen.y}, correct)) { chosen.locked = false; return; }
     q.hotspots.forEach(h => {
       var zone=document.createElement('span');
       zone.className='hotspot-correct-zone';
@@ -547,14 +548,14 @@ function renderHotspot(q, wrap) {
   };
 }
 
-function submitAnswer() {
+async function submitAnswer() {
   var radio = document.querySelector('input[name="q-ans"]:checked');
   var sel   = radio && radio.value;
   if (!sel) return;
 
   var q         = App.pool[App.idx];
   var isCorrect = sel === q.answer;
-  App.answers[q.id] = { selected: sel, correct: isCorrect };
+  if (!await saveQuestionAnswer(q, sel, isCorrect)) return;
 
   document.querySelectorAll('input[name="q-ans"]').forEach(r => {
     r.disabled = true;
@@ -646,16 +647,16 @@ function showResults() {
     if (App.answers[q.id] && App.answers[q.id].correct) stats[q.domain].c++;
   });
 
-  // Persist this completed attempt to history (local always, Supabase if signed in).
+  // Persist this completed attempt to history (local always, Firebase if signed in).
   recordAttempt({
-    id:          (self.crypto && crypto.randomUUID) ? crypto.randomUUID() : ('a-' + Date.now() + '-' + Math.random().toString(16).slice(2)),
+    id:          App.sessionId,
     examCode:    App.current.exam.code,
     examName:    App.current.exam.name,
     total:       total,
     correct:     correct,
     pct:         pct,
     domains:     Object.entries(stats).map(([num, d]) => ({ number: +num, name: d.name, correct: d.c, total: d.t })),
-    settings:    { domains: App.settings.domains, countMode: App.settings.countMode, timedMode: App.settings.timedMode },
+    settings:    { domains: App.settings.domains, countMode: App.settings.countMode, timedMode: App.settings.timedMode, mode: App.settings.mode },
     completedAt: new Date().toISOString(),
   });
 
@@ -665,12 +666,14 @@ function showResults() {
       var p = Math.round((d.c / d.t) * 100);
       return `<div class="domain-stat">
         <div class="domain-stat-label">Domain ${num}: ${esc(d.name)}</div>
-        <div class="mini-bar"><div class="mini-bar-fill ${p >= 70 ? 'pass' : 'fail'}" style="width:${p}%"></div></div>
+        <div class="mini-bar"><div class="mini-bar-fill ${p >= 70 ? 'pass' : 'fail'}" data-width="${p}"></div></div>
         <div class="domain-stat-score">${d.c}/${d.t} (${p}%)</div>
       </div>`;
     }).join('');
 
-  var wrong      = App.pool.filter(q => App.answers[q.id] && !App.answers[q.id].correct);
+  document.querySelectorAll('#domain-breakdown [data-width]').forEach(bar => { bar.style.width = bar.dataset.width + '%'; });
+  renderLearningFocus(App.current.exam.code, document.getElementById('results-focus'));
+  var wrong      = App.pool.filter(q => !App.answers[q.id] || !App.answers[q.id].correct);
   var retryBtn   = document.getElementById('btn-retry-wrong');
   var wrongPanel = document.getElementById('wrong-panel');
 
@@ -678,7 +681,7 @@ function showResults() {
     retryBtn.disabled = false;
     retryBtn.dataset.wrongIds = JSON.stringify(wrong.map(q => q.id));
     document.getElementById('wrong-list').innerHTML = wrong.map(q => {
-      var userAns = App.answers[q.id].selected;
+      var userAns = App.answers[q.id]?.selected;
       return `<div class="wrong-item">
         <p><strong>Q${q.id}.</strong> ${esc(q.question)}</p>
         ${userAns
@@ -706,7 +709,7 @@ function retryWrong() {
 // ── Progress dashboard ─────────────────────────────────────────
 function openProgress() {
   var sel = document.getElementById('progress-exam-select');
-  var withHistory = App.exams.filter(e => loadHistory(e.exam.code).length > 0);
+  var withHistory = App.exams.filter(e => loadHistory(e.exam.code).length > 0 || LearningStore.events(e.exam.code).length > 0);
   var list = withHistory.length ? withHistory : App.exams;
 
   sel.innerHTML = list.map(e =>
@@ -721,38 +724,36 @@ function openProgress() {
   renderProgress(initial);
 }
 
-async function renderProgress(code) {
-  var body  = document.getElementById('progress-body');
-  var empty = document.getElementById('progress-empty');
-  var note  = document.getElementById('progress-sync-note');
-
-  var signedIn = typeof Auth !== 'undefined' && Auth.isSignedIn();
-  var enabled  = typeof Auth !== 'undefined' && Auth.isEnabled();
-  note.textContent = signedIn ? 'Synced to your account'
-                   : enabled  ? 'Local only — sign in to sync across devices'
-                   : 'Stored locally on this device';
-
-  var attempts = code ? loadHistory(code) : [];
-  if (code && signedIn) {
-    var remote = await Auth.fetchAttempts(code);
-    var m = new Map();
-    attempts.concat(remote).forEach(a => m.set(a.id, a));
-    attempts = Array.from(m.values());
-  }
-  attempts.sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
-  if (code && signedIn) writeHistory(code, attempts);   // keep local cache warm
-
-  if (!attempts.length) {
-    body.classList.add('hidden');
-    empty.classList.remove('hidden');
+function renderProgress(code) {
+  const body = document.getElementById('progress-body'), empty = document.getElementById('progress-empty');
+  renderSyncStatus();
+  const attempts = code ? loadHistory(code).sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt)) : [];
+  const events = LearningStore.events(code);
+  empty.classList.toggle('hidden', attempts.length > 0 || events.length > 0);
+  body.classList.toggle('hidden', !attempts.length && !events.length);
+  document.getElementById('score-history-card').classList.toggle('hidden', !attempts.length);
+  if (attempts.length) { renderProgressSummary(attempts); renderProgressTrend(attempts); renderProgressDomains(attempts); }
+  else document.getElementById('progress-domains').innerHTML = '<p class="progress-hint">Complete a quiz to see domain score history.</p>';
+  renderLearningFocus(code, document.getElementById('progress-focus'));
+}
+function renderLearningFocus(code, target) {
+  const exam = App.exams.find(e => e.exam.code === code); if (!exam || !target) return;
+  const events = LearningStore.events(code), allGroups = LearningCore.summarize(exam.questions, events);
+  const assessed = allGroups.filter(g => g.tested), untested = allGroups.filter(g => !g.tested);
+  const card = g => {
+    const details = g.tested ? `${g.tested}/${g.available} distinct questions · ${g.misses} latest misses · ${g.confidentErrors} confident errors · ${g.uncertain} correct but uncertain` : `${g.available} questions available`;
+    return `<div class="learning-focus ${g.priority >= 3 ? 'needs-review' : ''}"><div>
+      <strong>${esc(g.name)}</strong><span class="learning-status">${esc(g.status)}${g.limited && g.status !== 'Limited evidence' ? ' · Limited evidence' : ''}</span>
+      <p>${esc(details)}</p><p>Domain ${g.domain}${g.lastPracticed ? ' · Last practiced ' + esc(new Date(g.lastPracticed).toLocaleDateString()) : ''}</p>
+      </div><button class="btn-secondary btn-sm" data-practice-code="${esc(code)}" data-concept-key="${esc(g.key)}">Practice this area →</button></div>`;
+  };
+  if (target.id === 'results-focus') {
+    target.innerHTML = (assessed.length ? assessed : untested).slice(0, 5).map(card).join('');
     return;
   }
-  empty.classList.add('hidden');
-  body.classList.remove('hidden');
-
-  renderProgressSummary(attempts);
-  renderProgressTrend(attempts);
-  renderProgressDomains(attempts);
+  target.innerHTML = `<p class="progress-hint">${assessed.length} areas assessed · ${untested.length} not assessed</p>` +
+    (assessed.length ? assessed.map(card).join('') : '<p class="progress-hint">No current answer-level evidence yet. Older scores are preserved; confidence was not recorded.</p>') +
+    (untested.length ? `<details class="untested-areas"><summary>Explore areas not assessed (${untested.length})</summary>${untested.map(card).join('')}</details>` : '');
 }
 
 function renderProgressSummary(attempts) {
@@ -812,17 +813,11 @@ function renderProgressDomains(attempts) {
   document.getElementById('progress-domains').innerHTML = rows.map(d =>
     `<div class="domain-stat">
       <div class="domain-stat-label">Domain ${d.num}: ${esc(d.name)}</div>
-      <div class="mini-bar"><div class="mini-bar-fill ${d.pct >= 70 ? 'pass' : 'fail'}" style="width:${d.pct}%"></div></div>
+      <div class="mini-bar"><div class="mini-bar-fill ${d.pct >= 70 ? 'pass' : 'fail'}" data-width="${d.pct}"></div></div>
       <div class="domain-stat-score">${d.c}/${d.t} (${d.pct}%)</div>
     </div>`
   ).join('');
-
-  var weak = rows.filter(d => d.pct < 70).sort((a, b) => a.pct - b.pct);
-  document.getElementById('progress-focus').innerHTML = weak.length
-    ? weak.map(d =>
-        `<div class="focus-item"><span class="focus-dom">Domain ${d.num}: ${esc(d.name)}</span><span class="focus-pct">${d.pct}%</span></div>`
-      ).join('')
-    : '<p class="progress-hint">All domains above 70% — great work! Keep it up.</p>';
+  document.querySelectorAll('#progress-domains [data-width]').forEach(bar => { bar.style.width = bar.dataset.width + '%'; });
 }
 
 function isScreenActive(name) {
@@ -843,11 +838,12 @@ function wireStaticButtons() {
 
     if (action === 'resume') {
       App.current = exam;
-      var session = loadSession(exam.exam.code);
+      var session = loadSession(exam.exam.code, btn.dataset.mode || 'regular');
       if (session) startQuizFromSession(session);
       else openSetup(idx);
+    } else if (action === 'focus') {
+      startFocus(exam);
     } else {
-      if (action === 'new') clearSession(exam.exam.code);
       openSetup(idx);
     }
   });
@@ -900,12 +896,21 @@ function wireStaticButtons() {
   document.getElementById('btn-signout')?.addEventListener('click', () => {
     document.getElementById('account-menu')?.classList.add('hidden');
     if (typeof Auth !== 'undefined') Auth.signOut();
-    showToast('Signed out — local progress kept on this device', 'info');
+    showToast('Guest mode — account progress stays separate on this device', 'info');
   });
   // Dismiss the account menu when clicking elsewhere.
   document.addEventListener('click', e => {
     var ctrl = document.getElementById('account-control');
     if (ctrl && !ctrl.contains(e.target)) document.getElementById('account-menu')?.classList.add('hidden');
+  });
+
+  wireProgressBackup();
+  document.getElementById('btn-sync').addEventListener('click', syncMergeOnSignIn);
+  document.getElementById('btn-import-guest').addEventListener('click', importGuestProgress);
+  document.addEventListener('click', e => {
+    const button = e.target.closest('[data-practice-code]'); if (!button) return;
+    const exam = App.exams.find(x => x.exam.code === button.dataset.practiceCode);
+    if (exam) startFocus(exam, button.dataset.conceptKey);
   });
 
   // ── Progress ─────────────────────────────────────────────────
@@ -926,6 +931,7 @@ function renderAccount(user) {
   var menu    = document.getElementById('account-menu');
 
   if (user) {
+    document.getElementById('btn-import-guest').classList.remove('hidden');
     signin.classList.add('hidden');
     account.classList.remove('hidden');
     document.getElementById('account-name').textContent  = user.name;
@@ -941,17 +947,18 @@ function renderAccount(user) {
 }
 
 // ── Screen transitions ─────────────────────────────────────────
+let screenTransition = 0;
 function showScreen(name) {
-  var current = document.querySelector('.screen.active');
   var next    = document.getElementById('screen-' + name);
-  if (!next || current === next) return;
-
-  if (current) {
-    current.classList.remove('visible');
-    setTimeout(() => current.classList.remove('active'), 200);
-  }
+  if (!next) return;
+  const transition = ++screenTransition;
+  document.querySelectorAll('.screen').forEach(screen => {
+    if (screen !== next) screen.classList.remove('active', 'visible');
+  });
   next.classList.add('active');
-  requestAnimationFrame(() => requestAnimationFrame(() => next.classList.add('visible')));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    if (transition === screenTransition) next.classList.add('visible');
+  }));
 }
 
 // ── Util ───────────────────────────────────────────────────────
@@ -977,3 +984,4 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => { /* ignore — works without SW */ });
   });
 }
+

@@ -71,6 +71,15 @@ const VALID_ANSWERS = new Set(['A', 'B', 'C', 'D']);
 
   if (q.id === undefined || q.id === null) errors.push(`${label}: missing "id"`);
   if (!q.question)                          errors.push(`${label}: missing "question"`);
+  if (q.type && !['choice', 'hotspot'].includes(q.type)) errors.push(`${label}: unsupported question type`);
+  if (q.type === 'hotspot') {
+    if (typeof q.image !== 'string' || !/^[A-Za-z0-9_-]+\/images\/[A-Za-z0-9_-]+\.png$/.test(q.image)) errors.push(`${label}: invalid hotspot image path`);
+    if (!Array.isArray(q.hotspots) || !q.hotspots.length) errors.push(`${label}: missing hotspots`);
+    else q.hotspots.forEach(h => {
+      if (!h || !['x','y','w','h'].every(k => Number.isFinite(h[k]) && h[k] >= 0 && h[k] <= 100) || h.w <= 0 || h.h <= 0 || h.x + h.w > 100 || h.y + h.h > 100 || typeof h.label !== 'string' || !h.label) errors.push(`${label}: invalid hotspot region`);
+    });
+    if (q.tolerance !== undefined && (!Number.isFinite(q.tolerance) || q.tolerance < 0 || q.tolerance > 5)) errors.push(`${label}: invalid tolerance`);
+  } else {
   if (!q.options || typeof q.options !== 'object') {
     errors.push(`${label}: missing or invalid "options" object`);
   } else {
@@ -82,6 +91,11 @@ const VALID_ANSWERS = new Set(['A', 'B', 'C', 'D']);
   if (!q.answer)                            errors.push(`${label}: missing "answer"`);
   else if (!VALID_ANSWERS.has(q.answer))    errors.push(`${label}: "answer" must be A, B, C, or D (got "${q.answer}")`);
   if (q.answer && q.options && !(q.answer in q.options)) errors.push(`${label}: answer "${q.answer}" not in options`);
+
+  }
+  if (q.conceptId !== undefined || q.conceptName !== undefined) {
+    if (typeof q.conceptId !== 'string' || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(q.conceptId) || typeof q.conceptName !== 'string' || !q.conceptName.trim()) errors.push(`${label}: conceptId and conceptName must be supplied together`);
+  }
 
   if (q.id !== undefined) {
     if (seenIds.has(q.id)) errors.push(`${label}: duplicate id "${q.id}"`);
@@ -123,3 +137,4 @@ fs.writeFileSync(reportPath, JSON.stringify({ valid, errors, warnings, checkedAt
 console.log(`Report saved to: ${path.relative(ROOT, reportPath)}\n`);
 
 process.exit(valid ? 0 : 1);
+
