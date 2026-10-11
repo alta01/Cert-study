@@ -3,7 +3,14 @@
   "title": "Cert Study Question",
   "description": "Schema for a single question in the app's flat exam JSON format.",
   "type": "object",
-  "required": ["id", "domain", "domainName", "question", "options", "answer"],
+  "required": [
+    "id",
+    "domain",
+    "domainName",
+    "question",
+    "options",
+    "answer"
+  ],
   "properties": {
     "id": {
       "description": "Unique integer identifier within the exam file.",
@@ -30,19 +37,37 @@
     "options": {
       "description": "Answer choices keyed A–D.",
       "type": "object",
-      "required": ["A", "B", "C", "D"],
+      "required": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
       "properties": {
-        "A": { "type": "string" },
-        "B": { "type": "string" },
-        "C": { "type": "string" },
-        "D": { "type": "string" }
+        "A": {
+          "type": "string"
+        },
+        "B": {
+          "type": "string"
+        },
+        "C": {
+          "type": "string"
+        },
+        "D": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
     "answer": {
       "description": "Key of the correct option.",
       "type": "string",
-      "enum": ["A", "B", "C", "D"]
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
     },
     "rationale": {
       "description": "Overall explanation shown when optionRationales is absent.",
@@ -52,10 +77,18 @@
       "description": "Per-option explanation (shown in the full explanation panel).",
       "type": "object",
       "properties": {
-        "A": { "type": "string" },
-        "B": { "type": "string" },
-        "C": { "type": "string" },
-        "D": { "type": "string" }
+        "A": {
+          "type": "string"
+        },
+        "B": {
+          "type": "string"
+        },
+        "C": {
+          "type": "string"
+        },
+        "D": {
+          "type": "string"
+        }
       },
       "additionalProperties": false
     },
@@ -64,12 +97,38 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["url"],
+        "required": [
+          "url"
+        ],
         "properties": {
-          "text": { "type": "string" },
-          "url": { "type": "string", "format": "uri", "pattern": "^https://" }
+          "text": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https://"
+          }
         },
         "additionalProperties": false
+      }
+    },
+    "objectiveId": {
+      "type": "string",
+      "description": "Official SC-500 skill bullet the question assesses"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "foundational",
+        "intermediate",
+        "advanced"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
       }
     }
   },
