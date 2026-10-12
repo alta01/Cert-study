@@ -1,0 +1,690 @@
+{
+  "exam": {
+    "code": "CISSP",
+    "name": "Certified Information Systems Security Professional",
+    "passingScore": 700,
+    "maxScore": 1000,
+    "domains": [
+      {
+        "number": 1,
+        "name": "Security and Risk Management",
+        "weight": "16%",
+        "topics": []
+      },
+      {
+        "number": 2,
+        "name": "Asset Security",
+        "weight": "10%",
+        "topics": []
+      },
+      {
+        "number": 3,
+        "name": "Security Architecture and Engineering",
+        "weight": "13%",
+        "topics": []
+      },
+      {
+        "number": 4,
+        "name": "Communication and Network Security",
+        "weight": "13%",
+        "topics": []
+      },
+      {
+        "number": 5,
+        "name": "Identity and Access Management (IAM)",
+        "weight": "13%",
+        "topics": []
+      },
+      {
+        "number": 6,
+        "name": "Security Assessment and Testing",
+        "weight": "12%",
+        "topics": []
+      },
+      {
+        "number": 7,
+        "name": "Security Operations",
+        "weight": "13%",
+        "topics": []
+      },
+      {
+        "number": 8,
+        "name": "Software Development Security",
+        "weight": "10%",
+        "topics": []
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": 1,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A business system cannot support a required security control. The security engineer recommends a compensating control, but material residual risk remains. Who should formally accept that risk?",
+      "options": {
+        "A": "The security engineer",
+        "B": "The authorized business risk owner",
+        "C": "The external auditor",
+        "D": "The control vendor"
+      },
+      "answer": "B",
+      "rationale": "The authorized business risk owner is responsible for formally accepting residual risk. Security engineers assess risks and recommend controls but cannot accept business risk without delegated authority."
+    },
+    {
+      "id": 2,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A SaaS platform has an asset value of $500,000 and an exposure factor of 40%. The annual rate of occurrence is 0.2. What is its ALE?",
+      "options": {
+        "A": "$20,000",
+        "B": "$40,000",
+        "C": "$100,000",
+        "D": "$200,000"
+      },
+      "answer": "B",
+      "rationale": "Annualized Loss Expectancy (ALE) = Asset Value x Exposure Factor x Annualized Rate of Occurrence. $500,000 x 0.40 x 0.2 = $40,000."
+    },
+    {
+      "id": 3,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A company needs to identify which business processes must be restored first after an outage. Which activity provides the most direct input?",
+      "options": {
+        "A": "Penetration test",
+        "B": "Business impact analysis",
+        "C": "Vulnerability scan",
+        "D": "Firewall rule review"
+      },
+      "answer": "B",
+      "rationale": "A Business Impact Analysis (BIA) identifies critical business processes, dependencies, disruption impacts, and recovery priorities. It helps determine which functions must be restored first."
+    },
+    {
+      "id": 4,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "Which choice BEST describes due diligence?",
+      "options": {
+        "A": "Purchasing a firewall",
+        "B": "Publishing an acceptable-use policy",
+        "C": "Regularly evaluating whether security controls are effective",
+        "D": "Accepting risk without documentation"
+      },
+      "answer": "C",
+      "rationale": "Due diligence involves continuously evaluating whether security controls are appropriate and effective. Due care involves taking reasonable steps to protect organizational assets."
+    },
+    {
+      "id": 5,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A company purchases cyber insurance to address ransomware-related losses. Which risk response is primarily being used?",
+      "options": {
+        "A": "Avoidance",
+        "B": "Transfer or sharing",
+        "C": "Elimination",
+        "D": "Acceptance only"
+      },
+      "answer": "B",
+      "rationale": "Purchasing cyber insurance transfers or shares certain financial consequences of ransomware incidents. It does not eliminate the underlying security risk or the organization's accountability."
+    },
+    {
+      "id": 6,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "An organization's database is restored in two hours, but its last usable recovery point is 30 minutes before the incident. Which metric addresses that lost-data window?",
+      "options": {
+        "A": "RTO",
+        "B": "MTD",
+        "C": "RPO",
+        "D": "MTTR"
+      },
+      "answer": "C",
+      "rationale": "Recovery Point Objective (RPO) defines the maximum acceptable amount of data loss measured in time. A 30-minute RPO means the organization must be capable of recovering data to a point no more than 30 minutes before the disruption."
+    },
+    {
+      "id": 7,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A developer changes customer account balances without authorization. Which security objective has been most directly compromised?",
+      "options": {
+        "A": "Confidentiality",
+        "B": "Integrity",
+        "C": "Availability",
+        "D": "Nonrepudiation"
+      },
+      "answer": "B",
+      "rationale": "Integrity ensures information remains accurate, complete, and protected against unauthorized modification. Changing customer account balances without authorization directly violates integrity."
+    },
+    {
+      "id": 8,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A vendor stores sensitive customer data. Which action is most appropriate BEFORE entering the agreement?",
+      "options": {
+        "A": "Assume the vendor's cloud provider handles all risk",
+        "B": "Evaluate data sensitivity, vendor risk, and required contractual safeguards",
+        "C": "Wait for the first security incident",
+        "D": "Require all customers to use the vendor's security policy"
+      },
+      "answer": "B",
+      "rationale": "Organizations should evaluate vendor risk, data sensitivity, security controls, and contractual requirements before entering an agreement. Outsourcing data processing does not automatically transfer accountability for the associated business risks."
+    },
+    {
+      "id": 9,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A security awareness campaign reports 100% course completion. Which additional measure would BEST demonstrate behavioral effectiveness?",
+      "options": {
+        "A": "Number of presentation slides",
+        "B": "Total training cost",
+        "C": "Improvement in accurate phishing reporting and reduced risky behavior",
+        "D": "Number of training emails sent"
+      },
+      "answer": "C",
+      "rationale": "Improvements in phishing reporting and reductions in risky behavior demonstrate whether security awareness is producing meaningful outcomes. Training completion alone measures participation, not effectiveness."
+    },
+    {
+      "id": 10,
+      "domain": 1,
+      "domainName": "Security and Risk Management",
+      "question": "A security professional is told to suppress evidence of a serious incident that could endanger the public. What should guide the response FIRST?",
+      "options": {
+        "A": "Obey organizational management regardless of consequences",
+        "B": "Protect the employer's reputation",
+        "C": "Follow professional ethical obligations and applicable law",
+        "D": "Delete the incident records"
+      },
+      "answer": "C",
+      "rationale": "The ISC2 Code of Ethics prioritizes protecting society, public trust, and infrastructure. Security professionals must follow ethical obligations and applicable laws even when organizational leadership pressures them to conceal a serious incident."
+    },
+    {
+      "id": 11,
+      "domain": 2,
+      "domainName": "Asset Security",
+      "question": "Who normally determines the sensitivity classification of business information?",
+      "options": {
+        "A": "Storage administrator",
+        "B": "Data owner",
+        "C": "External auditor",
+        "D": "Network engineer"
+      },
+      "answer": "B",
+      "rationale": "The data owner determines information classification and protection requirements based on business value, sensitivity, and applicable obligations. Data custodians implement the required safeguards."
+    },
+    {
+      "id": 12,
+      "domain": 2,
+      "domainName": "Asset Security",
+      "question": "A company deletes a sensitive file, but recoverable data remains on storage media. What is this called?",
+      "options": {
+        "A": "Data masking",
+        "B": "Data remanence",
+        "C": "Tokenization",
+        "D": "Data normalization"
+      },
+      "answer": "B",
+      "rationale": "Data remanence refers to residual information that remains recoverable after deletion or inadequate sanitization. Secure disposal techniques reduce the risk of unauthorized recovery."
+    },
+    {
+      "id": 13,
+      "domain": 2,
+      "domainName": "Asset Security",
+      "question": "Which control most directly addresses sensitive information being emailed outside an organization?",
+      "options": {
+        "A": "DLP",
+        "B": "RAID",
+        "C": "NAT",
+        "D": "Load balancing"
+      },
+      "answer": "A",
+      "rationale": "Data Loss Prevention (DLP) solutions identify and potentially block unauthorized transmission of sensitive information. They can enforce policies based on content, classification, destination, and other conditions."
+    },
+    {
+      "id": 14,
+      "domain": 2,
+      "domainName": "Asset Security",
+      "question": "A company must keep financial records for seven years but wants to delete all data after one year. What should govern the retention decision?",
+      "options": {
+        "A": "The lowest-cost storage option",
+        "B": "Applicable legal requirements and approved retention policy",
+        "C": "The developer's preference",
+        "D": "The default cloud setting"
+      },
+      "answer": "B",
+      "rationale": "Retention decisions must follow applicable legal, regulatory, contractual, and approved business requirements. An organization cannot disregard mandatory retention periods simply to reduce storage costs."
+    },
+    {
+      "id": 15,
+      "domain": 2,
+      "domainName": "Asset Security",
+      "question": "A SaaS company encrypts a customer database but stores unprotected exports in development environments. What is the primary issue?",
+      "options": {
+        "A": "Encryption is always ineffective",
+        "B": "Information protection is inconsistent across the data lifecycle",
+        "C": "Development databases need no controls",
+        "D": "Only network protection matters"
+      },
+      "answer": "B",
+      "rationale": "Information security controls must follow sensitive data throughout its lifecycle, including copies, exports, backups, and development environments. Encrypting the primary database does not protect unprotected copies elsewhere."
+    },
+    {
+      "id": 16,
+      "domain": 3,
+      "domainName": "Security Architecture and Engineering",
+      "question": "Which security model primarily addresses confidentiality using no-read-up and no-write-down rules?",
+      "options": {
+        "A": "Biba",
+        "B": "Bell\u2013LaPadula",
+        "C": "Clark\u2013Wilson",
+        "D": "Brewer\u2013Nash"
+      },
+      "answer": "B",
+      "rationale": "The Bell-LaPadula model protects confidentiality using the principles of no read up and no write down. These rules help prevent unauthorized disclosure across classification levels."
+    },
+    {
+      "id": 17,
+      "domain": 3,
+      "domainName": "Security Architecture and Engineering",
+      "question": "Which model emphasizes well-formed transactions and separation of duties for commercial integrity?",
+      "options": {
+        "A": "Clark\u2013Wilson",
+        "B": "Bell\u2013LaPadula",
+        "C": "Brewer\u2013Nash",
+        "D": "Take-Grant"
+      },
+      "answer": "A",
+      "rationale": "Clark-Wilson protects commercial data integrity through well-formed transactions, controlled procedures, and separation of duties. It emphasizes preventing unauthorized or improper data modifications."
+    },
+    {
+      "id": 18,
+      "domain": 3,
+      "domainName": "Security Architecture and Engineering",
+      "question": "Which mechanism most directly provides both message integrity and verifiable public-key signer authentication?",
+      "options": {
+        "A": "AES encryption",
+        "B": "A plain checksum",
+        "C": "A digital signature",
+        "D": "RAID 1"
+      },
+      "answer": "C",
+      "rationale": "Digital signatures support message integrity and public-key verification of the signer's identity. When properly implemented, they can also support nonrepudiation."
+    },
+    {
+      "id": 19,
+      "domain": 3,
+      "domainName": "Security Architecture and Engineering",
+      "question": "A security architect wants to reduce the impact of one failed control. What design principle is most appropriate?",
+      "options": {
+        "A": "Security through obscurity",
+        "B": "Defense in depth",
+        "C": "Single sign-on",
+        "D": "Maximum complexity"
+      },
+      "answer": "B",
+      "rationale": "Defense in depth uses multiple complementary security controls to reduce dependence on any single safeguard. If one control fails, additional layers may prevent or limit compromise."
+    },
+    {
+      "id": 20,
+      "domain": 3,
+      "domainName": "Security Architecture and Engineering",
+      "question": "Which responsibility normally remains with a customer using a SaaS platform?",
+      "options": {
+        "A": "Maintaining the provider's physical data center",
+        "B": "Installing the provider's hypervisor updates",
+        "C": "Managing assigned user permissions and organizational data use",
+        "D": "Replacing the provider's storage hardware"
+      },
+      "answer": "C",
+      "rationale": "SaaS customers generally remain responsible for managing their users, permissions, organizational data, and customer-controlled configurations. The provider typically manages underlying infrastructure and platform operations."
+    },
+    {
+      "id": 21,
+      "domain": 4,
+      "domainName": "Communication and Network Security",
+      "question": "Which OSI layer is primarily responsible for logical IP routing?",
+      "options": {
+        "A": "Physical",
+        "B": "Data Link",
+        "C": "Network",
+        "D": "Presentation"
+      },
+      "answer": "C",
+      "rationale": "The Network layer (OSI Layer 3) handles logical addressing and routing between networks. IP and routers operate primarily at this layer."
+    },
+    {
+      "id": 22,
+      "domain": 4,
+      "domainName": "Communication and Network Security",
+      "question": "What is the primary security benefit of microsegmentation?",
+      "options": {
+        "A": "Eliminates encryption needs",
+        "B": "Limits lateral movement using granular traffic policies",
+        "C": "Makes all systems publicly accessible",
+        "D": "Guarantees zero vulnerabilities"
+      },
+      "answer": "B",
+      "rationale": "Microsegmentation applies granular communication policies between workloads to restrict unauthorized connections. This reduces opportunities for lateral movement after an initial compromise."
+    },
+    {
+      "id": 23,
+      "domain": 4,
+      "domainName": "Communication and Network Security",
+      "question": "Which technology primarily detects suspicious network activity without inherently blocking it?",
+      "options": {
+        "A": "IDS",
+        "B": "IPS configured inline",
+        "C": "Firewall deny rule",
+        "D": "Network access blocklist"
+      },
+      "answer": "A",
+      "rationale": "An Intrusion Detection System (IDS) primarily monitors network activity and generates alerts about suspicious behavior. An Intrusion Prevention System (IPS) can additionally block traffic when appropriately deployed."
+    },
+    {
+      "id": 24,
+      "domain": 4,
+      "domainName": "Communication and Network Security",
+      "question": "An administrator needs a secure remote command-line connection to a server. Which protocol is most appropriate?",
+      "options": {
+        "A": "Telnet",
+        "B": "FTP",
+        "C": "SSH",
+        "D": "HTTP"
+      },
+      "answer": "C",
+      "rationale": "Secure Shell (SSH) provides encrypted and authenticated remote administration. It is preferred over insecure protocols such as Telnet."
+    },
+    {
+      "id": 25,
+      "domain": 4,
+      "domainName": "Communication and Network Security",
+      "question": "Which factor should be evaluated FIRST when selecting security requirements for a third-party network connection?",
+      "options": {
+        "A": "Preferred firewall brand",
+        "B": "Business purpose, information flows, trust boundaries, and risk",
+        "C": "Cable color",
+        "D": "Availability of public IP addresses only"
+      },
+      "answer": "B",
+      "rationale": "Network security requirements should begin with understanding business objectives, information flows, trust boundaries, and risks. These requirements determine which architecture and safeguards are appropriate."
+    },
+    {
+      "id": 26,
+      "domain": 5,
+      "domainName": "Identity and Access Management (IAM)",
+      "question": "An application uses an identity provider to learn who the user is through an ID token. Which protocol is most directly associated with this?",
+      "options": {
+        "A": "OAuth 2.0 alone",
+        "B": "OpenID Connect",
+        "C": "SNMP",
+        "D": "IPsec"
+      },
+      "answer": "B",
+      "rationale": "OpenID Connect (OIDC) adds an identity and authentication layer to OAuth 2.0 and supports ID tokens. OAuth 2.0 alone is an authorization framework, not an authentication protocol."
+    },
+    {
+      "id": 27,
+      "domain": 5,
+      "domainName": "Identity and Access Management (IAM)",
+      "question": "Which access control model primarily assigns permissions based on job roles?",
+      "options": {
+        "A": "DAC",
+        "B": "MAC",
+        "C": "RBAC",
+        "D": "Rule-based filtering"
+      },
+      "answer": "C",
+      "rationale": "Role-Based Access Control (RBAC) assigns permissions to roles that represent organizational responsibilities. Users receive permissions through their assigned roles rather than requiring individually managed entitlements."
+    },
+    {
+      "id": 28,
+      "domain": 5,
+      "domainName": "Identity and Access Management (IAM)",
+      "question": "An organization requires a password and a separate PIN to access an application. How many factor categories are represented?",
+      "options": {
+        "A": "One",
+        "B": "Two",
+        "C": "Three",
+        "D": "Four"
+      },
+      "answer": "A",
+      "rationale": "A password and PIN both represent something the user knows, so they constitute only one authentication factor category. True multifactor authentication requires credentials from different factor categories."
+    },
+    {
+      "id": 29,
+      "domain": 5,
+      "domainName": "Identity and Access Management (IAM)",
+      "question": "What is the strongest governance reason to perform regular privileged access reviews?",
+      "options": {
+        "A": "Make login screens simpler",
+        "B": "Validate continuing business need and eliminate unnecessary privileges",
+        "C": "Increase the number of admin accounts",
+        "D": "Replace incident response"
+      },
+      "answer": "B",
+      "rationale": "Privileged access reviews validate that elevated permissions remain justified by current business responsibilities. They help identify excessive, unnecessary, and outdated privileges."
+    },
+    {
+      "id": 30,
+      "domain": 5,
+      "domainName": "Identity and Access Management (IAM)",
+      "question": "A staff member transfers to another team. What is the best general access-management action?",
+      "options": {
+        "A": "Keep old access indefinitely",
+        "B": "Grant new access without removing old access",
+        "C": "Reevaluate entitlements and remove permissions no longer required",
+        "D": "Disable all logging"
+      },
+      "answer": "C",
+      "rationale": "An employee's access must be reevaluated when their job responsibilities change. Permissions no longer required should be removed to enforce least privilege and prevent privilege accumulation."
+    },
+    {
+      "id": 31,
+      "domain": 6,
+      "domainName": "Security Assessment and Testing",
+      "question": "Which activity most directly evaluates whether a known weakness can be exploited under an agreed scope?",
+      "options": {
+        "A": "Penetration testing",
+        "B": "Asset inventory",
+        "C": "Data classification",
+        "D": "Security awareness training"
+      },
+      "answer": "A",
+      "rationale": "Penetration testing attempts to validate whether vulnerabilities can actually be exploited within an authorized scope. Unlike vulnerability scanning, it can demonstrate attack paths and practical impact."
+    },
+    {
+      "id": 32,
+      "domain": 6,
+      "domainName": "Security Assessment and Testing",
+      "question": "A security team measures the number of critical internet-facing vulnerabilities that remain beyond their remediation deadline. This is most naturally a:",
+      "options": {
+        "A": "KRI",
+        "B": "Encryption algorithm",
+        "C": "Recovery site classification",
+        "D": "Biometric factor"
+      },
+      "answer": "A",
+      "rationale": "A Key Risk Indicator (KRI) measures conditions that signal current or increasing organizational risk. Overdue critical vulnerabilities on internet-facing assets indicate potentially increasing exposure."
+    },
+    {
+      "id": 33,
+      "domain": 6,
+      "domainName": "Security Assessment and Testing",
+      "question": "What should be established BEFORE a penetration test begins?",
+      "options": {
+        "A": "A public announcement",
+        "B": "Authorization, scope, and rules of engagement",
+        "C": "A promise that no findings will occur",
+        "D": "Deletion of existing security logs"
+      },
+      "answer": "B",
+      "rationale": "Penetration testing requires explicit authorization, an agreed scope, and defined rules of engagement before testing begins. These establish legal boundaries, responsibilities, and operational safeguards."
+    },
+    {
+      "id": 34,
+      "domain": 6,
+      "domainName": "Security Assessment and Testing",
+      "question": "Why is independence important in security auditing?",
+      "options": {
+        "A": "It removes all need for technical knowledge",
+        "B": "It reduces conflicts of interest and strengthens assurance",
+        "C": "It guarantees perfect security",
+        "D": "It prevents management from seeing findings"
+      },
+      "answer": "B",
+      "rationale": "Auditor independence reduces conflicts of interest and improves the credibility of findings. Independent assurance helps stakeholders trust that assessments are objective."
+    },
+    {
+      "id": 35,
+      "domain": 6,
+      "domainName": "Security Assessment and Testing",
+      "question": "A vulnerability scanner reports a high-severity issue. What is the best next step before deciding remediation priority?",
+      "options": {
+        "A": "Automatically shut down the business service",
+        "B": "Consider asset criticality, exposure, exploitability, and business impact",
+        "C": "Ignore the finding",
+        "D": "Assign priority based only on the vulnerability title"
+      },
+      "answer": "B",
+      "rationale": "Vulnerabilities should be prioritized using exploitability, asset criticality, exposure, existing safeguards, and potential business impact. A severity score alone does not establish organizational risk."
+    },
+    {
+      "id": 36,
+      "domain": 7,
+      "domainName": "Security Operations",
+      "question": "A response team isolates a compromised server from the network to prevent the attack from spreading. Which incident response activity is this?",
+      "options": {
+        "A": "Eradication",
+        "B": "Containment",
+        "C": "Lessons learned",
+        "D": "Recovery"
+      },
+      "answer": "B",
+      "rationale": "Containment limits the immediate impact or spread of an incident. Isolating an affected server prevents additional compromise while investigation and remediation continue."
+    },
+    {
+      "id": 37,
+      "domain": 7,
+      "domainName": "Security Operations",
+      "question": "Which evidence-handling practice most directly documents who possessed a forensic device and when?",
+      "options": {
+        "A": "Load balancing",
+        "B": "Chain of custody",
+        "C": "Data minimization",
+        "D": "Network segmentation"
+      },
+      "answer": "B",
+      "rationale": "Chain of custody documents evidence collection, possession, handling, and transfers. It supports evidence integrity, accountability, and admissibility considerations."
+    },
+    {
+      "id": 38,
+      "domain": 7,
+      "domainName": "Security Operations",
+      "question": "Which backup approach generally requires the last full backup and every subsequent incremental backup for recovery?",
+      "options": {
+        "A": "Incremental",
+        "B": "Differential",
+        "C": "Full only",
+        "D": "Mirroring"
+      },
+      "answer": "A",
+      "rationale": "Incremental backups capture changes since the preceding relevant backup. Restoration generally requires the last full backup and every subsequent incremental backup in the applicable sequence."
+    },
+    {
+      "id": 39,
+      "domain": 7,
+      "domainName": "Security Operations",
+      "question": "Which disaster recovery test generally presents the highest direct operational disruption risk?",
+      "options": {
+        "A": "Tabletop",
+        "B": "Documentation review",
+        "C": "Full-interruption test",
+        "D": "Read-through"
+      },
+      "answer": "C",
+      "rationale": "A full-interruption disaster recovery test involves stopping production operations and switching to recovery capabilities. It provides strong recovery evidence but introduces substantial operational disruption risk."
+    },
+    {
+      "id": 40,
+      "domain": 7,
+      "domainName": "Security Operations",
+      "question": "A backup dashboard shows every job completed successfully. What should the security team do to validate recoverability?",
+      "options": {
+        "A": "Assume recovery is guaranteed",
+        "B": "Periodically perform and document restoration tests",
+        "C": "Disable backup monitoring",
+        "D": "Delete old recovery procedures"
+      },
+      "answer": "B",
+      "rationale": "Periodic restoration testing verifies that backups are usable and recovery procedures work as intended. Successful backup jobs alone do not establish that data and systems can be restored within business requirements."
+    },
+    {
+      "id": 41,
+      "domain": 8,
+      "domainName": "Software Development Security",
+      "question": "Which security testing method examines code without running the application?",
+      "options": {
+        "A": "DAST",
+        "B": "SAST",
+        "C": "Network DDoS testing",
+        "D": "Disaster recovery testing"
+      },
+      "answer": "B",
+      "rationale": "Static Application Security Testing (SAST) examines source code or application artifacts without executing the application. It helps identify potential weaknesses during development."
+    },
+    {
+      "id": 42,
+      "domain": 8,
+      "domainName": "Software Development Security",
+      "question": "What is the most direct general protection against SQL injection?",
+      "options": {
+        "A": "Parameterized queries",
+        "B": "Increasing server RAM",
+        "C": "Changing the DNS server",
+        "D": "Using only client-side validation"
+      },
+      "answer": "A",
+      "rationale": "Parameterized queries keep untrusted input separate from SQL query structure. This prevents supplied data from being interpreted as executable SQL commands."
+    },
+    {
+      "id": 43,
+      "domain": 8,
+      "domainName": "Software Development Security",
+      "question": "A user can access another customer's invoice by changing an invoice ID in the API request. Which weakness is most directly involved?",
+      "options": {
+        "A": "Broken object-level authorization",
+        "B": "Weak hashing algorithm",
+        "C": "Missing load balancing",
+        "D": "DNS cache poisoning"
+      },
+      "answer": "A",
+      "rationale": "Broken Object-Level Authorization (BOLA) occurs when an application fails to verify that a user is authorized to access a requested object. Changing an invoice identifier to retrieve another customer's invoice is a classic example."
+    },
+    {
+      "id": 44,
+      "domain": 8,
+      "domainName": "Software Development Security",
+      "question": "What is the main purpose of software composition analysis?",
+      "options": {
+        "A": "Manage HVAC systems",
+        "B": "Identify third-party software components and relevant risks",
+        "C": "Configure network routes",
+        "D": "Replace all manual application tests"
+      },
+      "answer": "B",
+      "rationale": "Software Composition Analysis (SCA) identifies third-party libraries, dependencies, and associated security or licensing risks. It supports software supply chain security and dependency management."
+    },
+    {
+      "id": 45,
+      "domain": 8,
+      "domainName": "Software Development Security",
+      "question": "Which practice BEST supports secure software delivery across frequent releases?",
+      "options": {
+        "A": "Perform security testing only after deployment",
+        "B": "Integrate automated checks, secure design, reviews, and accountable remediation into CI/CD",
+        "C": "Give every pipeline identity global administrative permissions",
+        "D": "Disable change tracking"
+      },
+      "answer": "B",
+      "rationale": "Integrating secure design, automated testing, code reviews, and accountable remediation into CI/CD embeds security throughout delivery. This approach provides more consistent protection than relying exclusively on testing after deployment."
+    }
+  ]
+}
