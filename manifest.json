@@ -16,7 +16,7 @@
     {
       "id": "saa-c03",
       "file": "data/exams/aws-saa-c03.json",
-      "title": "SAA-C03: AWS Certified Solutions Architect – Associate",
+      "title": "SAA-C03: AWS Certified Solutions Architect \u2013 Associate",
       "category": "AWS Certifications"
     },
     {
@@ -30,6 +30,12 @@
       "file": "data/exams/sc-500.json",
       "title": "SC-500: Implementing End-to-End Security Controls for Cloud and AI Workloads",
       "category": "Microsoft Certifications"
+    },
+    {
+      "id": "cissp",
+      "file": "data/exams/cissp.json",
+      "title": "CISSP: Certified Information Systems Security Professional",
+      "category": "Security Certifications"
     }
   ]
 }
