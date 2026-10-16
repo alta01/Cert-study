@@ -776,7 +776,7 @@
       "references": [
         {
           "text": "NIST SP 800-30 Rev. 1 - Guide for Conducting Risk Assessments",
-          "url": "https://csrc.nist.gov/pubs/sp/800/39/final"
+          "url": "https://csrc.nist.gov/pubs/sp/800/30/r1/final"
         }
       ],
       "topic": "Risk response effectiveness",
@@ -3051,7 +3051,7 @@
           "url": "https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final"
         }
       ],
-      "topic": "Software-Defined Networking Control Plane",
+      "topic": "Secure time synchronization",
       "id": 139
     },
     {
