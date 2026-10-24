@@ -3,7 +3,7 @@
 // manifest.json is one of them (only data/exams/*.json is network-first), so a
 // new deck is invisible to returning visitors until the cache name changes and
 // activate() purges the old one.
-const CACHE = 'cert-study-v4';
+const CACHE = 'cert-study-v5';
 
 // Resolve everything relative to the SW's own scope so this works under
 // any deploy path (root '/', '/cert-study/', or any future subpath).

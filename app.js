@@ -59,6 +59,7 @@ function saveSession() {
   const data = {
     examCode:       App.current.exam.code,
     poolIds:        App.pool.map(q => q.id),
+    scrambleSeed:   App.scrambleSeed || null,
     idx:            App.idx,
     answers:        App.answers,
     settings:       App.settings,
@@ -344,7 +345,8 @@ function startQuizFromSession(session) {
   App.idx      = session.idx;
 
   const byId = new Map(App.current.questions.map(q => [q.id, q]));
-  App.pool   = session.poolIds.map(id => byId.get(id)).filter(Boolean);
+  App.scrambleSeed = session.scrambleSeed || null;   // sessions saved before scrambling existed stay unscrambled
+  App.pool   = applyScramble(session.poolIds.map(id => byId.get(id)).filter(Boolean), App.scrambleSeed);
 
   if (App.pool.length === 0) {
     clearSession(App.current.exam.code);
@@ -387,6 +389,7 @@ function renderSetup() {
 
   document.querySelector('input[name="q-count"][value="all"]').checked = true;
   document.getElementById('opt-randomize').checked     = false;
+  document.getElementById('opt-scramble').checked      = true;
   document.getElementById('opt-explain').checked       = true;
   document.getElementById('opt-show-links').checked    = true;
   document.getElementById('opt-save-progress').checked = true;
@@ -400,6 +403,7 @@ function gatherSettings() {
     countMode:    (document.querySelector('input[name="q-count"]:checked') || {}).value || 'all',
     customCount:  parseInt(document.getElementById('custom-count').value) || 20,
     randomize:    document.getElementById('opt-randomize').checked    || false,
+    scrambleAnswers: document.getElementById('opt-scramble').checked  !== false,
     showExplain:  document.getElementById('opt-explain').checked      !== false,
     showLinks:    document.getElementById('opt-show-links').checked   !== false,
     saveProgress: document.getElementById('opt-save-progress').checked !== false,
@@ -425,7 +429,8 @@ function startQuiz(retryPool) {
 
   if (pool.length === 0) { alert('No questions match the selected filters.'); return; }
 
-  App.pool = pool;
+  App.scrambleSeed = App.settings.scrambleAnswers ? newScrambleSeed() : null;
+  App.pool = applyScramble(pool, App.scrambleSeed);
 
   if (App.settings.timedMode) {
     document.getElementById('timer-display').classList.remove('hidden');
@@ -891,6 +896,86 @@ function showScreen(name) {
 }
 
 // ── Util ───────────────────────────────────────────────────────
+// ── Answer-order scrambling ───────────────────────────────────
+// Stored decks keep a fixed A/B/C/D layout. At quiz time each question is
+// re-keyed with a per-session seed so the correct letter is not predictable.
+// The seed is saved with the session, so a resumed quiz reproduces the exact
+// same layout and previously selected letters still line up.
+const ABOVE_REF  = /\b(all|none|both|neither)\b[^.]{0,20}\babove\b/i;
+const OPTION_SRC = String.raw`\b(Options?|Choices?|Answers?|options?|choices?|answers?)(\s+)((?:\(?[A-D]\)?(?:\s*(?:,|and|or|&)\s*)?)+)`;   // "Option C", "Options A and B"
+const OPTION_REF = new RegExp(OPTION_SRC);
+const BARE_REF   = /\([A-D]\)|\b[A-D] (and|or) [A-D]\b/;                                                                            // case-sensitive: "a or b" is just prose
+
+function hashSeed(str) {
+  var h = 2166136261;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+function seededRandom(seed) {   // mulberry32
+  var a = seed >>> 0;
+  return function() {
+    a = (a + 0x6D2B79F5) >>> 0;
+    var t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Explanatory text may point at options by letter ("Option C ..."). Those
+// mentions are rewritten to follow the scramble; anything else that depends on
+// letter positions makes the question unsafe to scramble.
+function remapLetterRefs(text, map) {
+  return String(text).replace(new RegExp(OPTION_SRC, 'g'), (m, word, space, letters) =>
+    word + space + letters.replace(/[A-D]/g, l => map[l] || l));
+}
+
+function dependsOnLetters(q) {
+  var stem    = [q.question || ''].concat(Object.values(q.options || {}));
+  var explain = [q.rationale || ''].concat(Object.values(q.optionRationales || {}));
+  return stem.some(t => ABOVE_REF.test(t) || OPTION_REF.test(t) || BARE_REF.test(t))
+      || explain.some(t => ABOVE_REF.test(t) || BARE_REF.test(String(t).replace(new RegExp(OPTION_SRC, 'g'), '')));
+}
+
+// Returns a copy of q with options re-keyed in a seeded random order, and
+// answer / optionRationales / letter mentions remapped to match. Questions
+// whose wording depends on letter positions ("A and B", "all of the above")
+// are returned unchanged.
+function scrambleQuestion(q, seed) {
+  if (!seed || !q.options || typeof q.options !== 'object') return q;
+  var keys = Object.keys(q.options).sort();
+  if (keys.length < 2 || !keys.includes(q.answer) || dependsOnLetters(q)) return q;
+
+  var rand  = seededRandom(hashSeed(seed + ':' + q.id));
+  var order = keys.slice();                       // order[i] = original key shown at position i
+  for (var i = order.length - 1; i > 0; i--) {
+    var j = Math.floor(rand() * (i + 1));
+    var t = order[i]; order[i] = order[j]; order[j] = t;
+  }
+
+  var map = {}, options = {}, optionRationales = q.optionRationales ? {} : undefined;
+  order.forEach((oldKey, i) => { map[oldKey] = keys[i]; });
+  order.forEach(oldKey => {
+    options[map[oldKey]] = q.options[oldKey];
+    if (optionRationales && q.optionRationales[oldKey] !== undefined) {
+      optionRationales[map[oldKey]] = remapLetterRefs(q.optionRationales[oldKey], map);
+    }
+  });
+
+  var out = Object.assign({}, q, { options: options, answer: map[q.answer] });
+  if (optionRationales) out.optionRationales = optionRationales;
+  if (q.rationale) out.rationale = remapLetterRefs(q.rationale, map);
+  return out;
+}
+
+function applyScramble(pool, seed) {
+  return seed ? pool.map(q => scrambleQuestion(q, seed)) : pool;
+}
+
+function newScrambleSeed() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+}
+
 function shuffle(arr) {
   for (var i = arr.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
